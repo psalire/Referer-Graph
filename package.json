@@ -4,8 +4,12 @@
     "description": "",
     "main": "dist/server.js",
     "scripts": {
+        "build-start": "npm run build && npm start",
         "build": "babel --extensions .ts ./src/ts -d ./dist",
         "start": "node dist/main.js",
+        "build-start-example": "npm run build-example && npm run start-example",
+        "build-example": "babel --extensions .ts ./example-server/src/ts -d ./example-server/dist",
+        "start-example": "node ./example-server/dist/main.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
