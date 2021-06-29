@@ -17,8 +17,6 @@ import javax.json.Json;
 public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListener, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
-    private PrintWriter stdout;
-    private PrintWriter stderr;
     private Pattern reHeader;
     private class Writer {
         private PrintWriter out;
