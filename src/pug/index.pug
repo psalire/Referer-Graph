@@ -1,10 +1,6 @@
-doctype
-html(lang='en')
-    head
-        meta(charset='utf-8')
-        title=title
-    body
-        header
-            h1=header
-        main
-            div=body
+extends base.pug
+
+block header
+    h1=header
+block main
+    div=content

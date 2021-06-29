@@ -23,7 +23,7 @@ export default class Server {
             res.render('index', {
                 title: 'Home',
                 header: 'Home',
-                body: 'Welcome home!'
+                content: 'Welcome home!'
             });
         });
 
