@@ -2,8 +2,8 @@ package burp;
 
 import java.net.http.HttpRequest;
 
-public class HttpClient {
+public class HttpHandler {
 
-    public HttpClient() {
+    public HttpHandler() {
     }
 }
