@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import javax.json.JsonBuilderFactory;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonObject;
@@ -15,17 +14,22 @@ import javax.json.Json;
 public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListener, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
-    private JsonBuilderFactory jsonBuilderFactory;
     private PrintWriter stdout;
     private PrintWriter stderr;
     private Pattern reHeader;
     private class Log {
-        public PrintWriter out;
-        public PrintWriter err;
+        private PrintWriter out;
+        private PrintWriter err;
 
         public Log(OutputStream stdout, OutputStream stderr) {
             this.out = new PrintWriter(stdout, true);
             this.err = new PrintWriter(stderr, true);
+        }
+        public void printlnOut(String str) {
+            this.out.println(str);
+        }
+        public void printlnErr(String str) {
+            this.err.println(str);
         }
     }
     private Log logger;
@@ -43,7 +47,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         this.callbacks = callbacks;
         this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
-        this.jsonBuilderFactory  = Json.createBuilderFactory(null);
         this.logger = new Log(callbacks.getStdout(), callbacks.getStderr());
     }
 
@@ -60,6 +63,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo.getRequest());
         List<String> headersList = requestInfo.getHeaders();
 
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+
         this.logger.out.println("Headers: ");
         this.logger.out.println("(Size: "+headersList.size()+")");
         this.logger.out.println(headersList);
@@ -72,6 +77,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 matchHeader.find();
                 this.logger.out.println("  "+matchHeader.group(1));
                 this.logger.out.println("  "+matchHeader.group(2));
+                jsonArrayBuilder.add(Json.createObjectBuilder().add(
+                    matchHeader.group(1),
+                    matchHeader.group(2)
+                ));
             }
             catch (Exception e) {
                 this.logger.out.println("[ERROR] See error log. Affected header: "+headerStr);
