@@ -14,7 +14,7 @@ import javax.json.Json;
 
 public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListener, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
-    private IExtensionHelpers helpers;
+    private IExtensionHelpers burpHelpers;
     private JsonBuilderFactory jsonBuilderFactory;
     private PrintWriter stdout;
     private PrintWriter stderr;
@@ -41,7 +41,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         callbacks.registerExtensionStateListener(this);
 
         this.callbacks = callbacks;
-        this.helpers = callbacks.getHelpers();
+        this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
         this.jsonBuilderFactory  = Json.createBuilderFactory(null);
         this.logger = new Log(callbacks.getStdout(), callbacks.getStderr());
@@ -57,7 +57,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         //         messageInfo.getHttpService() +
         //         " [" + callbacks.getToolName(toolFlag) + "]");
 
-        IRequestInfo requestInfo = helpers.analyzeRequest(messageInfo.getRequest());
+        IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo.getRequest());
         List<String> headersList = requestInfo.getHeaders();
 
         this.logger.out.println("Headers: ");
