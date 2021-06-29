@@ -33,10 +33,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         ).add(
             "path", requestURL.getPath()
         ).add(
-            "query",  requestQuery!=null ? requestQuery : ""
-        ).add(
             "raw", rawRequest
         );
+        if (requestQuery==null) {
+            jsonObjectBuilder.addNull("query");
+        }
+        else {
+            jsonObjectBuilder.add("query", requestQuery);
+        }
 
         return jsonObjectBuilder.build();
     }
