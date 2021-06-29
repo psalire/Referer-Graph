@@ -3,6 +3,7 @@ package burp;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.net.URL;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonStructure;
@@ -20,10 +21,22 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     /**
     * Json helper
     */
-    private JsonObject getRequestJson(JsonArray requestHeaders, String rawRequest) {
+    private JsonObject getRequestJson(
+        JsonArray requestHeaders,
+        URL requestURL,
+        String rawRequest
+    ) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add("headers", requestHeaders);
-        jsonObjectBuilder.add("raw", rawRequest);
+        String requestQuery = requestURL.getQuery();
+        jsonObjectBuilder.add(
+            "headers", requestHeaders
+        ).add(
+            "path", requestURL.getPath()
+        ).add(
+            "query",  requestQuery!=null ? requestQuery : ""
+        ).add(
+            "raw", rawRequest
+        );
 
         return jsonObjectBuilder.build();
     }
@@ -55,18 +68,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 messageInfo.getHttpService() +
                 " [" + this.callbacks.getToolName(toolFlag) + "]");
 
-        IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo.getRequest());
+        IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         List<String> headersList = requestInfo.getHeaders();
 
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
-        this.output.printlnOut("Headers: ");
-        this.output.printlnOut("(Size: "+headersList.size()+")");
-        // this.output.printlnOut(headersList);
         for (int i=1; i<headersList.size(); i++) {
             String headerStr = headersList.get(i);
-            // this.output.printlnOut(i+"\""+headerStr+"\"");
             try {
                 Matcher matchHeader = this.reHeader.matcher(headerStr);
                 matchHeader.find();
@@ -76,7 +85,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 ));
             }
             catch (Exception e) {
-                this.output.printlnOut("[BurpExtender] See error log. Affected header: "+headerStr);
+                this.output.printlnOut("[BurpExtender] See error log for stacktrace. Affected header: "+headerStr);
                 this.output.printlnErr(e.toString());
                 this.output.printlnErr(e.getStackTrace().toString());
             }
@@ -84,6 +93,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         String requestBody = this.output.jsonToString(
             getRequestJson(
                 jsonArrayBuilder.build(),
+                requestInfo.getUrl(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
         );
