@@ -8,6 +8,7 @@ export default class Server {
 
     constructor(port=8000) {
         this.port = port;
+        this.app.use(express.json());
         this.app.set('view engine', 'pug');
         this.app.set('views', path.resolve(__dirname, '../src/pug'));
     }
@@ -19,6 +20,11 @@ export default class Server {
                 header: 'Home',
                 body: 'Welcome home!'
             });
+        });
+
+        this.app.post('/request', (req, res) => {
+            console.log(req.body);
+            res.status(200).end();
         });
 
         this.app.listen(this.port, () => {
