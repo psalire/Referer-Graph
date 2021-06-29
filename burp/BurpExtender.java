@@ -15,6 +15,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     private IExtensionHelpers burpHelpers;
     private Pattern reHeader;
     private Writer output;
+    private HttpHandler httpHandler;
 
     /**
     * Json helper
@@ -36,12 +37,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         callbacks.registerHttpListener(this);
         callbacks.registerScannerListener(this);
         callbacks.registerExtensionStateListener(this);
-        HttpClient hc = new HttpClient();
 
         this.callbacks = callbacks;
         this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
         this.output = new Writer(callbacks.getStdout(), callbacks.getStderr());
+        this.httpHandler = new HttpHandler(this.output);
     }
 
     /**
@@ -52,7 +53,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         this.output.printlnOut(
                 (messageIsRequest ? "HTTP request to " : "HTTP response from ") +
                 messageInfo.getHttpService() +
-                " [" + callbacks.getToolName(toolFlag) + "]");
+                " [" + this.callbacks.getToolName(toolFlag) + "]");
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo.getRequest());
         List<String> headersList = requestInfo.getHeaders();
@@ -75,17 +76,19 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 ));
             }
             catch (Exception e) {
-                this.output.printlnOut("[ERROR] See error log. Affected header: "+headerStr);
+                this.output.printlnOut("[BurpExtender] See error log. Affected header: "+headerStr);
                 this.output.printlnErr(e.toString());
                 this.output.printlnErr(e.getStackTrace().toString());
             }
         }
-        this.output.printlnOut(this.output.jsonToString(
+        String requestBody = this.output.jsonToString(
             getRequestJson(
                 jsonArrayBuilder.build(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
-        ));
+        );
+        this.output.printlnOut(requestBody);
+        this.httpHandler.postJson(requestBody);
         this.output.printlnOut("--------------------");
 
     }
