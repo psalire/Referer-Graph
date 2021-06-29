@@ -22,7 +22,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     * Json helper
     */
     private JsonObject getRequestJson(
-        JsonArray requestHeaders,
+        JsonObject requestHeaders,
         URL requestURL,
         String rawRequest
     ) {
@@ -71,7 +71,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         List<String> headersList = requestInfo.getHeaders();
 
-        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
         for (int i=1; i<headersList.size(); i++) {
@@ -79,10 +78,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             try {
                 Matcher matchHeader = this.reHeader.matcher(headerStr);
                 matchHeader.find();
-                jsonArrayBuilder.add(Json.createObjectBuilder().add(
+                jsonObjectBuilder.add(
                     matchHeader.group(1),
                     matchHeader.group(2)
-                ));
+                );
             }
             catch (Exception e) {
                 this.output.printlnOut("[BurpExtender] See error log for stacktrace. Affected header: "+headerStr);
@@ -92,7 +91,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         }
         String requestBody = this.output.jsonToString(
             getRequestJson(
-                jsonArrayBuilder.build(),
+                jsonObjectBuilder.build(),
                 requestInfo.getUrl(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
