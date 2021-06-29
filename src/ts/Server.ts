@@ -14,6 +14,11 @@ export default class Server {
     }
 
     start(): void {
+        this.app.all('*', (req, _, next) => {
+            console.log(`${req.method} ${req.originalUrl}`);
+            next();
+        });
+
         this.app.get('/', (_, res) => {
             res.render('index', {
                 title: 'Home',
