@@ -6,7 +6,7 @@ export default class Server {
     readonly app: express.Application = express();
     port: number;
 
-    constructor(port=8888) {
+    constructor(port=8000) {
         this.port = port;
         this.app.set('view engine', 'pug');
         this.app.set('views', path.resolve(__dirname, '../src/pug'));
