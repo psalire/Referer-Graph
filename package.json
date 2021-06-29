@@ -1,5 +1,5 @@
 {
-    "name": "app-flow-visualizer",
+    "name": "webapp-flow-visualizer",
     "version": "1.0.0",
     "description": "",
     "main": "dist/server.js",
