@@ -2,6 +2,7 @@ package burp;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -9,6 +10,7 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonArray;
+import javax.json.JsonWriter;
 import javax.json.Json;
 
 public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListener, IExtensionStateListener {
@@ -75,8 +77,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             try {
                 Matcher matchHeader = this.reHeader.matcher(headerStr);
                 matchHeader.find();
-                this.logger.out.println("  "+matchHeader.group(1));
-                this.logger.out.println("  "+matchHeader.group(2));
+                // this.logger.out.println("  "+matchHeader.group(1));
+                // this.logger.out.println("  "+matchHeader.group(2));
                 jsonArrayBuilder.add(Json.createObjectBuilder().add(
                     matchHeader.group(1),
                     matchHeader.group(2)
@@ -89,6 +91,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             }
         }
         this.logger.out.println("--------------------");
+
+        StringWriter jsonStringWriter = new StringWriter();
+        JsonWriter jsonWriter = Json.createWriter(jsonStringWriter);
+        jsonWriter.writeArray(jsonArrayBuilder.build());
+        jsonWriter.close();
+        this.logger.out.println(jsonStringWriter.toString());
     }
 
     /**
