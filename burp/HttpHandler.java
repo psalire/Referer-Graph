@@ -7,11 +7,11 @@ import java.net.URI;
 
 public class HttpHandler {
     private HttpClient client;
-    private Writer output;
+    private Writer logOutput;
 
-    public HttpHandler(Writer output) {
+    public HttpHandler(Writer logOutput) {
         this.client = HttpClient.newHttpClient();
-        this.output = output;
+        this.logOutput = logOutput;
     }
 
     public void postJson(String jsonStr) {
@@ -30,7 +30,7 @@ public class HttpHandler {
             HttpResponse::statusCode
         ).thenAccept(code -> {
             if (code != 200) {
-                this.output.printlnErr(
+                this.logOutput.printlnErr(
                     "[HTTP] Got status code ("+code+") for JSON POST: "+jsonStr
                 );
             }

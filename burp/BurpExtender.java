@@ -15,7 +15,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
     private Pattern reHeader;
-    private Writer output;
+    private Writer logOutput;
     private HttpHandler httpHandler;
 
     /**
@@ -58,8 +58,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         this.callbacks = callbacks;
         this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
-        this.output = new Writer(callbacks.getStdout(), callbacks.getStderr());
-        this.httpHandler = new HttpHandler(this.output);
+        this.logOutput = new Writer(callbacks.getStdout(), callbacks.getStderr());
+        this.httpHandler = new HttpHandler(this.logOutput);
     }
 
     /**
@@ -67,7 +67,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        this.output.printlnOut(
+        this.logOutput.printlnOut(
                 (messageIsRequest ? "HTTP request to " : "HTTP response from ") +
                 messageInfo.getHttpService() +
                 " [" + this.callbacks.getToolName(toolFlag) + "]");
@@ -88,21 +88,21 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 );
             }
             catch (Exception e) {
-                this.output.printlnOut("[BurpExtender] See error log for stacktrace. Affected header: "+headerStr);
-                this.output.printlnErr(e.toString());
-                this.output.printlnErr(e.getStackTrace().toString());
+                this.logOutput.printlnOut("[BurpExtender] See error log for stacktrace. Affected header: "+headerStr);
+                this.logOutput.printlnErr(e.toString());
+                this.logOutput.printlnErr(e.getStackTrace().toString());
             }
         }
-        String requestBody = this.output.jsonToString(
+        String requestBody = this.logOutput.jsonToString(
             getRequestJson(
                 jsonObjectBuilder.build(),
                 requestInfo.getUrl(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
         );
-        this.output.printlnOut(requestBody);
+        this.logOutput.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
-        this.output.printlnOut("--------------------");
+        this.logOutput.printlnOut("--------------------");
 
     }
 
@@ -111,7 +111,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void newScanIssue(IScanIssue issue) {
-        this.output.printlnOut("New scan issue: " + issue.getIssueName());
+        this.logOutput.printlnOut("New scan issue: " + issue.getIssueName());
     }
 
     /**
@@ -119,6 +119,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void extensionUnloaded() {
-        this.output.printlnOut("Extension was unloaded");
+        this.logOutput.printlnOut("Extension was unloaded");
     }
 }
