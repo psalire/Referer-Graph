@@ -5,7 +5,7 @@
     "main": "dist/server.js",
     "scripts": {
         "build-start": "npm run build && npm start",
-        "build": "babel --extensions .ts ./src/ts -d ./dist",
+        "build": "babel --extensions .ts ./src/ts/server -d ./dist",
         "start": "node dist/main.js",
         "build-start-example": "npm run build-example && npm run start-example",
         "build-example": "babel --extensions .ts ./example-server/src/ts -d ./example-server/dist",
@@ -16,6 +16,7 @@
     "license": "ISC",
     "dependencies": {
         "argparse": "^2.0.1",
+        "better-sqlite3": "^7.4.1",
         "express": "^4.17.1",
         "pug": "^3.0.2"
     },
@@ -27,6 +28,7 @@
         "@babel/preset-typescript": "^7.14.5",
         "@tsconfig/node14": "^1.0.1",
         "@types/argparse": "^2.0.8",
+        "@types/better-sqlite3": "^5.4.2",
         "@types/express": "^4.17.12"
     }
 }
