@@ -3,17 +3,17 @@ import express from 'express';
 import * as path from 'path';
 
 export default class Server {
-    readonly app: express.Application = express();
-    port: number;
+    private readonly app: express.Application = express();
+    private port: number;
 
-    constructor(port=8000) {
+    public constructor(port=8000) {
         this.port = port;
         this.app.use(express.json());
         this.app.set('view engine', 'pug');
         this.app.set('views', path.resolve(__dirname, '../src/pug'));
     }
 
-    start(): void {
+    public start(): void {
         this.app.all('*', (req, _, next) => {
             console.log(`${req.method} ${req.originalUrl}`);
             next();

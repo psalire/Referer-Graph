@@ -4,21 +4,23 @@ import * as path from 'path';
 
 export default class SqliteDatabase {
 
-    db: Database.Database|null;
-    dbPath: string;
-    dbName: string|null;
+    private db: Database.Database|null;
+    private dbPath: string;
+    private dbName: string|null;
 
-    constructor(dbPath="./sqlite-dbs", dbName=null) {
+    public constructor(dbPath="./sqlite-dbs", dbName=null) {
         this.dbPath = dbPath;
         this.dbName = dbName;
         this.db = null;
     }
 
-    openDb(dbName: string): boolean {
+    public openDb(dbName: string): boolean {
         try {
             this.db = new Database(
                 path.join(this.dbPath, dbName),
-                {fileMustExist: true}
+                {
+                    fileMustExist: true
+                }
             );
             this.dbName = dbName;
             return true;
@@ -29,15 +31,31 @@ export default class SqliteDatabase {
         }
     }
 
-    createHost(): boolean {
-        if (this.db==null) {
+    public createHostTable(host: string): boolean {
+        try {
+            if (this.db) {
+                this.db.prepare(
+                    'CREATE TABLE ?(path VARCHAR(1024))'
+                ).run(host);
+                return true;
+            }
             return false;
         }
+        catch(e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    public createPath(path: string): boolean {
         try {
-            this.db.prepare(
-                'CREATE TABLE test(col1 VARCHAR(10), col2 VARCHAR(20))'
-            ).run();
-            return true;
+            if (this.db) {
+                this.db.prepare(
+                    'CREATE TABLE ?(path VARCHAR(1024))'
+                ).run(path);
+                return true;
+            }
+            return false;
         }
         catch(e) {
             console.error(e);
