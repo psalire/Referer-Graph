@@ -31,12 +31,12 @@ export default class SqliteDatabase {
         }
     }
 
-    public createHostTable(host: string): boolean {
+    private createTable(tableName: string, columns: string): boolean {
         try {
             if (this.db) {
                 this.db.prepare(
-                    'CREATE TABLE ?(path VARCHAR(1024))'
-                ).run(host);
+                    `CREATE TABLE ?(${columns})`
+                ).run(tableName);
                 return true;
             }
             return false;
@@ -47,19 +47,11 @@ export default class SqliteDatabase {
         }
     }
 
-    public createPath(path: string): boolean {
-        try {
-            if (this.db) {
-                this.db.prepare(
-                    'CREATE TABLE ?(path VARCHAR(1024))'
-                ).run(path);
-                return true;
-            }
-            return false;
-        }
-        catch(e) {
-            console.error(e);
-            return false;
-        }
+    public createHostTable(host: string): boolean {
+        return this.createTable(host, 'path VARCHAR(512)');
+    }
+
+    public createSourcePathTable(path: string): boolean {
+        return this.createTable(path, 'destPath VARCHAR(1024)');
     }
 }
