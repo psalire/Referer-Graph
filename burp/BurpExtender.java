@@ -21,26 +21,38 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     /**
     * Json helper
     */
+    private void addPotentialNull(
+        JsonObjectBuilder jsonObjectBuilder,
+        String name,
+        String value
+    ) {
+        if (value==null) {
+            jsonObjectBuilder.addNull(name);
+        }
+        else {
+            jsonObjectBuilder.add(name, value);
+        }
+    }
+    /**
+    * Json helper
+    */
     private JsonObject getRequestJson(
-        JsonObject requestHeaders,
+        String referer,
+        // JsonObject requestHeaders,
         URL requestURL,
         String rawRequest
     ) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         String requestQuery = requestURL.getQuery();
         jsonObjectBuilder.add(
-            "headers", requestHeaders
-        ).add(
             "path", requestURL.getPath()
+        // ).add(
+            // "headers", requestHeaders
         ).add(
             "raw", rawRequest
         );
-        if (requestQuery==null) {
-            jsonObjectBuilder.addNull("query");
-        }
-        else {
-            jsonObjectBuilder.add("query", requestQuery);
-        }
+        addPotentialNull(jsonObjectBuilder, "query", requestQuery);
+        addPotentialNull(jsonObjectBuilder, "referer", referer);
 
         return jsonObjectBuilder.build();
     }
@@ -76,26 +88,31 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         List<String> headersList = requestInfo.getHeaders();
 
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+        String referer = null;
 
         for (int i=1; i<headersList.size(); i++) {
             String headerStr = headersList.get(i);
             try {
                 Matcher matchHeader = this.reHeader.matcher(headerStr);
                 matchHeader.find();
-                jsonObjectBuilder.add(
-                    matchHeader.group(1),
-                    matchHeader.group(2)
-                );
+                String name = matchHeader.group(1);
+                String value = matchHeader.group(2);
+                if (name.equals("Referer")) {
+                    // jsonObjectBuilder.add(name, value);
+                    referer = value;
+                    break;
+                }
             }
             catch (Exception e) {
-                this.logOutput.printlnOut("[BurpExtender] See error log for stacktrace. Affected header: "+headerStr);
+                this.logOutput.printlnOut("[BurpExtender] See error log for details. Affected header: "+headerStr);
                 this.logOutput.printlnErr(e.toString());
                 this.logOutput.printlnErr(e.getStackTrace().toString());
             }
         }
         String requestBody = this.logOutput.jsonToString(
             getRequestJson(
-                jsonObjectBuilder.build(),
+                referer,
+                // jsonObjectBuilder.build(),
                 requestInfo.getUrl(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
