@@ -1,11 +1,11 @@
 
 import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
-import HostTable from './HostTable';
+import HostsTable from './HostsTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
-    public hosts: HostTable;
+    public hosts: HostsTable;
     private hostPathTables: Map<string,ModelCtor<Model>>;
     private srcDstTables: Map<string,ModelCtor<Model>>;
 
@@ -14,7 +14,7 @@ export default class SqliteDatabase {
             dialect: 'sqlite',
             storage: path.join(dbPath, dbName)
         });
-        this.hosts = new HostTable(this.sequelize.define(
+        this.hosts = new HostsTable(this.sequelize.define(
             'Host',
             {
                 host: {

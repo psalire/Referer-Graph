@@ -2,7 +2,7 @@
 import { Model, ModelCtor } from 'sequelize';
 import aDatabaseTable from './aSqliteTable';
 
-export default class HostTable extends aDatabaseTable {
+export default class HostsTable extends aDatabaseTable {
 
     constructor(model: ModelCtor<Model>) {
         super(model, ['host']);
