@@ -10,8 +10,6 @@ export default class SqliteDatabase {
     public hosts: HostsTable;
     public paths: PathsTable;
     public srcDst: SrcDstTable;
-    // private hostPathTables: Map<string,ModelCtor<Model>>;
-    // private srcDstTables: Map<string,ModelCtor<Model>>;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
         this.sequelize = new Sequelize({
@@ -55,11 +53,17 @@ export default class SqliteDatabase {
         pathsModel.belongsTo(hostsModel);
         pathsModel.hasMany(srcDstModel, {
             as: 'src',
-            foreignKey: 'srcPathId'
+            foreignKey: {
+                name: 'srcPathId',
+                allowNull: false
+            }
         });
         pathsModel.hasMany(srcDstModel, {
             as: 'dst',
-            foreignKey: 'dstPathId'
+            foreignKey: {
+                name: 'dstPathId',
+                allowNull: false
+            }
         });
         // srcDstModel.belongsTo(pathsModel);
 
@@ -68,9 +72,6 @@ export default class SqliteDatabase {
         this.srcDst = new SrcDstTable(srcDstModel);
 
         this.sync();
-
-        // this.hostPathTables = new Map();
-        // this.srcDstTables = new Map();
     }
 
     public authenticate(): Promise<any> {
