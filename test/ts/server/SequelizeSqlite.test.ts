@@ -45,18 +45,19 @@ test('Sync hosts table', (done) => {
 });
 
 test('Insert one into hosts table', async () => {
-    await db.hosts.insert(['example.com']);
+    const testVal = 'https://example.com/'
+    await db.hosts.insert([testVal]);
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(1);
     console.log(models[0]);
-    expect(models[0].host).toBe('example.com');
+    expect(models[0].host).toBe(testVal);
 });
 
 test('Insert multiple into hosts table', async () => {
     let testVals = [
-        'example1.com',
-        'example2.com',
-        'example3.com'
+        'http://www.example1.com/',
+        'https://www.example2.com/',
+        'https://example3.com/'
     ]
     for (let testVal of testVals) {
         await db.hosts.insert([testVal]);
@@ -65,18 +66,18 @@ test('Insert multiple into hosts table', async () => {
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(4);
 
-    expect(models[0].host).toBe('example.com');
+    expect(models[0].host).toBe('https://example.com/');
     for (let i=1; i<4; i++) {
         expect(models[i].host).toBe(testVals[i-1]);
     }
 
     let testVals2 = [
-        'test.com',
-        'test1.com',
-        'test2.com',
-        'test3.com',
-        'test4.com',
-        'test5.com',
+        'http://test.com',
+        'https://test1.com',
+        'https://www.test2.com',
+        'https://www.test3.com',
+        'http://www.test4.com',
+        'https://test.test5.com',
     ];
     await db.hosts.bulkInsert(testVals2.map((val)=>{
         return [val];
@@ -85,11 +86,11 @@ test('Insert multiple into hosts table', async () => {
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
 
-    expect(models[0].host).toBe('example.com');
+    expect(models[0].host).toBe('https://example.com/');
     for (let i=1; i<4; i++) {
         expect(models[i].host).toBe(testVals[i-1]);
     }
-    expect(models[4].host).toBe('test.com');
+    expect(models[4].host).toBe(testVals2[0]);
     for (let i=5; i<10; i++) {
         expect(models[i].host).toBe(testVals2[i-4]);
     }
