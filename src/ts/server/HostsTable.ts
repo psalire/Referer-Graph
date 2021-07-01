@@ -16,28 +16,17 @@ export default class HostsTable extends aSqliteTable {
             throw new SqliteDatabaseError('HostsTable.insert(vals, path): expected path')
         }
         super.validateValuesLength(vals);
-        return this.pathsModel.create(
+        return this.model.create(
             {
-                path: path,
-                Hosts: [{
-                    host: vals[0]
+                host: vals[0],
+                SrcPaths: [{
+                    path: path
                 }]
             },
             {
-                include: [this.model]
+                include: [this.pathsModel]
             }
-        )
-        // return this.model.create(
-        //     {
-        //         host: vals[0],
-        //         paths: {
-        //             path: path
-        //         }
-        //     },
-        //     {
-        //         include: [this.pathsModel]
-        //     }
-        // );
+        );
     }
     public bulkInsert(vals: string[][]): Promise<any> {
         return this.model.bulkCreate(vals.flat().map((val) => {
