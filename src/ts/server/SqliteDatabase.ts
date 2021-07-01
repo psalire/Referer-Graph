@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
 import HostsTable from './HostsTable';
-import PathsTable from './HostsTable';
+import PathsTable from './PathsTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
@@ -33,7 +33,7 @@ export default class SqliteDatabase {
         var srcPathsModel = this.sequelize.define(
             'SrcPath',
             {
-                srcPath: {
+                path: {
                     type: DataTypes.TEXT,
                     allowNull: false
                 }
@@ -45,7 +45,7 @@ export default class SqliteDatabase {
         var dstPathsModel = this.sequelize.define(
             'DstPath',
             {
-                dstPath: {
+                path: {
                     type: DataTypes.TEXT,
                     allowNull: false
                 }
@@ -60,9 +60,9 @@ export default class SqliteDatabase {
         dstPathsModel.hasMany(srcPathsModel);
         srcPathsModel.belongsTo(dstPathsModel);
 
-        this.hosts = new HostsTable(hostsModel);
+        this.hosts = new HostsTable(hostsModel, srcPathsModel);
         this.srcPaths = new PathsTable(srcPathsModel);
-        this.dstPaths = new PathsTable(dstPathsModel);
+        this.dstPaths = new PathsTable(dstPathsModel, srcPathsModel);
 
         this.sync();
 

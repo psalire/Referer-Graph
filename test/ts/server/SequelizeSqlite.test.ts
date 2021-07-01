@@ -42,7 +42,7 @@ test('Sync hosts table', (done) => {
 });
 
 test('Insert one into hosts table', async () => {
-    await db.hosts.insert(['example.com']);
+    await db.hosts.insert(['example.com'], '/');
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(1);
     console.log(models[0]);
@@ -56,7 +56,7 @@ test('Insert multiple into hosts table', async () => {
         'example3.com'
     ]
     for (let testVal of testVals) {
-        await db.hosts.insert([testVal]);
+        await db.hosts.insert([testVal], '/');
     }
 
     let models = await db.hosts.selectAll();
@@ -75,7 +75,9 @@ test('Insert multiple into hosts table', async () => {
         'test4.com',
         'test5.com',
     ];
-    await db.hosts.bulkInsert(testVals2.map((val)=>{return [val]}));
+    await db.hosts.bulkInsert(testVals2.map((val)=>{
+        return [val];
+    }));
 
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
