@@ -12,12 +12,15 @@ export default abstract class aDatabaseTable implements iDatabaseTable {
         this.columns = columns;
     }
 
-    private mapColumnsToValues(vals: string[]): object {
+    protected validateValuesLength(vals: string[]): void {
         if (vals.length != this.columns.length) {
             new SqliteDatabaseError(
                 `Expected length ${this.columns.length}. Got ${vals.length}`
             );
         }
+    }
+    private mapColumnsToValues(vals: string[]): object {
+        this.validateValuesLength(vals);
         return this.columns.reduce(
             (obj: {[key: string]: any}, col: string, i: number) => {
                 obj[col] = vals[i];
