@@ -21,7 +21,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     /**
     * Json helper
     */
-    private void addPotentialNull(
+    private void addPotentialNullToJson(
         JsonObjectBuilder jsonObjectBuilder,
         String name,
         String value
@@ -51,8 +51,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         ).add(
             "raw", rawRequest
         );
-        addPotentialNull(jsonObjectBuilder, "query", requestQuery);
-        addPotentialNull(jsonObjectBuilder, "referer", referer);
+        addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
+        addPotentialNullToJson(jsonObjectBuilder, "referer", referer);
 
         return jsonObjectBuilder.build();
     }
