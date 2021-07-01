@@ -6,52 +6,54 @@ export default class SqliteDatabase {
 
     private db: Database.Database|null;
     private dbPath: string;
-    private dbName: string|null;
+    // private dbName: string|null;
 
-    public constructor(dbPath="./sqlite-dbs", dbName=null) {
+    // public constructor(dbPath="./sqlite-dbs", dbName=null) {
+    public constructor(dbPath="./sqlite-dbs") {
         this.dbPath = dbPath;
-        this.dbName = dbName;
+        // this.dbName = dbName;
         this.db = null;
     }
 
-    public openDb(dbName: string): boolean {
-        try {
-            this.db = new Database(
-                path.join(this.dbPath, dbName),
-                {
-                    fileMustExist: true
-                }
+    private initializeDb(dbName: string, fileMustExist=false): Database.Database {
+        return new Database(
+            path.join(this.dbPath, dbName),
+            { fileMustExist: fileMustExist }
+        );
+    }
+
+    private createTable(tableName: string, columns: string): SqliteDatabase {
+        if (!this.db) {
+            throw new SqliteDatabaseError(
+                'Database hasn\'t been initialized. Call createAndOpenDb() or openDb().'
             );
-            this.dbName = dbName;
-            return true;
         }
-        catch (e) {
-            console.error(e);
-            return false;
-        }
+        this.db.prepare(`CREATE TABLE ?(${columns})`).run(tableName);
+        return this;
     }
 
-    private createTable(tableName: string, columns: string): boolean {
-        try {
-            if (this.db) {
-                this.db.prepare(
-                    `CREATE TABLE ?(${columns})`
-                ).run(tableName);
-                return true;
-            }
-            return false;
+    public createAndOpenDb(dbName: string): SqliteDatabase {
+        if (this.openDb(dbName, true)) {
+            throw new SqliteDatabaseError(`Database "${dbName}" already exists`);
         }
-        catch(e) {
-            console.error(e);
-            return false;
-        }
+        this.db = this.initializeDb(dbName);
+        return this;
     }
 
-    public createHostTable(host: string): boolean {
+    public openDb(dbName: string, checkOnly=false): SqliteDatabase {
+        let dbObj = this.initializeDb(dbName, true);
+        if (!checkOnly) {
+            // this.dbName = dbName;
+            this.db = dbObj;
+        }
+        return this;
+    }
+
+    public createHostTable(host: string): SqliteDatabase {
         return this.createTable(host, 'path VARCHAR(512)');
     }
 
-    public createSourcePathTable(path: string): boolean {
+    public createSourcePathTable(path: string): SqliteDatabase {
         return this.createTable(path, 'destPath VARCHAR(1024)');
     }
 }
