@@ -3,4 +3,4 @@ dist
 example-server/dist
 **/.classpath
 sqlite-dbs
-!sqlite-dbs/test-existing.sqlite
+!test/sqlite-dbs/

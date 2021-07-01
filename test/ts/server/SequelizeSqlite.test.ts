@@ -1,12 +1,15 @@
 
 import SqliteDatabase from "../../../src/ts/server/SqliteDatabase";
 import * as fs from "fs";
+import * as path from "path";
 
 var db: SqliteDatabase|null = null;
 
+const dbsPath = './sqlite-dbs'
+
 function rmDefaultTestSqliteFile() {
     try {
-        fs.rmSync('./sqlite-dbs/default-test.sqlite');
+        fs.rmSync(path.join(dbsPath, 'default-test.sqlite'));
     }
     catch(e) {
         if (e.code!=='ENOENT') {
@@ -24,7 +27,7 @@ afterAll(async () => {
 });
 
 test('Create default-test.sqlite', (done) => {
-    db = new SqliteDatabase('./sqlite-dbs','default-test.sqlite');
+    db = new SqliteDatabase(dbsPath, 'default-test.sqlite');
     expect(db).not.toBeNull();
     db.authenticate().then(() => {
         done();
@@ -32,7 +35,7 @@ test('Create default-test.sqlite', (done) => {
 });
 
 test('Open test-existing.sqlite', () => {
-    new SqliteDatabase('./sqlite-dbs','test-existing.sqlite');
+    new SqliteDatabase(dbsPath, 'test-existing.sqlite');
 });
 
 test('Sync hosts table', (done) => {
