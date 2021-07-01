@@ -45,25 +45,23 @@ export default class SqliteDatabase {
         );
         var srcDstModel = this.sequelize.define(
             'SrcDst',
-            {
-                src: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false
-                },
-                dst: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false
-                }
-            },
+            {},
             {
                 timestamps: false
             }
         );
 
-        pathsModel.hasMany(hostsModel);
-        hostsModel.belongsTo(pathsModel);
-        srcDstModel.hasMany(pathsModel);
-        pathsModel.belongsTo(srcDstModel);
+        hostsModel.hasMany(pathsModel);
+        pathsModel.belongsTo(hostsModel);
+        pathsModel.hasMany(srcDstModel, {
+            as: 'src',
+            foreignKey: 'srcPathId'
+        });
+        pathsModel.hasMany(srcDstModel, {
+            as: 'dst',
+            foreignKey: 'dstPathId'
+        });
+        // srcDstModel.belongsTo(pathsModel);
 
         this.hosts = new HostsTable(hostsModel);
         this.paths = new PathsTable(pathsModel);
