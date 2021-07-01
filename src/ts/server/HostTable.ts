@@ -1,6 +1,6 @@
 
 import { Model, ModelCtor } from 'sequelize';
-import aDatabaseTable from './aDatabaseTable';
+import aDatabaseTable from './aSqliteTable';
 
 export default class HostTable extends aDatabaseTable {
 

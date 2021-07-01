@@ -3,7 +3,7 @@ import { Model, ModelCtor } from 'sequelize';
 import iDatabaseTable from './iDatabaseTable';
 import SqliteDatabaseError from './SqliteDatabaseError';
 
-export default abstract class aDatabaseTable implements iDatabaseTable {
+export default abstract class aSqliteTable implements iDatabaseTable {
     protected model: ModelCtor<Model>;
     protected columns: string[];
 
