@@ -3,13 +3,9 @@ import { Model, ModelCtor } from 'sequelize';
 import aSqliteTable from './aSqliteTable';
 
 export default class PathsTable extends aSqliteTable {
-    private foreignModel?: ModelCtor<Model>;
 
-    constructor(model: ModelCtor<Model>, foreignModel?: ModelCtor<Model>) {
+    constructor(model: ModelCtor<Model>) {
         super(model, ['path']);
-        if (foreignModel !== undefined) {
-            this.foreignModel = foreignModel;
-        }
     }
 
     public insert(vals: string[]): Promise<any> {

@@ -3,14 +3,15 @@ import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
 import HostsTable from './HostsTable';
 import PathsTable from './PathsTable';
+import SrcDstTable from './SrcDstTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
     public hosts: HostsTable;
-    public srcPaths: PathsTable;
-    public dstPaths: PathsTable;
-    private hostPathTables: Map<string,ModelCtor<Model>>;
-    private srcDstTables: Map<string,ModelCtor<Model>>;
+    public paths: PathsTable;
+    public srcDst: SrcDstTable;
+    // private hostPathTables: Map<string,ModelCtor<Model>>;
+    // private srcDstTables: Map<string,ModelCtor<Model>>;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
         this.sequelize = new Sequelize({
@@ -30,8 +31,8 @@ export default class SqliteDatabase {
                 timestamps: false
             }
         );
-        var srcPathsModel = this.sequelize.define(
-            'SrcPath',
+        var pathsModel = this.sequelize.define(
+            'Path',
             {
                 path: {
                     type: DataTypes.TEXT,
@@ -42,11 +43,15 @@ export default class SqliteDatabase {
                 timestamps: false
             }
         );
-        var dstPathsModel = this.sequelize.define(
-            'DstPath',
+        var srcDstModel = this.sequelize.define(
+            'SrcDst',
             {
-                path: {
-                    type: DataTypes.TEXT,
+                src: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false
+                },
+                dst: {
+                    type: DataTypes.INTEGER,
                     allowNull: false
                 }
             },
@@ -55,19 +60,19 @@ export default class SqliteDatabase {
             }
         );
 
-        srcPathsModel.hasMany(hostsModel);
-        hostsModel.belongsTo(srcPathsModel);
-        dstPathsModel.hasMany(srcPathsModel);
-        srcPathsModel.belongsTo(dstPathsModel);
+        pathsModel.hasMany(hostsModel);
+        hostsModel.belongsTo(pathsModel);
+        srcDstModel.hasMany(pathsModel);
+        pathsModel.belongsTo(srcDstModel);
 
-        this.hosts = new HostsTable(hostsModel, srcPathsModel);
-        this.srcPaths = new PathsTable(srcPathsModel);
-        this.dstPaths = new PathsTable(dstPathsModel, srcPathsModel);
+        this.hosts = new HostsTable(hostsModel);
+        this.paths = new PathsTable(pathsModel);
+        this.srcDst = new SrcDstTable(srcDstModel);
 
         this.sync();
 
-        this.hostPathTables = new Map();
-        this.srcDstTables = new Map();
+        // this.hostPathTables = new Map();
+        // this.srcDstTables = new Map();
     }
 
     public authenticate(): Promise<any> {
