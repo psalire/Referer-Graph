@@ -1,10 +1,11 @@
 
 import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
+import HostTable from './HostTable';
 
-export default class SequlizeSqlite {
+export default class SqliteDatabase {
     private sequelize: Sequelize;
-    private hostTable: ModelCtor<Model>;
+    public hosts: HostTable;
     private hostPathTables: Map<string,ModelCtor<Model>>;
     private srcDstTables: Map<string,ModelCtor<Model>>;
 
@@ -13,7 +14,7 @@ export default class SequlizeSqlite {
             dialect: 'sqlite',
             storage: path.join(dbPath, dbName)
         });
-        this.hostTable = this.sequelize.define(
+        this.hosts = new HostTable(this.sequelize.define(
             'Host',
             {
                 host: {
@@ -24,28 +25,9 @@ export default class SequlizeSqlite {
             {
                 timestamps: false
             }
-        );
+        ));
         this.hostPathTables = new Map();
         this.srcDstTables = new Map();
-    }
-
-    public syncHosts(): Promise<any> {
-        return this.hostTable.sync();
-    }
-    public insertHost(host: string): Promise<any> {
-        return this.hostTable.create({
-            host: host
-        });
-    }
-    public bulkInsertHosts(hosts: string[]) {
-        return this.hostTable.bulkCreate(hosts.map(host => {
-            return {host: host}
-        }));
-    }
-    public selectAllHosts(): Promise<Model[]> {
-        return this.hostTable.findAll({
-            attributes: ['host']
-        });
     }
 
     public authenticate(): Promise<any> {
