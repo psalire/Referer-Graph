@@ -19,8 +19,8 @@ beforeAll(() => {
     rmDefaultTestSqliteFile();
 });
 afterAll(async () => {
-    await db.closeDb();
-    rmDefaultTestSqliteFile();
+    await db.close();
+    // rmDefaultTestSqliteFile();
 });
 
 test('Create default-test.sqlite', (done) => {

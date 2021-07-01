@@ -2,10 +2,13 @@
 import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
 import HostsTable from './HostsTable';
+import PathsTable from './HostsTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
     public hosts: HostsTable;
+    public srcPaths: PathsTable;
+    public dstPaths: PathsTable;
     private hostPathTables: Map<string,ModelCtor<Model>>;
     private srcDstTables: Map<string,ModelCtor<Model>>;
 
@@ -14,7 +17,8 @@ export default class SqliteDatabase {
             dialect: 'sqlite',
             storage: path.join(dbPath, dbName)
         });
-        this.hosts = new HostsTable(this.sequelize.define(
+
+        var hostsModel = this.sequelize.define(
             'Host',
             {
                 host: {
@@ -25,7 +29,43 @@ export default class SqliteDatabase {
             {
                 timestamps: false
             }
-        ));
+        );
+        var srcPathsModel = this.sequelize.define(
+            'SrcPath',
+            {
+                srcPath: {
+                    type: DataTypes.TEXT,
+                    allowNull: false
+                }
+            },
+            {
+                timestamps: false
+            }
+        );
+        var dstPathsModel = this.sequelize.define(
+            'DstPath',
+            {
+                dstPath: {
+                    type: DataTypes.TEXT,
+                    allowNull: false
+                }
+            },
+            {
+                timestamps: false
+            }
+        );
+
+        srcPathsModel.hasMany(hostsModel);
+        hostsModel.belongsTo(srcPathsModel);
+        dstPathsModel.hasMany(srcPathsModel);
+        srcPathsModel.belongsTo(dstPathsModel);
+
+        this.hosts = new HostsTable(hostsModel);
+        this.srcPaths = new PathsTable(srcPathsModel);
+        this.dstPaths = new PathsTable(dstPathsModel);
+
+        this.sync();
+
         this.hostPathTables = new Map();
         this.srcDstTables = new Map();
     }
@@ -33,7 +73,10 @@ export default class SqliteDatabase {
     public authenticate(): Promise<any> {
         return this.sequelize.authenticate();
     }
-    public closeDb(): Promise<any> {
+    public sync(): Promise<any> {
+        return this.sequelize.sync();
+    }
+    public close(): Promise<any> {
         return this.sequelize.close();
     }
 }
