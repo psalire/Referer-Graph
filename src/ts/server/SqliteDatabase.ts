@@ -69,7 +69,7 @@ export default class SqliteDatabase {
 
         this.hosts = new HostsTable(hostsModel);
         this.paths = new PathsTable(pathsModel);
-        this.srcDst = new SrcDstTable(srcDstModel);
+        this.srcDst = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
 
         this.sync();
     }

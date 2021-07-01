@@ -53,7 +53,7 @@ test('Insert one into hosts table', async () => {
     expect(models[0].host).toBe(testVal);
 });
 
-test('Insert multiple into hosts table', async () => {
+test('Insert bulk into hosts table', async () => {
     let testVals = [
         'http://www.example1.com/',
         'https://www.example2.com/',
