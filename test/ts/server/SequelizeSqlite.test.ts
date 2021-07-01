@@ -4,7 +4,6 @@ import * as fs from "fs";
 import * as path from "path";
 
 var db: SqliteDatabase|null = null;
-
 const dbsPath = './test/sqlite-dbs'
 
 function rmDefaultTestSqliteFile() {
@@ -38,14 +37,12 @@ test('Open test-existing.sqlite', () => {
     new SqliteDatabase(dbsPath, 'test-existing.sqlite');
 });
 
-test('Sync hosts table', (done) => {
-    db.hosts.sync().then(() => {
-        done();
-    })
+test('Sync hosts table', async () => {
+    await db.hosts.sync();
 });
 
 test('Insert one into hosts table', async () => {
-    const testVal = 'https://example.com/'
+    const testVal = 'example.com'
     await db.hosts.insert([testVal]);
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(1);
@@ -55,9 +52,9 @@ test('Insert one into hosts table', async () => {
 
 test('Insert bulk into hosts table', async () => {
     let testVals = [
-        'http://www.example1.com/',
-        'https://www.example2.com/',
-        'https://example3.com/'
+        'example1.com',
+        'example2.com',
+        'example3.com'
     ]
     for (let testVal of testVals) {
         await db.hosts.insert([testVal]);
@@ -66,18 +63,18 @@ test('Insert bulk into hosts table', async () => {
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(4);
 
-    expect(models[0].host).toBe('https://example.com/');
+    expect(models[0].host).toBe('example.com');
     for (let i=1; i<4; i++) {
         expect(models[i].host).toBe(testVals[i-1]);
     }
 
     let testVals2 = [
-        'http://test.com',
-        'https://test1.com',
-        'https://www.test2.com',
-        'https://www.test3.com',
-        'http://www.test4.com',
-        'https://test.test5.com',
+        'test.com',
+        'test1.com',
+        'test2.com',
+        'www.test3.com',
+        'www.test4.com',
+        'test.test5.com',
     ];
     await db.hosts.bulkInsert(testVals2.map((val)=>{
         return [val];
@@ -86,7 +83,7 @@ test('Insert bulk into hosts table', async () => {
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
 
-    expect(models[0].host).toBe('https://example.com/');
+    expect(models[0].host).toBe('example.com');
     for (let i=1; i<4; i++) {
         expect(models[i].host).toBe(testVals[i-1]);
     }
@@ -94,4 +91,12 @@ test('Insert bulk into hosts table', async () => {
     for (let i=5; i<10; i++) {
         expect(models[i].host).toBe(testVals2[i-4]);
     }
-})
+});
+
+test('Insert into paths table', async () => {
+    await db.paths.insert(['/'], 'example.com');
+    let models = await db.paths.selectAll();
+    expect(models.length).toBe(1);
+    console.log(models[0]);
+    expect(models[0].path).toBe('/');
+});

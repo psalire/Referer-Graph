@@ -22,7 +22,8 @@ export default class SqliteDatabase {
             {
                 host: {
                     type: DataTypes.TEXT,
-                    allowNull: false
+                    allowNull: false,
+                    unique: true
                 }
             },
             {
@@ -68,7 +69,7 @@ export default class SqliteDatabase {
         // srcDstModel.belongsTo(pathsModel);
 
         this.hosts = new HostsTable(hostsModel);
-        this.paths = new PathsTable(pathsModel);
+        this.paths = new PathsTable(pathsModel, hostsModel);
         this.srcDst = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
 
         this.sync();

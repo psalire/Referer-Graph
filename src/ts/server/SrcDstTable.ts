@@ -7,19 +7,12 @@ export default class SrcDstTable extends aSqliteTable {
     private pathsModel: ModelCtor<Model>;
     private hostsModel: ModelCtor<Model>;
 
-    constructor(model: ModelCtor<Model>, pathsModel?: ModelCtor<Model>, hostsModel?: ModelCtor<Model>) {
-        if (pathsModel === undefined || hostsModel === undefined) {
-            throw new SqliteDatabaseError(
-                `SrcDstTable(model, pathsModel, hostModel): need 3 parameters, got ${
-                    1 + Number(pathsModel!==undefined) + Number(hostsModel!==undefined)
-                }`
-            );
-        }
+    constructor(model: ModelCtor<Model>, pathsModel: ModelCtor<Model>, hostsModel: ModelCtor<Model>) {
         super(model, ['src','dst']);
         this.pathsModel = pathsModel;
         this.hostsModel = hostsModel;
     }
-    private async getPathId(path: string, host: string): Promise<number> {
+    private async getPathObj(path: string, host: string): Promise<Model> {
         var hostObj = await this.hostsModel.findOne({
             where: {
                 host: host
@@ -41,7 +34,7 @@ export default class SrcDstTable extends aSqliteTable {
                 `SrcDstTable.getPathId(): Can't find in Paths table path="${path}" && host="${host}"`
             );
         }
-        return pathObj.id;
+        return pathObj;
     }
     public async insert(vals: string[], srcHost?: string, dstHost?: string): Promise<any> {
         if (srcHost === undefined) {
@@ -49,11 +42,13 @@ export default class SrcDstTable extends aSqliteTable {
                 'SrcDstTable.insert(vals, host, dstHost?): missing host argument'
             );
         }
-        let dstHostname = dstHost===undefined ? srcHost : dstHost;
+        var srcHostObj = await this.getPathObj(vals[0], srcHost);
+        var dstHostObj = await this.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost);
         super.validateValuesLength(vals);
-        return this.model.create({
-            src: await this.getPathId(vals[0], srcHost),
-            dst: await this.getPathId(vals[1], dstHostname)
+        return this.model.create().then((createdSrcDst) => {
+            return createdSrcDst.setSrcPath(srcHostObj).then((createdSrcDst) => {
+                return createdSrcDst.setDstPath(dstHostObj);
+            })
         });
     }
 }
