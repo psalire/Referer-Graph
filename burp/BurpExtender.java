@@ -46,6 +46,22 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             jsonObjectBuilder.add(name, jsonObj);
         }
     }
+    private void addURLInformationToJson(
+        JsonObjectBuilder jsonObjectBuilder,
+        URL url
+    ) {
+        jsonObjectBuilder.add(
+            "host", url.getHost()
+        ).add(
+            "path", url.getPath()
+        ).add(
+            "protocol", url.getProtocol()
+        // ).add(
+            // "headers", requestHeaders
+        // ).add(
+        //     "raw", rawRequest
+        );
+    }
     /**
     * Json helper. Build JSON with relevant request data
     */
@@ -56,26 +72,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         String rawRequest
     ) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add(
-            "host", requestURL.getHost()
-        ).add(
-            "path", requestURL.getPath()
-        ).add(
-            "protocol", requestURL.getProtocol()
-        // ).add(
-            // "headers", requestHeaders
-        // ).add(
-        //     "raw", rawRequest
-        );
+        this.addURLInformationToJson(jsonObjectBuilder, requestURL);
         this.addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
 
         JsonObjectBuilder refererObj = Json.createObjectBuilder();
         if (referer != null) {
             try {
                 URL refererURL =  new URL(referer);
-                refererObj.add("host", refererURL.getHost());
-                refererObj.add("path", refererURL.getPath());
-                refererObj.add("protocol", refererURL.getProtocol());
+                this.addURLInformationToJson(refererObj, refererURL);
                 this.addPotentialNullToJson(refererObj, "query", refererURL.getQuery());
             }
             catch (MalformedURLException e) {
