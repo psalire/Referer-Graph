@@ -88,7 +88,6 @@ test('Insert bulk into hosts table', async () => {
     for (let i=0; i<testVals.length; i++) {
         expect(models[i+1].host).toBe(testVals[i]);
     }
-    // expect(models[4].host).toBe(testVals2[0]);
     for (let i=testVals.length+1; i<testVals.length+testVals2.length; i++) {
         expect(models[i].host).toBe(testVals2[i-testVals.length-1]);
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.net.URL;
+import java.net.MalformedURLException;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonStructure;
@@ -15,11 +16,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
     private Pattern reHeader;
-    private Writer logOutput;
+    private Writer writer;
     private HttpHandler httpHandler;
 
     /**
-    * Json helper
+    * Json helper. Add a value that may be null
     */
     private void addPotentialNullToJson(
         JsonObjectBuilder jsonObjectBuilder,
@@ -34,7 +35,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         }
     }
     /**
-    * Json helper
+    * Json helper. Build JSON with relevant request data
     */
     private JsonObject getRequestJson(
         String referer,
@@ -45,16 +46,39 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         String requestQuery = requestURL.getQuery();
         jsonObjectBuilder.add(
+            "host", requestURL.getHost()
+        ).add(
             "path", requestURL.getPath()
+        ).add(
+            "protocol", requestURL.getProtocol()
         // ).add(
             // "headers", requestHeaders
-        ).add(
-            "raw", rawRequest
+        // ).add(
+        //     "raw", rawRequest
         );
-        addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
-        addPotentialNullToJson(jsonObjectBuilder, "referer", referer);
+        JsonObjectBuilder refererObj = Json.createObjectBuilder();
+        if (referer != null) {
+            try {
+                URL refererURL =  new URL(referer);
+                refererObj.add("host", refererURL.getHost());
+                refererObj.add("path", refererURL.getPath());
+                refererObj.add("protocol", refererURL.getProtocol());
+            }
+            catch (MalformedURLException e) {
+                this.writer.printlnOut(
+                    "[BurpExtender] getRequestJson(): bad referer \""+referer+"\""+
+                    ". See error log."
+                );
+                this.writer.printlnErr(e.toString());
+                this.writer.printlnErr(e.getStackTrace().toString());
+            }
+        }
+        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
+        jsonObjectBuilder.add("referer", refererObj.build());
+        JsonObjectBuilder retJson = Json.createObjectBuilder();
+        retJson.add("requestData", jsonObjectBuilder.build());
 
-        return jsonObjectBuilder.build();
+        return retJson.build();
     }
 
     /**
@@ -70,8 +94,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         this.callbacks = callbacks;
         this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
-        this.logOutput = new Writer(callbacks.getStdout(), callbacks.getStderr());
-        this.httpHandler = new HttpHandler(this.logOutput);
+        this.writer = new Writer(callbacks.getStdout(), callbacks.getStderr());
+        this.httpHandler = new HttpHandler(this.writer);
     }
 
     /**
@@ -79,15 +103,19 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        this.logOutput.printlnOut(
+        this.writer.printlnOut(
                 (messageIsRequest ? "HTTP request to " : "HTTP response from ") +
                 messageInfo.getHttpService() +
                 " [" + this.callbacks.getToolName(toolFlag) + "]");
 
+        if (messageIsRequest) {
+            return; // Only record requests with responses
+        }
+
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
+        IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
         List<String> headersList = requestInfo.getHeaders();
 
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         String referer = null;
 
         for (int i=1; i<headersList.size(); i++) {
@@ -98,28 +126,27 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 String name = matchHeader.group(1);
                 String value = matchHeader.group(2);
                 if (name.equals("Referer")) {
-                    // jsonObjectBuilder.add(name, value);
                     referer = value;
                     break;
                 }
             }
             catch (Exception e) {
-                this.logOutput.printlnOut("[BurpExtender] See error log for details. Affected header: "+headerStr);
-                this.logOutput.printlnErr(e.toString());
-                this.logOutput.printlnErr(e.getStackTrace().toString());
+                this.writer.printlnOut("[BurpExtender] See error log for details. Affected header: "+headerStr);
+                this.writer.printlnErr(e.toString());
+                this.writer.printlnErr(e.getStackTrace().toString());
             }
         }
-        String requestBody = this.logOutput.jsonToString(
-            getRequestJson(
+        String requestBody = this.writer.jsonToString(
+            this.getRequestJson(
                 referer,
                 // jsonObjectBuilder.build(),
                 requestInfo.getUrl(),
                 this.burpHelpers.bytesToString(messageInfo.getRequest())
             )
         );
-        this.logOutput.printlnOut(requestBody);
+        this.writer.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
-        this.logOutput.printlnOut("--------------------");
+        this.writer.printlnOut("--------------------");
 
     }
 
@@ -128,7 +155,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void newScanIssue(IScanIssue issue) {
-        this.logOutput.printlnOut("New scan issue: " + issue.getIssueName());
+        this.writer.printlnOut("New scan issue: " + issue.getIssueName());
     }
 
     /**
@@ -136,6 +163,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void extensionUnloaded() {
-        this.logOutput.printlnOut("Extension was unloaded");
+        this.writer.printlnOut("Extension was unloaded");
     }
 }
