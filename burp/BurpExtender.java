@@ -20,86 +20,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     private HttpHandler httpHandler;
 
     /**
-    * Json helper. Add a value that may be null
-    */
-    private void addPotentialNullToJson(
-        JsonObjectBuilder jsonObjectBuilder,
-        String name,
-        String value
-    ) {
-        if (value==null) {
-            jsonObjectBuilder.addNull(name);
-        }
-        else {
-            jsonObjectBuilder.add(name, value);
-        }
-    }
-    private void addPotentialNullToJson(
-        JsonObjectBuilder jsonObjectBuilder,
-        String name,
-        JsonObject jsonObj
-    ) {
-        if (jsonObj.isEmpty()) {
-            jsonObjectBuilder.addNull(name);
-        }
-        else {
-            jsonObjectBuilder.add(name, jsonObj);
-        }
-    }
-    private void addURLInformationToJson(
-        JsonObjectBuilder jsonObjectBuilder,
-        URL url
-    ) {
-        jsonObjectBuilder.add(
-            "host", url.getHost()
-        ).add(
-            "path", url.getPath()
-        ).add(
-            "protocol", url.getProtocol()
-        // ).add(
-            // "headers", requestHeaders
-        // ).add(
-        //     "raw", rawRequest
-        );
-    }
-    /**
-    * Json helper. Build JSON with relevant request data
-    */
-    private JsonObject getRequestJson(
-        String referer,
-        // JsonObject requestHeaders,
-        URL requestURL,
-        String rawRequest
-    ) {
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        this.addURLInformationToJson(jsonObjectBuilder, requestURL);
-        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
-
-        JsonObjectBuilder refererObj = Json.createObjectBuilder();
-        if (referer != null) {
-            try {
-                URL refererURL =  new URL(referer);
-                this.addURLInformationToJson(refererObj, refererURL);
-                this.addPotentialNullToJson(refererObj, "query", refererURL.getQuery());
-            }
-            catch (MalformedURLException e) {
-                this.writer.printlnOut(
-                    "[BurpExtender] getRequestJson(): bad referer \""+referer+"\""+
-                    ". See error log."
-                );
-                this.writer.printlnErr(e.toString());
-                this.writer.printlnErr(e.getStackTrace().toString());
-            }
-        }
-        this.addPotentialNullToJson(jsonObjectBuilder, "referer", refererObj.build());
-
-        return Json.createObjectBuilder().add(
-            "requestData",
-            jsonObjectBuilder.build()
-        ).build();
-    }
-
-    /**
     * implement IBurpExtender
     */
     @Override
@@ -155,17 +75,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             }
         }
         String requestBody = this.writer.jsonToString(
-            this.getRequestJson(
+            JsonHelper.getRequestJson(
                 referer,
-                // jsonObjectBuilder.build(),
                 requestInfo.getUrl(),
-                this.burpHelpers.bytesToString(messageInfo.getRequest())
+                this.burpHelpers.bytesToString(messageInfo.getRequest()),
+                this.writer
             )
         );
         this.writer.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
         this.writer.printlnOut("--------------------");
-
     }
 
     /**

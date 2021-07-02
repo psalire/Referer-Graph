@@ -30,8 +30,9 @@ public class HttpHandler {
             HttpResponse::statusCode
         ).thenAccept(code -> {
             if (code != 200) {
+                this.logOutput.printlnOut("[HTTPHandler] Got non-200 statuscode. See error log.");
                 this.logOutput.printlnErr(
-                    "[HTTP] Got status code ("+code+") for JSON POST: "+jsonStr
+                    "[HTTPHandler] Got status code ("+code+") for JSON POST:\n"+jsonStr
                 );
             }
         });
