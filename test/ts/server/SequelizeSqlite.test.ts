@@ -65,8 +65,8 @@ test('Insert bulk into hosts table', async () => {
     expect(models.length).toBe(4);
 
     expect(models[0].host).toBe('example.com');
-    for (let i=1; i<4; i++) {
-        expect(models[i].host).toBe(testVals[i-1]);
+    for (let i=0; i<testVals.length; i++) {
+        expect(models[i+1].host).toBe(testVals[i]);
     }
 
     let testVals2 = [
@@ -85,12 +85,12 @@ test('Insert bulk into hosts table', async () => {
     expect(models.length).toBe(10);
 
     expect(models[0].host).toBe('example.com');
-    for (let i=1; i<4; i++) {
-        expect(models[i].host).toBe(testVals[i-1]);
+    for (let i=0; i<testVals.length; i++) {
+        expect(models[i+1].host).toBe(testVals[i]);
     }
-    expect(models[4].host).toBe(testVals2[0]);
-    for (let i=5; i<10; i++) {
-        expect(models[i].host).toBe(testVals2[i-4]);
+    // expect(models[4].host).toBe(testVals2[0]);
+    for (let i=testVals.length+1; i<testVals.length+testVals2.length; i++) {
+        expect(models[i].host).toBe(testVals2[i-testVals.length-1]);
     }
 });
 
@@ -100,18 +100,22 @@ test('Insert into paths table', async () => {
     expect(models.length).toBe(1);
     expect(models[0].path).toBe('/');
 
-    await db.paths.insert(['/index.html'], 'example.com');
-    await db.paths.insert(['/word.exe'], 'example.com');
-    await db.paths.insert(['/a/path/file'], 'test.test5.com');
-    await db.paths.insert(['/home'], 'www.test3.com');
+    let vals = [
+        [['/index.html'], 'example.com'],
+        [['/word.exe'], 'example.com'],
+        [['/a/path/file'], 'test.test5.com'],
+        [['/home'], 'www.test3.com'],
+    ];
+    for (let val of vals) {
+        await db.paths.insert(val[0], val[1]);
+    }
     models = await db.paths.selectAll();
     expect(models.length).toBe(5);
-    expect(models[0].path).toBe('/');
-    expect(models[1].path).toBe('/index.html');
-    expect(models[2].path).toBe('/word.exe');
-    expect(models[3].path).toBe('/a/path/file');
-    expect(models[4].path).toBe('/home');
-    expect((await models[0].getHost()).host).toBe('example.com');
+    for (let i=1; i<models.length; i++) {
+        let val = vals[i-1];
+        expect(models[i].path).toBe(val[0][0]);
+        expect((await models[i].getHost()).host).toBe(val[1]);
+    }
     expect((await models[1].getHost()).host).toBe('example.com');
     expect((await models[2].getHost()).host).toBe('example.com');
     expect((await models[3].getHost()).host).toBe('test.test5.com');
@@ -124,19 +128,30 @@ test('Insert path with non-existing host', async () => {
 });
 
 test('Insert into srcDst table', async () => {
-    await db.srcDsts.insert(['/', '/index.html'], 'example.com');
-    await db.srcDsts.insert(['/index.html', '/word.exe'], 'example.com');
+    let vals = [
+        [['/', '/index.html'], 'example.com'],
+        [['/index.html', '/word.exe'], 'example.com']
+    ]
+    for (let val of vals) {
+        await db.srcDsts.insert(val[0], val[1]);
+    }
     let models = await db.srcDsts.selectAll();
-    expect(models.length).toBe(2);
-    let srcObj = await db.paths.selectByPk(models[0].srcPathId);
-    let dstObj = await db.paths.selectByPk(models[0].dstPathId);
-    expect(srcObj.path).toBe('/');
-    expect(dstObj.path).toBe('/index.html');
-    expect((await srcObj.getHost()).host).toBe('example.com');
-    expect((await dstObj.getHost()).host).toBe('example.com');
+    expect(models.length).toBe(vals.length);
+    for (let i=0; i<models.length; i++) {
+        let srcObj = await db.paths.selectByPk(models[i].srcPathId);
+        let dstObj = await db.paths.selectByPk(models[i].dstPathId);
+        let val = vals[i];
+        expect(srcObj.path).toBe(val[0][0]);
+        expect(dstObj.path).toBe(val[0][1]);
+        expect((await srcObj.getHost()).host).toBe(val[1]);
+        expect((await dstObj.getHost()).host).toBe(val[1]);
+    }
 });
 
 test('Insert cross host into srcDst table', async () => {
     await db.srcDsts.insert(['/index.html', '/home'], 'example.com', 'www.test3.com');
     await db.srcDsts.insert(['/word.exe', '/home'], 'example.com', 'www.test3.com');
+    await db.srcDsts.insert(['/home', '/a/path/file'], 'www.test3.com', 'test.test5.com');
+    let models = await db.srcDsts.selectAll();
+    expect(models.length).toBe(5);
 });
