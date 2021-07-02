@@ -1,5 +1,5 @@
 
-import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 import * as path from 'path';
 import HostsTable from './HostsTable';
 import PathsTable from './PathsTable';
@@ -14,7 +14,8 @@ export default class SqliteDatabase {
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
         this.sequelize = new Sequelize({
             dialect: 'sqlite',
-            storage: path.join(dbPath, dbName)
+            storage: path.join(dbPath, dbName),
+            logging: false
         });
 
         var hostsModel = this.sequelize.define(
