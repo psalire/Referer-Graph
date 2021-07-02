@@ -34,6 +34,18 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             jsonObjectBuilder.add(name, value);
         }
     }
+    private void addPotentialNullToJson(
+        JsonObjectBuilder jsonObjectBuilder,
+        String name,
+        JsonObject jsonObj
+    ) {
+        if (jsonObj.isEmpty()) {
+            jsonObjectBuilder.addNull(name);
+        }
+        else {
+            jsonObjectBuilder.add(name, jsonObj);
+        }
+    }
     /**
     * Json helper. Build JSON with relevant request data
     */
@@ -56,6 +68,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         // ).add(
         //     "raw", rawRequest
         );
+        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
+
         JsonObjectBuilder refererObj = Json.createObjectBuilder();
         if (referer != null) {
             try {
@@ -73,12 +87,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 this.writer.printlnErr(e.getStackTrace().toString());
             }
         }
-        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
-        jsonObjectBuilder.add("referer", refererObj.build());
-        JsonObjectBuilder retJson = Json.createObjectBuilder();
-        retJson.add("requestData", jsonObjectBuilder.build());
+        this.addPotentialNullToJson(jsonObjectBuilder, "referer", refererObj.build());
 
-        return retJson.build();
+        return Json.createObjectBuilder().add(
+            "requestData",
+            jsonObjectBuilder.build()
+        ).build();
     }
 
     /**
