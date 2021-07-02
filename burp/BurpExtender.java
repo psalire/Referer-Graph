@@ -53,7 +53,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
         List<String> headersList = requestInfo.getHeaders();
-
+        // String rawRequest = this.burpHelpers.bytesToString(messageInfo.getRequest());
         String referer = null;
 
         for (int i=1; i<headersList.size(); i++) {
@@ -75,12 +75,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
             }
         }
         String requestBody = this.writer.jsonToString(
-            JsonHelper.getRequestJson(
-                referer,
-                requestInfo.getUrl(),
-                this.burpHelpers.bytesToString(messageInfo.getRequest()),
-                this.writer
-            )
+            Json.createObjectBuilder().addAll(
+                JsonHelper.getRequestJson(requestInfo, this.writer)
+            ).addAll(
+                JsonHelper.getResponseJson(responseInfo, this.writer)
+            ).build()
         );
         this.writer.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
