@@ -1,5 +1,6 @@
 
 import SqliteDatabase from "../../../src/ts/server/SqliteDatabase";
+import SqliteDatabaseError from "../../../src/ts/server/SqliteDatabaseError";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -97,6 +98,27 @@ test('Insert into paths table', async () => {
     await db.paths.insert(['/'], 'example.com');
     let models = await db.paths.selectAll();
     expect(models.length).toBe(1);
-    console.log(models[0]);
     expect(models[0].path).toBe('/');
+
+    await db.paths.insert(['/index.html'], 'example.com');
+    await db.paths.insert(['/word.exe'], 'example.com');
+    await db.paths.insert(['/a/path/file'], 'test.test5.com');
+    await db.paths.insert(['/home'], 'www.test3.com');
+    models = await db.paths.selectAll();
+    expect(models.length).toBe(5);
+    expect(models[0].path).toBe('/');
+    expect(models[1].path).toBe('/index.html');
+    expect(models[2].path).toBe('/word.exe');
+    expect(models[3].path).toBe('/a/path/file');
+    expect(models[4].path).toBe('/home');
+    expect((await models[0].getHost()).host).toBe('example.com');
+    expect((await models[1].getHost()).host).toBe('example.com');
+    expect((await models[2].getHost()).host).toBe('example.com');
+    expect((await models[3].getHost()).host).toBe('test.test5.com');
+    expect((await models[4].getHost()).host).toBe('www.test3.com');
+
+});
+
+test('Insert path with non-existing host', async () => {
+    await expect(db.paths.insert(['/abcd'], 'google.com')).rejects.toThrow(SqliteDatabaseError);
 });
