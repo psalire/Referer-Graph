@@ -9,7 +9,7 @@ export default class SqliteDatabase {
     private sequelize: Sequelize;
     public hosts: HostsTable;
     public paths: PathsTable;
-    public srcDst: SrcDstTable;
+    public srcDsts: SrcDstTable;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
         this.sequelize = new Sequelize({
@@ -51,7 +51,11 @@ export default class SqliteDatabase {
             }
         );
 
-        hostsModel.hasMany(pathsModel);
+        hostsModel.hasMany(pathsModel, {
+            foreignKey: {
+                allowNull: false
+            }
+        });
         pathsModel.belongsTo(hostsModel);
         pathsModel.hasMany(srcDstModel, {
             as: 'src',
@@ -71,7 +75,7 @@ export default class SqliteDatabase {
 
         this.hosts = new HostsTable(hostsModel);
         this.paths = new PathsTable(pathsModel, hostsModel);
-        this.srcDst = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
+        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
 
         this.sync();
     }

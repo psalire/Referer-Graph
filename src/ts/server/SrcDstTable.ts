@@ -45,10 +45,9 @@ export default class SrcDstTable extends aSqliteTable {
         var srcHostObj = await this.getPathObj(vals[0], srcHost);
         var dstHostObj = await this.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost);
         super.validateValuesLength(vals);
-        return this.model.create().then((createdSrcDst) => {
-            return createdSrcDst.setSrcPath(srcHostObj).then((createdSrcDst) => {
-                return createdSrcDst.setDstPath(dstHostObj);
-            })
-        });
+        return this.model.create({
+            srcPathId: srcHostObj.id,
+            dstPathId: dstHostObj.id
+        })
     }
 }

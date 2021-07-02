@@ -25,9 +25,8 @@ export default class PathsTable extends aSqliteTable {
             throw new SqliteDatabaseError(`cannot find host "${host}"`);
         }
         return this.model.create({
-            path: vals[0]
-        }).then((createdPath) => {
-            return createdPath.setHost(hostObj);
+            path: vals[0],
+            HostId: hostObj.id
         });
     }
     public async bulkInsert(vals: string[][], host?: string): Promise<any> {

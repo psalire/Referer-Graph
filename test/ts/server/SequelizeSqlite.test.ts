@@ -122,3 +122,7 @@ test('Insert into paths table', async () => {
 test('Insert path with non-existing host', async () => {
     await expect(db.paths.insert(['/abcd'], 'google.com')).rejects.toThrow(SqliteDatabaseError);
 });
+
+test('Insert into srcDst table', async () => {
+    await db.srcDsts.insert(['/', '/index.html'], 'example.com');
+});
