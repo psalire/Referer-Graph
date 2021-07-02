@@ -42,12 +42,31 @@ export default class SrcDstTable extends aSqliteTable {
                 'SrcDstTable.insert(vals, host, dstHost?): missing host argument'
             );
         }
+        super.validateValuesLength(vals);
         var srcHostObj = await this.getPathObj(vals[0], srcHost);
         var dstHostObj = await this.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost);
-        super.validateValuesLength(vals);
         return this.model.create({
             srcPathId: srcHostObj.id,
             dstPathId: dstHostObj.id
-        })
+        });
+    }
+    public async bulkInsert(vals: string[][], srcHost?: string, dstHost?: string): Promise<any> {
+        if (srcHost === undefined) {
+            throw new SqliteDatabaseError(
+                'SrcDstTable.insert(vals, host, dstHost?): missing host argument'
+            );
+        }
+        var dstHostStr = dstHost===undefined ? srcHost : dstHost;
+        return this.model.bulkCreate(await Promise.all(
+            vals.map(async (val) => {
+                super.validateValuesLength(val);
+                var srcHostObj = await this.getPathObj(val[0], srcHost);
+                var dstHostObj = await this.getPathObj(val[1], dstHostStr);
+                return {
+                    srcPathId: srcHostObj.id,
+                    dstPathId: dstHostObj.id
+                };
+            })
+        ));
     }
 }

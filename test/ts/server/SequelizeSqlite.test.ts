@@ -182,3 +182,14 @@ test('Insert cross host into srcDst table', async () => {
         expect((await dstObj.getHost()).host).toBe(val[2]);
     }
 });
+
+test('Insert bulk into srcDst table', async () => {
+    let vals = [
+        ['/abcd', '/efgh'],
+        ['/ijkl', '/mnop'],
+        ['/qrst', '/uvwx'],
+        ['/yz', '/abcd'],
+    ];
+    await db.paths.bulkInsert(vals.flat().map(v=>[v]), 'yahoo.com');
+    await db.srcDsts.bulkInsert(vals, 'yahoo.com');
+});
