@@ -39,14 +39,14 @@ export default class PathsTable extends aSqliteTable {
                 host: host
             }
         });
-
+        if (hostObj == null) {
+            throw new SqliteDatabaseError(`cannot find host "${host}"`);
+        }
         return this.model.bulkCreate(vals.flat().map((val) => {
-            return {path: val};
-        })).then((createdObjs) => {
-            for (let obj of createdObjs) {
-                obj.setHost(hostObj);
-            }
-            return createdObjs;
-        });
+            return {
+                path: val,
+                HostId: hostObj.id
+            };
+        }));
     }
 }

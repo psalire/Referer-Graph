@@ -40,9 +40,19 @@ export default abstract class aSqliteTable implements iDatabaseTable {
             return this.mapColumnsToValues(val);
         }));
     }
-    public selectAll(): Promise<Model[]> {
-        return this.model.findAll({
+
+    public selectAll(where?: object): Promise<Model[]> {
+        var findAllOptions = {
             attributes: this.columns
+        };
+        if (where !== undefined) {
+            findAllOptions.where = where;
+        }
+        return this.model.findAll(findAllOptions);
+    }
+    public selectOne(where: object): Promise<Model|null> {
+        return this.model.findOne({
+            where: where
         });
     }
     public selectByPk(pk: number): Promise<Model|null> {

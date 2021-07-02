@@ -77,9 +77,7 @@ test('Insert bulk into hosts table', async () => {
         'www.test4.com',
         'test.test5.com',
     ];
-    await db.hosts.bulkInsert(testVals2.map((val)=>{
-        return [val];
-    }));
+    await db.hosts.bulkInsert(testVals2.map(val=>[val]));
 
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
@@ -115,11 +113,26 @@ test('Insert into paths table', async () => {
         expect(models[i].path).toBe(val[0][0]);
         expect((await models[i].getHost()).host).toBe(val[1]);
     }
-    expect((await models[1].getHost()).host).toBe('example.com');
-    expect((await models[2].getHost()).host).toBe('example.com');
-    expect((await models[3].getHost()).host).toBe('test.test5.com');
-    expect((await models[4].getHost()).host).toBe('www.test3.com');
+});
 
+test('Insert bulk into paths table', async () => {
+    await db.hosts.insert(['yahoo.com']);
+    let vals = [
+        '/', '/page/1', '/page/2',
+        '/page/3', '/page/4', '/page/5',
+        '/page/6', '/page/7', '/page/8',
+    ];
+    await db.paths.bulkInsert(vals.map(v=>[v]), 'yahoo.com');
+    let hostObj = await db.hosts.selectOne({
+        host: 'yahoo.com'
+    });
+    let models = await db.paths.selectAll({
+        HostId: hostObj.id
+    });
+    expect(models.length).toBe(9);
+    for (let i=0; i<models.length; i++) {
+        expect(models[i].path).toBe(vals[i]);
+    }
 });
 
 test('Insert path with non-existing host', async () => {
