@@ -1,7 +1,7 @@
 
 import SqliteDatabase from './SqliteDatabase';
 
-export default class AppFacade {
+export default class DatabaseFacade {
     private sqliteDb : SqliteDatabase;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
