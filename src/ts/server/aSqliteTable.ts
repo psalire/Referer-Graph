@@ -45,4 +45,7 @@ export default abstract class aSqliteTable implements iDatabaseTable {
             attributes: this.columns
         });
     }
+    public selectByPk(pk: number): Promise<Model|null> {
+        return this.model.findByPk(pk);
+    }
 }

@@ -125,4 +125,18 @@ test('Insert path with non-existing host', async () => {
 
 test('Insert into srcDst table', async () => {
     await db.srcDsts.insert(['/', '/index.html'], 'example.com');
+    await db.srcDsts.insert(['/index.html', '/word.exe'], 'example.com');
+    let models = await db.srcDsts.selectAll();
+    expect(models.length).toBe(2);
+    let srcObj = await db.paths.selectByPk(models[0].srcPathId);
+    let dstObj = await db.paths.selectByPk(models[0].dstPathId);
+    expect(srcObj.path).toBe('/');
+    expect(dstObj.path).toBe('/index.html');
+    expect((await srcObj.getHost()).host).toBe('example.com');
+    expect((await dstObj.getHost()).host).toBe('example.com');
+});
+
+test('Insert cross host into srcDst table', async () => {
+    await db.srcDsts.insert(['/index.html', '/home'], 'example.com', 'www.test3.com');
+    await db.srcDsts.insert(['/word.exe', '/home'], 'example.com', 'www.test3.com');
 });

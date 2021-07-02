@@ -8,7 +8,7 @@ export default class SrcDstTable extends aSqliteTable {
     private hostsModel: ModelCtor<Model>;
 
     constructor(model: ModelCtor<Model>, pathsModel: ModelCtor<Model>, hostsModel: ModelCtor<Model>) {
-        super(model, ['src','dst']);
+        super(model, ['srcPathId','dstPathId']);
         this.pathsModel = pathsModel;
         this.hostsModel = hostsModel;
     }
