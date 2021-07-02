@@ -130,7 +130,8 @@ test('Insert path with non-existing host', async () => {
 test('Insert into srcDst table', async () => {
     let vals = [
         [['/', '/index.html'], 'example.com'],
-        [['/index.html', '/word.exe'], 'example.com']
+        [['/index.html', '/word.exe'], 'example.com'],
+        [['/word.exe', '/index.html'], 'example.com', 'example.com']
     ]
     for (let val of vals) {
         await db.srcDsts.insert(val[0], val[1]);
@@ -144,14 +145,28 @@ test('Insert into srcDst table', async () => {
         expect(srcObj.path).toBe(val[0][0]);
         expect(dstObj.path).toBe(val[0][1]);
         expect((await srcObj.getHost()).host).toBe(val[1]);
-        expect((await dstObj.getHost()).host).toBe(val[1]);
+        expect((await dstObj.getHost()).host).toBe(val.length==3 ? val[2] : val[1]);
     }
 });
 
 test('Insert cross host into srcDst table', async () => {
-    await db.srcDsts.insert(['/index.html', '/home'], 'example.com', 'www.test3.com');
-    await db.srcDsts.insert(['/word.exe', '/home'], 'example.com', 'www.test3.com');
-    await db.srcDsts.insert(['/home', '/a/path/file'], 'www.test3.com', 'test.test5.com');
+    let vals = [
+        [['/index.html', '/home'], 'example.com', 'www.test3.com'],
+        [['/word.exe', '/home'], 'example.com', 'www.test3.com'],
+        [['/home', '/a/path/file'], 'www.test3.com', 'test.test5.com']
+    ]
+    for (let val of vals) {
+        await db.srcDsts.insert(val[0], val[1], val[2]);
+    }
     let models = await db.srcDsts.selectAll();
-    expect(models.length).toBe(5);
+    expect(models.length).toBe(6);
+    for (let i=models.length-vals.length; i<models.length; i++) {
+        let srcObj = await db.paths.selectByPk(models[i].srcPathId);
+        let dstObj = await db.paths.selectByPk(models[i].dstPathId);
+        let val = vals[i-(models.length-vals.length)];
+        expect(srcObj.path).toBe(val[0][0]);
+        expect(dstObj.path).toBe(val[0][1]);
+        expect((await srcObj.getHost()).host).toBe(val[1]);
+        expect((await dstObj.getHost()).host).toBe(val[2]);
+    }
 });
