@@ -56,7 +56,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         String rawRequest
     ) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        String requestQuery = requestURL.getQuery();
         jsonObjectBuilder.add(
             "host", requestURL.getHost()
         ).add(
@@ -68,7 +67,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         // ).add(
         //     "raw", rawRequest
         );
-        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestQuery);
+        this.addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
 
         JsonObjectBuilder refererObj = Json.createObjectBuilder();
         if (referer != null) {
@@ -77,6 +76,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
                 refererObj.add("host", refererURL.getHost());
                 refererObj.add("path", refererURL.getPath());
                 refererObj.add("protocol", refererURL.getProtocol());
+                this.addPotentialNullToJson(refererObj, "query", refererURL.getQuery());
             }
             catch (MalformedURLException e) {
                 this.writer.printlnOut(
