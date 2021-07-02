@@ -32,6 +32,7 @@ export default abstract class aSqliteTable implements iDatabaseTable {
     public sync(): Promise<any> {
         return this.model.sync();
     }
+
     public insert(vals: string[]): Promise<any> {
         return this.model.create(this.mapColumnsToValues(vals));
     }
@@ -42,13 +43,10 @@ export default abstract class aSqliteTable implements iDatabaseTable {
     }
 
     public selectAll(where?: object): Promise<Model[]> {
-        var findAllOptions = {
-            attributes: this.columns
-        };
-        if (where !== undefined) {
-            findAllOptions.where = where;
-        }
-        return this.model.findAll(findAllOptions);
+        return this.model.findAll({
+            attributes: this.columns,
+            where: where
+        });
     }
     public selectOne(where: object): Promise<Model|null> {
         return this.model.findOne({

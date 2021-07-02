@@ -16,7 +16,7 @@ export default class HostsTable extends aSqliteTable {
     }
     public bulkInsert(vals: string[][]): Promise<any> {
         return this.model.bulkCreate(vals.flat().map((val) => {
-            return {host: val}
+            return {host: val};
         }));
     }
 }
