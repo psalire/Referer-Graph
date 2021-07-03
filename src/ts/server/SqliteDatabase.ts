@@ -36,7 +36,17 @@ export default class SqliteDatabase {
             {
                 path: {
                     type: DataTypes.TEXT,
-                    allowNull: false
+                    allowNull: false,
+                    unique: 'pathsComposite'
+                },
+                HostId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'pathsComposite',
+                    references: {
+                        model: hostsModel,
+                        key: 'id'
+                    }
                 }
             },
             {
@@ -45,9 +55,28 @@ export default class SqliteDatabase {
         );
         var srcDstModel = this.sequelize.define(
             'SrcDst',
-            {},
             {
-                timestamps: false
+                srcPathId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'srcDstComposite',
+                    references: {
+                        model: pathsModel,
+                        key: 'id'
+                    }
+                },
+                dstPathId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'srcDstComposite',
+                    references: {
+                        model: pathsModel,
+                        key: 'id'
+                    }
+                }
+            },
+            {
+                timestamps: false,
             }
         );
 
@@ -71,7 +100,6 @@ export default class SqliteDatabase {
                 allowNull: false
             }
         });
-        // srcDstModel.belongsTo(pathsModel);
 
         this.hosts = new HostsTable(hostsModel);
         this.paths = new PathsTable(pathsModel, hostsModel);

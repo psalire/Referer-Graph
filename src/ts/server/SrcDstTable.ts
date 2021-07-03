@@ -36,18 +36,24 @@ export default class SrcDstTable extends aSqliteTable {
         }
         return pathObj;
     }
+
     public async insert(vals: string[], srcHost?: string, dstHost?: string): Promise<any> {
         if (srcHost === undefined) {
             throw new SqliteDatabaseError(
                 'SrcDstTable.insert(vals, host, dstHost?): missing host argument'
             );
         }
-        super.validateValuesLength(vals);
+        this.validateValuesLength(vals);
         var srcHostObj = await this.getPathObj(vals[0], srcHost);
         var dstHostObj = await this.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost);
         return this.model.create({
             srcPathId: srcHostObj.id,
             dstPathId: dstHostObj.id
+        }).catch((e) => {
+            if (!this.isUniqueViolationError(e)) {
+                throw e;
+            }
+            return null;
         });
     }
     public async bulkInsert(vals: string[][], srcHost?: string, dstHost?: string): Promise<any> {
@@ -59,7 +65,7 @@ export default class SrcDstTable extends aSqliteTable {
         var dstHostStr = dstHost===undefined ? srcHost : dstHost;
         return this.model.bulkCreate(await Promise.all(
             vals.map(async (val) => {
-                super.validateValuesLength(val);
+                this.validateValuesLength(val);
                 var srcHostObj = await this.getPathObj(val[0], srcHost);
                 var dstHostObj = await this.getPathObj(val[1], dstHostStr);
                 return {

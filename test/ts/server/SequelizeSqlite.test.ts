@@ -3,7 +3,7 @@ import SqliteDatabase from "../../../src/ts/server/SqliteDatabase";
 import SqliteDatabaseError from "../../../src/ts/server/SqliteDatabaseError";
 import * as fs from "fs";
 import * as path from "path";
-import { ValidationError } from 'sequelize';
+import { ValidationError, SequelizeUniqueConstraintError } from 'sequelize';
 
 var db: SqliteDatabase|null = null;
 const dbsPath = './test/sqlite-dbs'
@@ -92,8 +92,9 @@ test('Insert bulk into hosts table', async () => {
 });
 
 test('Insert duplicate hosts', async () => {
+    expect(await db.hosts.insert(['apple.com'])).not.toBeNull();
     for (let i=0; i<5; i++) {
-        await db.hosts.insert(['apple.com']);
+        expect(await db.hosts.insert(['apple.com'])).toBeNull();
     }
 });
 
@@ -143,7 +144,7 @@ test('Insert bulk into paths table', async () => {
 
 test('Insert duplicate paths', async () => {
     for (let i=0; i<5; i++) {
-        await db.paths.insert(['/index.html'], 'example.com');
+        expect(await db.paths.insert(['/index.html'], 'example.com')).toBeNull();
     }
 });
 
@@ -202,6 +203,15 @@ test('Insert bulk into srcDst table', async () => {
         ['/qrst', '/uvwx'],
         ['/yz', '/abcd'],
     ];
-    await db.paths.bulkInsert(vals.flat().map(v=>[v]), 'yahoo.com');
+    expect(await db.paths.bulkInsert(vals.flat().map(v=>[v]), 'yahoo.com')).toBeNull();
+    for (let val of vals.flat()) {
+        await db.paths.insert([val], 'yahoo.com');
+    }
     await db.srcDsts.bulkInsert(vals, 'yahoo.com');
+});
+
+test('Insert duplicate into srcDst table', async () => {
+    for (let i=0; i<5; i++) {
+        expect(await db.srcDsts.insert(['/abcd', '/efgh'], 'yahoo.com')).toBeNull();
+    }
 });

@@ -26,23 +26,17 @@ export default class PathsTable extends aSqliteTable {
         return hostObj;
     }
     public async insert(vals: string[], host?: string): Promise<any> {
-        super.validateValuesLength(vals);
+        this.validateValuesLength(vals);
 
         var hostObj = await this.getHostObj(host);
-        var count = await this.model.count({
-            where: {
-                path: vals[0],
-                HostId: hostObj.id
-            }
-        });
-        if (count != 0) {
-            return new Promise((resolve, _) => {
-                resolve(null);
-            });
-        }
         return this.model.create({
             path: vals[0],
             HostId: hostObj.id
+        }).catch((e) => {
+            if (!this.isUniqueViolationError(e)) {
+                throw e;
+            }
+            return null;
         });
     }
     public async bulkInsert(vals: string[][], host?: string): Promise<any> {
@@ -52,6 +46,11 @@ export default class PathsTable extends aSqliteTable {
                 path: val,
                 HostId: hostObj.id
             };
-        }));
+        })).catch((e) => {
+            if (!this.isUniqueViolationError(e)) {
+                throw e;
+            }
+            return null;
+        });
     }
 }

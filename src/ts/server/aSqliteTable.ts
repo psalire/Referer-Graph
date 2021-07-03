@@ -1,5 +1,5 @@
 
-import { Model, ModelCtor } from 'sequelize';
+import { Model, ModelCtor, ValidationError, UniqueConstraintError } from 'sequelize';
 import iDatabaseTable from './iDatabaseTable';
 import SqliteDatabaseError from './SqliteDatabaseError';
 
@@ -12,6 +12,26 @@ export default abstract class aSqliteTable implements iDatabaseTable {
         this.columns = columns;
     }
 
+    protected isUniqueViolationError(e: Error, vals?: string[], expectedLength?: number) {
+        if (e instanceof UniqueConstraintError) {
+            return true;
+        }
+        if (e instanceof ValidationError) {
+            if (e.errors.length==expectedLength &&
+                e.errors[0].type == 'unique violation' &&
+                e.errors[0].message == 'host must be unique') {
+                return true;
+            }
+            for (let err of e.errors) {
+                console.error(err);
+            }
+        }
+        if (vals !== undefined) {
+            console.error('With vals: ');
+            console.error(vals);
+        }
+        return false;
+    }
     protected validateValuesLength(vals: string[]): void {
         if (vals.length != this.columns.length) {
             new SqliteDatabaseError(
