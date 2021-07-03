@@ -10,11 +10,11 @@ export default class PathsTable extends aSqliteTable {
         super(model, ['path', 'HostId']);
         this.hostsModel = hostsModel;
     }
-    public async insert(vals: string[], host?: string): Promise<any> {
+
+    private async getHostObj(host?: string): Promise<Model> {
         if (host === undefined) {
             throw new SqliteDatabaseError('missing host argument');
         }
-        super.validateValuesLength(vals);
 
         var hostObj = await this.hostsModel.findOne({
             where: {
@@ -24,24 +24,19 @@ export default class PathsTable extends aSqliteTable {
         if (hostObj == null) {
             throw new SqliteDatabaseError(`cannot find host "${host}"`);
         }
+        return hostObj;
+    }
+    public async insert(vals: string[], host?: string): Promise<any> {
+        super.validateValuesLength(vals);
+
+        var hostObj = await this.getHostObj(host);
         return this.model.create({
             path: vals[0],
             HostId: hostObj.id
         });
     }
     public async bulkInsert(vals: string[][], host?: string): Promise<any> {
-        if (host === undefined) {
-            throw new SqliteDatabaseError('missing host argument');
-        }
-
-        var hostObj = await this.hostsModel.findOne({
-            where: {
-                host: host
-            }
-        });
-        if (hostObj == null) {
-            throw new SqliteDatabaseError(`cannot find host "${host}"`);
-        }
+        var hostObj = await this.getHostObj(host);
         return this.model.bulkCreate(vals.flat().map((val) => {
             return {
                 path: val,
