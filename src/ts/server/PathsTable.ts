@@ -37,7 +37,6 @@ export default class PathsTable extends aSqliteTable {
         });
         if (count != 0) {
             return new Promise((resolve, _) => {
-                console.log('duplicate path');
                 resolve(null);
             });
         }

@@ -9,10 +9,12 @@ export default class HostsTable extends aSqliteTable {
     }
 
     private isUniqueViolationError(e: Error) {
-        return (e instanceof ValidationError) &&
+        return (
+            (e instanceof ValidationError) &&
             e.errors.length==1 &&
             e.errors[0].type == 'unique violation' &&
-            e.errors[0].message == 'host must be unique';
+            e.errors[0].message == 'host must be unique'
+        );
     }
 
     public async insert(vals: string[]): Promise<any> {
