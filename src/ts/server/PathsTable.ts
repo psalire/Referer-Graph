@@ -15,7 +15,6 @@ export default class PathsTable extends aSqliteTable {
         if (host === undefined) {
             throw new SqliteDatabaseError('missing host argument');
         }
-
         var hostObj = await this.hostsModel.findOne({
             where: {
                 host: host
@@ -30,6 +29,18 @@ export default class PathsTable extends aSqliteTable {
         super.validateValuesLength(vals);
 
         var hostObj = await this.getHostObj(host);
+        var count = await this.model.count({
+            where: {
+                path: vals[0],
+                HostId: hostObj.id
+            }
+        });
+        if (count != 0) {
+            return new Promise((resolve, _) => {
+                console.log('duplicate path');
+                resolve(null);
+            });
+        }
         return this.model.create({
             path: vals[0],
             HostId: hostObj.id

@@ -141,6 +141,12 @@ test('Insert bulk into paths table', async () => {
     }
 });
 
+test('Insert duplicate paths', async () => {
+    for (let i=0; i<5; i++) {
+        await db.paths.insert(['/index.html'], 'example.com');
+    }
+});
+
 test('Insert path with non-existing host', async () => {
     await expect(db.paths.insert(['/abcd'], 'google.com')).rejects.toThrow(SqliteDatabaseError);
 });
