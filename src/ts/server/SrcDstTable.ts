@@ -13,26 +13,40 @@ export default class SrcDstTable extends aSqliteTable {
         this.hostsModel = hostsModel;
     }
     private async getPathObj(path: string, host: string): Promise<Model> {
+        var hostParam = {
+            host: host
+        };
         var hostObj = await this.hostsModel.findOne({
-            where: {
-                host: host
-            }
+            where: hostParam
         });
         if (hostObj == null) {
-            throw new SqliteDatabaseError(
-                `SrcDstTable.getPathId(): Can't find in Hosts table host="${host}"`
-            );
+            await this.hostsModel.create(hostParam);
+            hostObj = await this.hostsModel.findOne({
+                where: hostParam
+            });
+            if (hostObj == null) {
+                throw new SqliteDatabaseError(
+                    `SrcDstTable.getPathId(): Error creating host "${host}"`
+                );
+            }
+        }
+        var pathParam = {
+            path: path,
+            HostId: hostObj.id
         }
         var pathObj = await this.pathsModel.findOne({
-            where: {
-                path: path,
-                hostId: hostObj.id
-            }
+            where: pathParam
         });
         if (pathObj == null) {
-            throw new SqliteDatabaseError(
-                `SrcDstTable.getPathId(): Can't find in Paths table path="${path}" && host="${host}"`
-            );
+            await this.pathsModel.create(pathParam);
+            pathObj = await this.pathsModel.findOne({
+                where: pathParam
+            });
+            if (pathObj == null) {
+                throw new SqliteDatabaseError(
+                    `SrcDstTable.getPathId(): Error creating path "${path}" for host="${host}"`
+                );
+            }
         }
         return pathObj;
     }

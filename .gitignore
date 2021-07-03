@@ -2,5 +2,6 @@ node_modules
 dist
 example-server/dist
 **/.classpath
+sqlite-dbs
 test/sqlite-dbs
 !test/sqlite-dbs/default-test.sqlite

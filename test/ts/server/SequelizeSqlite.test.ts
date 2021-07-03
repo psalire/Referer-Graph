@@ -215,3 +215,29 @@ test('Insert duplicate into srcDst table', async () => {
         expect(await db.srcDsts.insert(['/abcd', '/efgh'], 'yahoo.com')).toBeNull();
     }
 });
+
+test('Insert non-existing paths & hosts into srcDst table', async () => {
+    await db.srcDsts.insert(['/non', '/exist'], 'nonexist.com');
+    await db.srcDsts.insert(['/nonx', '/existx'], 'yahoo.com');
+    await db.srcDsts.insert(['/non', '/exist'], 'yahoo.com');
+
+    let hostObj = await db.hosts.selectOne({
+        host: 'nonexist.com'
+    });
+    let srcPathObj = await db.paths.selectOne({
+        path: '/non',
+        HostId: hostObj.id
+    });
+    let dstPathObj = await db.paths.selectOne({
+        path: '/exist',
+        HostId: hostObj.id
+    });
+    let srcModels = await db.srcDsts.selectAll({
+        srcPathId: srcPathObj.id
+    });
+    let dstModels = await db.srcDsts.selectAll({
+        dstPathId: dstPathObj.id
+    });
+    expect(srcModels.length).toBe(1);
+    expect(dstModels.length).toBe(1);
+})
