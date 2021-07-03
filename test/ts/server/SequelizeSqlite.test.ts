@@ -3,6 +3,7 @@ import SqliteDatabase from "../../../src/ts/server/SqliteDatabase";
 import SqliteDatabaseError from "../../../src/ts/server/SqliteDatabaseError";
 import * as fs from "fs";
 import * as path from "path";
+import { ValidationError } from 'sequelize';
 
 var db: SqliteDatabase|null = null;
 const dbsPath = './test/sqlite-dbs'
@@ -47,7 +48,6 @@ test('Insert one into hosts table', async () => {
     await db.hosts.insert([testVal]);
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(1);
-    console.log(models[0]);
     expect(models[0].host).toBe(testVal);
 });
 
@@ -88,6 +88,12 @@ test('Insert bulk into hosts table', async () => {
     }
     for (let i=testVals.length+1; i<testVals.length+testVals2.length; i++) {
         expect(models[i].host).toBe(testVals2[i-testVals.length-1]);
+    }
+});
+
+test('Insert duplicate hosts', async () => {
+    for (let i=0; i<5; i++) {
+        await db.hosts.insert(['apple.com']);
     }
 });
 
