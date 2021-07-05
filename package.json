@@ -6,7 +6,7 @@
     "scripts": {
         "build-start": "npm run build && npm start",
         "build": "babel --extensions .ts --config-file ./.babelrc.server.json ./src/ts/server -d ./dist/server",
-        "build-scripts": "babel --extensions .ts ./src/ts/scripts -d ./public/static/js",
+        "build-scripts": "webpack",
         "start": "node dist/server/main.js",
         "build-start-example": "npm run build-example && npm run start-example",
         "build-example": "babel --extensions .ts ./example-server/src/ts -d ./example-server/dist",
@@ -17,8 +17,6 @@
     "license": "ISC",
     "dependencies": {
         "argparse": "^2.0.1",
-        "d3": "^7.0.0",
-        "d3-force": "^3.0.0",
         "express": "^4.17.1",
         "pug": "^3.0.2",
         "sequelize": "^6.6.4",
@@ -32,12 +30,17 @@
         "@babel/preset-env": "^7.14.7",
         "@babel/preset-typescript": "^7.14.5",
         "@tsconfig/node14": "^1.0.1",
+        "@tsconfig/recommended": "^1.0.1",
         "@types/argparse": "^2.0.8",
-        "@types/d3": "^7.0.0",
+        "@types/d3": "^4.13.12",
         "@types/express": "^4.17.12",
         "@types/jest": "^26.0.23",
         "@types/validator": "^13.1.4",
         "babel-jest": "^27.0.6",
-        "jest": "^27.0.6"
+        "babel-loader": "^8.2.2",
+        "d3": "^4.13.0",
+        "jest": "^27.0.6",
+        "webpack": "^5.42.0",
+        "webpack-cli": "^4.7.2"
     }
 }

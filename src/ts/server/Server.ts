@@ -11,8 +11,9 @@ export default class Server {
     public constructor(port=8000) {
         this.port = port;
         this.app.use(express.json());
+        this.app.use(express.static('./public/'));
         this.app.set('view engine', 'pug');
-        this.app.set('views', path.resolve(__dirname, '../src/pug'));
+        this.app.set('views', path.resolve(__dirname, '../../src/pug'));
         this.db = new DatabaseFacade();
     }
 
