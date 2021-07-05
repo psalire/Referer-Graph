@@ -1,5 +1,5 @@
 
-import { Model, ModelCtor, ValidationError, UniqueConstraintError } from 'sequelize';
+import { Model, ModelCtor, ValidationError, UniqueConstraintError, OrderItem } from 'sequelize';
 import iDatabaseTable from './iDatabaseTable';
 import SqliteDatabaseError from './SqliteDatabaseError';
 
@@ -62,10 +62,11 @@ export default abstract class aSqliteTable implements iDatabaseTable {
         }));
     }
 
-    public selectAll(where?: object): Promise<Model[]> {
+    public selectAll(where?: object, order?: OrderItem[]): Promise<Model[]> {
         return this.model.findAll({
             attributes: this.columns,
-            where: where
+            where: where,
+            order: order
         });
     }
     public selectOne(where: object): Promise<Model|null> {
