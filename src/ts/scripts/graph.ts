@@ -2,20 +2,24 @@
 import * as d3 from "d3";
 
 var svg = d3.select("body").select("svg");
-console.log(svg);
 
-var width = svg.attr("width");
-var height = svg.attr("height");
+var bbox = document.getElementById("graph").getBoundingClientRect()
+var width = bbox.width;
+var height = bbox.height;
+console.log(width)
+console.log(height)
+// var width = svg.attr("width");
+// var height = svg.attr("height");
 
 svg = svg.call(d3.zoom().on("zoom", zoomed)).append("g");
 
 svg.append("defs").append("marker")
     .attr("id", "arrow")
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 30)
+    .attr("refX", 15)
     .attr("refY", 0)
-    .attr("markerWidth", 10)
-    .attr("markerHeight", 10)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
     .attr("orient", "auto")
   .append("svg:path")
     .attr("d", "M0,-5L10,0L0,5");
@@ -25,8 +29,8 @@ var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody().strength(-350))
-    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("charge", d3.forceManyBody().strength(-300))
+    .force("center", d3.forceCenter(width/2, height/2))
     .force("collision", d3.forceCollide(25));
 
 //d3.json("data.json", createGraph );
@@ -48,7 +52,7 @@ function createGraph (error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", 20)
+      .attr("r", 4)
       .attr("fill", function(d) { if (d.root == "true") return color(d.root); return color(d.type); })
       .call(d3.drag()
           .on("start", dragstarted)
