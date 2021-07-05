@@ -31,7 +31,7 @@ var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody().strength(-300))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collision", d3.forceCollide(25));
+// .force("collision", d3.forceCollide(25));
 
 //d3.json("data.json", createGraph );
 
@@ -55,8 +55,8 @@ function createGraph(error, graph) {
         .attr("r", 4)
         .attr("fill", function(d) { if (d.root == "true") return color(d.root); return color(d.type); })
         .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged));
+        .on("start", dragstarted)
+        .on("drag", dragged));
     // .on("end", dragended));
 
     var text = svg.append("g").attr("class", "labels").selectAll("g")
