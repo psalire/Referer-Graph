@@ -26,9 +26,6 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: true
                 }
-            },
-            {
-                timestamps: false
             }
         );
         var pathsModel = this.sequelize.define(
@@ -48,9 +45,6 @@ export default class SqliteDatabase {
                         key: 'id'
                     }
                 }
-            },
-            {
-                timestamps: false
             }
         );
         var srcDstModel = this.sequelize.define(
@@ -74,9 +68,6 @@ export default class SqliteDatabase {
                         key: 'id'
                     }
                 }
-            },
-            {
-                timestamps: false,
             }
         );
 

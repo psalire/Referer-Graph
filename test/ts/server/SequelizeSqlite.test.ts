@@ -81,13 +81,9 @@ test('Insert bulk into hosts table', async () => {
 
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
-
-    expect(models[0].host).toBe('example.com');
-    for (let i=0; i<testVals.length; i++) {
-        expect(models[i+1].host).toBe(testVals[i]);
-    }
-    for (let i=testVals.length+1; i<testVals.length+testVals2.length; i++) {
-        expect(models[i].host).toBe(testVals2[i-testVals.length-1]);
+    let hosts = models.map(val=>val.host);
+    for (let host of hosts) {
+        expect(testVals.concat(testVals2).concat("example.com")).toContain(host);
     }
 });
 
@@ -115,10 +111,18 @@ test('Insert into paths table', async () => {
     }
     models = await db.paths.selectAll();
     expect(models.length).toBe(5);
-    for (let i=1; i<models.length; i++) {
-        let val = vals[i-1];
-        expect(models[i].path).toBe(val[0][0]);
-        expect((await models[i].getHost()).host).toBe(val[1]);
+    let paths = models.map(val=>val.path);
+    let hosts = models.map(async (val)=>{
+        return (await val.getHost()).host
+    });
+    hosts = await Promise.all(hosts);
+    let testPaths = (vals.map(val=>val[0][0])).concat("/");
+    let testHosts = vals.map(val=>val[1]);
+    for (let path of paths) {
+        expect(testPaths).toContain(path);
+    }
+    for (let host of hosts) {
+        expect(testHosts).toContain(host);
     }
 });
 
@@ -183,7 +187,7 @@ test('Insert cross host into srcDst table', async () => {
     for (let val of vals) {
         await db.srcDsts.insert(val[0], val[1], val[2]);
     }
-    let models = await db.srcDsts.selectAll();
+    let models = await db.srcDsts.selectAll(undefined, [['updatedAt', 'ASC']]);
     expect(models.length).toBe(6);
     for (let i=models.length-vals.length; i<models.length; i++) {
         let srcObj = await db.paths.selectByPk(models[i].srcPathId);
