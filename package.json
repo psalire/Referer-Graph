@@ -5,7 +5,7 @@
     "main": "dist/server/main.js",
     "scripts": {
         "build-start": "npm run build && npm start",
-        "build": "babel --extensions .ts --config-file ./.babelrc.server.json ./src/ts/server -d ./dist/server",
+        "build": "babel --extensions .ts ./src/ts/server -d ./dist/server",
         "build-scripts": "webpack",
         "start": "node dist/server/main.js",
         "build-start-example": "npm run build-example && npm run start-example",
