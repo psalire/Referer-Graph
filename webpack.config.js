@@ -17,5 +17,8 @@ module.exports = {
                 loader: 'babel-loader'
             }
         ]
+    },
+    resolve: {
+        extensions: ['.ts', '.js']
     }
 };
