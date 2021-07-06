@@ -2,12 +2,6 @@
 import * as d3 from "d3";
 import { io } from "socket.io-client";
 
-const socket = io();
-socket.on('data', (msg) => {
-    console.log('got data');
-    console.log(msg);
-});
-
 var svg = d3.select("body").select("svg");
 
 var bbox = document.getElementById("graph").getBoundingClientRect()
@@ -35,7 +29,7 @@ var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 
 var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("link", d3.forceLink().id((d) => { return d.id; }))
     .force("charge", d3.forceManyBody().strength(-300))
     .force("center", d3.forceCenter(width / 2, height / 2))
 // .force("collision", d3.forceCollide(25));
@@ -50,7 +44,7 @@ function createGraph(error, graph) {
         .selectAll("line")
         .data(graph.links)
         .enter().append("line")
-        .attr("stroke", function(d) { return color(d.type); })
+        .attr("stroke", (d) => { return color(d.type); })
         .attr("marker-end", "url(#arrow)");
 
 
@@ -60,7 +54,7 @@ function createGraph(error, graph) {
         .data(graph.nodes)
         .enter().append("circle")
         .attr("r", 4)
-        .attr("fill", function(d) { if (d.root == "true") return color(d.root); return color(d.type); })
+        .attr("fill", (d) => { if (d.root == "true") return color(d.root); return color(d.type); })
         .call(d3.drag()
         .on("start", dragstarted)
         .on("drag", dragged));
@@ -75,40 +69,33 @@ function createGraph(error, graph) {
         .attr("y", ".31em")
         .style("font-family", "sans-serif")
         .style("font-size", "0.7em")
-        .text(function(d) { return d.id; });
+        .text((d) => { return d.id; });
 
-    node.on("click", function(d) {
+    node.on("click", (d) => {
         console.log("clicked", d.id);
     });
 
 
     node.append("title")
-        .text(function(d) { return d.id; });
+        .text((d) => { return d.id; });
 
     simulation
         .nodes(graph.nodes)
-        .on("tick", ticked);
+        .on("tick", () => {
+            link
+                .attr("x1", (d) => { return d.source.x; })
+                .attr("y1", (d) => { return d.source.y; })
+                .attr("x2", (d) => { return d.target.x; })
+                .attr("y2", (d) => { return d.target.y; });
+            node
+                .attr("cx", (d) => { return d.x; })
+                .attr("cy", (d) => { return d.y; });
+            text
+                .attr("transform", (d) => { return "translate(" + d.x + "," + d.y + ")"; })
+        });
 
     simulation.force("link")
         .links(graph.links);
-
-
-    function ticked() {
-        link
-            .attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
-
-        node
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
-
-        text
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-
-
-    }
 }
 
 
@@ -132,7 +119,6 @@ function dragended(d) {
 function zoomed() {
     svg.attr("transform", "translate(" + d3.event.transform.x + "," + d3.event.transform.y + ")" + " scale(" + d3.event.transform.k + ")");
 }
-
 
 var data = {
     "nodes": [
@@ -1725,3 +1711,8 @@ var data = {
 };
 
 createGraph(false, data);
+
+const socket = io();
+socket.on('data', (msg) => {
+    console.log(msg);
+});

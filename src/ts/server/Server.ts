@@ -55,7 +55,7 @@ export default class Server {
                         requestData.host
                     );
                 }
-                this.io.emit('data', {host: requestData.host, path: requestData.path});
+                this.io.emit('data', requestData);
             }
             catch(e) {
                 console.error(e);
