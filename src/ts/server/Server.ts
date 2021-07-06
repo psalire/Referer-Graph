@@ -1,10 +1,12 @@
 
 import DatabaseFacade from './DatabaseFacade';
 import express from 'express';
+import http from 'http';
 import * as path from 'path';
 
 export default class Server {
     private readonly app: express.Application = express();
+    private server: http.Server;
     private db: DatabaseFacade;
     private port: number;
 
@@ -56,7 +58,8 @@ export default class Server {
             res.status(statusCode).end();
         });
 
-        this.app.listen(this.port, () => {
+        this.server = http.createServer(this.app);
+        this.server.listen(this.port, () => {
             console.log(`Listening at http://localhost:${this.port}`);
         });
     }
