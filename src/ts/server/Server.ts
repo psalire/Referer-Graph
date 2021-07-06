@@ -1,12 +1,14 @@
 
 import DatabaseFacade from './DatabaseFacade';
 import express from 'express';
-import http from 'http';
+import { createServer, Server as HttpServer} from 'http';
+import { Server as IOServer , Socket as IOSocket } from 'socket.io';
 import * as path from 'path';
 
 export default class Server {
     private readonly app: express.Application = express();
-    private server: http.Server;
+    private httpServer: HttpServer;
+    private io: IOServer;
     private db: DatabaseFacade;
     private port: number;
 
@@ -17,11 +19,15 @@ export default class Server {
         this.app.set('view engine', 'pug');
         this.app.set('views', path.resolve(__dirname, '../../src/pug'));
         this.db = new DatabaseFacade();
+        this.httpServer = createServer(this.app);
+        this.io = new IOServer(this.httpServer, {
+            serveClient: false
+        });
     }
 
     public start(): void {
         this.app.all('*', (req, _, next) => {
-            console.log(`${req.method} ${req.originalUrl}`);
+            console.log(`[${req.ip}]: ${req.method} ${req.originalUrl}`);
             next();
         });
 
@@ -35,7 +41,7 @@ export default class Server {
 
         this.app.post('/request', async (req, res) => {
             console.log(req.body);
-            var statusCode = 200;
+            var statusCode = 204;
             try {
                 var requestData = req.body.requestData;
                 // var responseData = req.body.respsonseData;
@@ -49,6 +55,7 @@ export default class Server {
                         requestData.host
                     );
                 }
+                this.io.emit('data', {host: requestData.host, path: requestData.path});
             }
             catch(e) {
                 console.error(e);
@@ -58,8 +65,11 @@ export default class Server {
             res.status(statusCode).end();
         });
 
-        this.server = http.createServer(this.app);
-        this.server.listen(this.port, () => {
+        this.io.on("connection", (socket) => {
+            console.log(`socket ${socket.id} connected!`);
+        });
+
+        this.httpServer.listen(this.port, () => {
             console.log(`Listening at http://localhost:${this.port}`);
         });
     }

@@ -28,4 +28,10 @@ public class Writer {
         jsonWriter.close();
         return jsonStringWriter.toString();
     }
+    public PrintWriter getOut() {
+        return this.out;
+    }
+    public PrintWriter getErr() {
+        return this.err;
+    }
 }

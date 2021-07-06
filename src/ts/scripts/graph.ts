@@ -1,5 +1,12 @@
 
 import * as d3 from "d3";
+import { io } from "socket.io-client";
+
+const socket = io();
+socket.on('data', (msg) => {
+    console.log('got data');
+    console.log(msg);
+});
 
 var svg = d3.select("body").select("svg");
 
