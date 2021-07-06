@@ -103,6 +103,7 @@ public class JsonHelper {
         URL requestURL = requestInfo.getUrl();
 
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+        jsonObjectBuilder.add("method", requestInfo.getMethod());
         addURLInformationToJson(jsonObjectBuilder, requestURL);
         addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
         addPotentialNullToJson(jsonObjectBuilder, "referer", getRefererJson(
