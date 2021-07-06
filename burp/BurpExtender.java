@@ -41,10 +41,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
     */
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        this.writer.printlnOut(
-                (messageIsRequest ? "HTTP request to " : "HTTP response from ") +
-                messageInfo.getHttpService() +
-                " [" + this.callbacks.getToolName(toolFlag) + "]");
+        // this.writer.printlnOut(
+        //         (messageIsRequest ? "HTTP request to " : "HTTP response from ") +
+        //         messageInfo.getHttpService() +
+        //         " [" + this.callbacks.getToolName(toolFlag) + "]");
 
         if (messageIsRequest) {
             return; // Only record requests with responses
