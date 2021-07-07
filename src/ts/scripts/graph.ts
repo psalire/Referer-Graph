@@ -24,8 +24,9 @@ socket.on('data', (msg) => {
             knownPaths.add(src);
             d3Graph.data.addNode(src, 1);
         }
+        if (src==dst) return;
         let srcDstStr = src+dst;
-        if (src!=dst && !(knownLinks.has(srcDstStr))) {
+        if (!(knownLinks.has(srcDstStr))) {
             knownLinks.add(srcDstStr);
             let srcDstHosts = msg.referer.host+','+msg.host;
             if (!(srcDstHosts in knownPathsIndex)) {
@@ -36,8 +37,6 @@ socket.on('data', (msg) => {
             console.log(type)
             d3Graph.data.addLink(src, dst, msg.method, type);
         }
-        // console.log(d3Graph.data.getNodes());
-        // console.log(d3Graph.data.getLinks());
         if (isGraphCreated) {
             d3Graph.updateGraph();
         }

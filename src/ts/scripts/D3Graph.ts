@@ -7,7 +7,6 @@ export default class D3Graph {
     private simulation: any;
     public data: Data;
     private readonly simulationStrength = -400;
-    // private readonly colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 17;
 
@@ -66,15 +65,6 @@ export default class D3Graph {
             .enter().append("g");
         this.formatText(text);
 
-        // var linkLabel = null
-
-        // node.on("click", (d) => {
-        //     console.log("clicked", d.id);
-        // });
-
-        // node.append("title")
-        //     .text((d) => { return d.id; });
-
         this.defineSimulation(dataNodes, dataLinks, link, node, text);
 
         return this;
@@ -106,6 +96,7 @@ export default class D3Graph {
         link = this.formatLink(link)
                 .merge(link);
 
+        // Update link labels
         var linkPath = this.svg.select('.links')
                         .selectAll('.linkPath')
                         .data(dataLinks);
@@ -233,22 +224,13 @@ export default class D3Graph {
                 return 'rotate(0)';
             }
         })
-        .attr('dy', (d) => {
-            if (d.target.x<d.source.x) {
-                return '10';
-            }
-            else {
-                return '-2';
-            }
-        });
-
+        .attr('dy', (d) => (d.target.x<d.source.x) ? '10' : '-2');
     }
     private placeWithBoundary(val: number, boundary: number) {
         return val;
         // return val<0 ? 0 : Math.min(val, boundary);
     }
     private dragstarted(d): void {
-        // if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
     }
@@ -257,7 +239,6 @@ export default class D3Graph {
         d.fy = d3.event.y;
     }
     private dragended(d): void {
-        // if (!d3.event.active) this.simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
     }
