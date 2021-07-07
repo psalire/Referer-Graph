@@ -104,7 +104,11 @@ export default class D3Graph {
         linkPath.exit().remove();
         linkPath = linkPath.enter().append('path')
             .attr('d', (d) => {
-                return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y
+                let sx = d.source.x || d.x;
+                let sy = d.source.y || d.y;
+                let tx = d.target.x || d.x;
+                let ty = d.target.y || d.y;
+                return 'M '+sx+' '+sy+' L '+tx+' '+ty
             }).attr('class', 'linkPath')
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
@@ -209,6 +213,7 @@ export default class D3Graph {
                 // .attr("y", '0.31em')
                 .style("font-family", "sans-serif")
                 .style("font-size", "11px")
+                .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
                 .text((d) => { return d.method });
     }
@@ -262,7 +267,7 @@ export default class D3Graph {
     private getPathsToId(d) {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
-        let method = d.target.method || d.method || '';
+        let method = d.target.method || d.method || 'n/a';
         return 'linkId_'+btoa(src+target+method);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {
