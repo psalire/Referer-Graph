@@ -13,19 +13,19 @@ var knownLinks = new Set();
 const socket = io();
 socket.on('data', (msg) => {
     // console.log(msg);
+    let dst = msg.protocol+'://'+msg.host+msg.path;
+    let dstWithMethod = msg.method+dst;
+    if (!(knownPaths.has(dstWithMethod))) {
+        knownPaths.add(dstWithMethod);
+        d3Graph.data.addNode(dst, msg.method, 1);
+    }
     if (msg.referer) {
-        let dst = msg.protocol+'://'+msg.host+msg.path;
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
-        if (src==dst) return;
-        let dstWithMethod = msg.method+dst;
-        if (!(knownPaths.has(dstWithMethod))) {
-            knownPaths.add(dstWithMethod);
-            d3Graph.data.addNode(dst, msg.method, 1);
-        }
         if (!(knownPaths.has(src))) {
             knownPaths.add(src);
             d3Graph.data.addNode(src, null, 1);
         }
+        if (src==dst) return;
         let srcDstStr = src+dst+msg.method;
         if (!(knownLinks.has(srcDstStr))) {
             knownLinks.add(srcDstStr);
