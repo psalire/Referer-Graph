@@ -8,7 +8,9 @@ export default class D3Graph {
     public data: Data;
     private readonly simulationStrength = -400;
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
-    private readonly radius = 17;
+    private readonly radius = 18;
+    private readonly linkDistance = 300;
+    private readonly circleStrokeWidth = 2;
 
     constructor(svgName='#graph') {
         this.svg = d3.select(svgName);
@@ -23,7 +25,7 @@ export default class D3Graph {
             .append("marker")
             .attr("id", "arrow")
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 20)
+            .attr("refX", this.radius+this.circleStrokeWidth+1)
             .attr("refY", 0)
             .attr("markerWidth", 8)
             .attr("markerHeight", 8)
@@ -32,13 +34,14 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().distance(200).id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance(this.linkDistance).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
             .force("x", d3.forceX(dims.x / 2))
             .force("y", d3.forceY(dims.y / 2))
-            .force("collision", d3.forceCollide().radius(this.radius+2))
+            .force("collision", d3.forceCollide().radius(this.radius+10))
+            .alphaTarget(0.3)
         this.data = new Data();
     }
 
@@ -60,10 +63,7 @@ export default class D3Graph {
 
         var text = this.svg.append("g")
             .attr("class", "labels")
-            // .selectAll(".nodeLabel")
-            // .data(dataNodes)
             .enter()
-            // .append("g");
         // this.formatText(text);
 
         this.defineSimulation(dataNodes, dataLinks, link, node, text);
@@ -119,8 +119,20 @@ export default class D3Graph {
                             .data(dataLinks);
         linkLabel.exit().remove();
         linkLabel = linkLabel.enter().append('text')
-            .attr("dx", 20)
+            .attr("dx", this.radius+this.circleStrokeWidth)
             .attr("dy", -2)
+            .attr('transform', (d) => {
+                if (d.target.x<d.source.x) {
+                    let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
+                    if (!dims) return 'rotate(0)';
+                    var rx = dims.x+dims.width/2;
+                    var ry = dims.y+dims.height/2;
+                    return 'rotate(180 '+rx+' '+ry+')';
+                }
+                else {
+                    return 'rotate(0)';
+                }
+            })
             .attr("id", (d) => {
                 return 'labelPath_'+this.getPathsToId(d);
             })
@@ -147,7 +159,7 @@ export default class D3Graph {
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
-        this.simulation.alphaTarget(0.3).restart();
+        this.simulation.restart();
 
         return this;
     }
@@ -193,7 +205,7 @@ export default class D3Graph {
     private formatText(text: object): object {
         return text.enter().append("text")
                 .attr('class', 'nodeLabel')
-                .attr("x", 20)
+                .attr("x", this.radius+this.circleStrokeWidth)
                 // .attr("y", '0.31em')
                 .style("font-family", "sans-serif")
                 .style("font-size", "11px")
@@ -251,7 +263,6 @@ export default class D3Graph {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
         let method = d.target.method || d.method || '';
-        method!='' || console.log(JSON.stringify(d));
         return 'linkId_'+btoa(src+target+method);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {

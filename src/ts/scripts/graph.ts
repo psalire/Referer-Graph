@@ -12,7 +12,7 @@ var knownLinks = new Set();
 
 const socket = io();
 socket.on('data', (msg) => {
-    console.log(msg);
+    // console.log(msg);
     let dst = msg.protocol+'://'+msg.host+msg.path;
     let dstWithMethod = msg.method+dst;
     if (!(knownPaths.has(dstWithMethod))) {
