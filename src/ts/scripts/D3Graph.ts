@@ -110,7 +110,8 @@ export default class D3Graph {
                         .selectAll('.linkPath')
                         .data(dataLinks);
         linkPath.exit().remove();
-        linkPath = linkPath.enter().append('path').attr('d', (d) => {
+        linkPath = linkPath.enter().append('path')
+            .attr('d', (d) => {
                 return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y
             }).attr('class', 'linkPath')
             .attr('fill-opacity', 0)
@@ -131,10 +132,11 @@ export default class D3Graph {
             .attr("id", (d) => {
                 return 'label_'+this.getPathsToId(d);
             })
+            .attr('class', 'linkLabel')
             .style("font-family", "sans-serif")
             .style("font-size", "12px")
-            .style("pointer-events", "none");
-        linkLabel.append('textPath')
+            .style("pointer-events", "none")
+            .append('textPath')
             .attr('xlink:href', (d) => {
                 return '#'+this.getPathsToId(d);
             })
