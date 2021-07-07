@@ -9,7 +9,7 @@ export default class D3Graph {
     private readonly simulationStrength = -300;
     // private readonly colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
-    private readonly radius = 10;
+    private readonly radius = 18;
 
     constructor(svgName='#graph') {
         this.svg = d3.select(svgName);
@@ -24,7 +24,7 @@ export default class D3Graph {
             .append("marker")
             .attr("id", "arrow")
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 16)
+            .attr("refX", 22)
             .attr("refY", 0)
             .attr("markerWidth", 8)
             .attr("markerHeight", 8)
@@ -66,26 +66,7 @@ export default class D3Graph {
             .enter().append("g");
         this.formatText(text);
 
-        var linkLabel = null
-
-        // var edgelabels = this.svg.append('g')
-        //     .attr('class', "linkLabels")
-        //     .selectAll('g')
-        //     .data(dataLinks)
-        //     .enter()
-        //     .append('text')
-        //     .style("pointer-events", "none")
-        //     .attr('class', 'edgelabel')
-        //     // .attr('id', function (d, i) {return 'linkId_'+d.type+i})
-        //     .attr('font-size', 10)
-        //     .attr('fill', '#aaa');
-        //
-        // edgelabels.append('textPath')
-        //     .attr('xlink:href', function (d, i) {return '#linkId_'+d.type+i})
-        //     .style("text-anchor", "middle")
-        //     .style("pointer-events", "none")
-        //     .attr("startOffset", "50%")
-        //     .text('hello world');
+        // var linkLabel = null
 
         // node.on("click", (d) => {
         //     console.log("clicked", d.id);
@@ -128,10 +109,10 @@ export default class D3Graph {
         const getPathsToId = (d)=> {
             let src = d.source.id || d.source;
             let target = d.target.id || d.target;
-            console.log('dis');
-            console.log(src)
-            console.log(target)
-            console.log('sid');
+            // console.log('dis');
+            // console.log(src)
+            // console.log(target)
+            // console.log('sid');
             return 'linkId_'+btoa(src+target);
         };
 
@@ -153,12 +134,17 @@ export default class D3Graph {
                             .selectAll('.linkLabel')
                             .data(dataLinks);
         linkLabel.exit().remove();
-        linkLabel.enter().append('text').append('textPath')
+        linkLabel.enter().append('text')
+            .attr("dx", (d)=>{return 100-d.method.length*10})
+            .attr("dy", -2)
+            .style("font-family", "sans-serif")
+            .style("font-size", "12px")
+            .style("pointer-events", "none")
+            .append('textPath')
             .attr('xlink:href', (d) => {
                 return '#'+getPathsToId(d);
             })
-            .style("pointer-events", "none")
-            .text((d) => {return 'hello world'})
+            .text((d) => {return d.method})
             .merge(linkLabel);
 
         var text = this.svg.select('.labels')
@@ -216,7 +202,7 @@ export default class D3Graph {
     }
     private formatText(text: object): object {
         return text.append("text")
-                .attr("x", 15)
+                .attr("x", 22)
                 .attr("y", '0.31em')
                 .style("font-family", "sans-serif")
                 .style("font-size", "0.7em")
