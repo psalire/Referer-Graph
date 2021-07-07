@@ -34,7 +34,7 @@ socket.on('data', (msg) => {
             let type = knownPathsIndex[srcDstHosts];
             console.log(srcDstHosts);
             console.log(type)
-            d3Graph.data.addLink(src, dst, type);
+            d3Graph.data.addLink(src, dst, msg.method, type);
         }
         // console.log(d3Graph.data.getNodes());
         // console.log(d3Graph.data.getLinks());

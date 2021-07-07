@@ -15,10 +15,11 @@ export default class Data {
         });
         return this;
     }
-    public addLink(src: string, dst: string, type: number): Data {
+    public addLink(src: string, dst: string, method: string, type: number): Data {
         this.links.push({
             'source': src,
             'target': dst,
+            'method': method,
             'type': type
         });
         return this;

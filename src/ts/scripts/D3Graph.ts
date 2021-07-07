@@ -33,7 +33,7 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance(200).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
@@ -64,23 +64,37 @@ export default class D3Graph {
             .selectAll("g")
             .data(dataNodes)
             .enter().append("g");
-
         this.formatText(text);
 
-        node.on("click", (d) => {
-            console.log("clicked", d.id);
-        });
+        var linkLabel = null
+
+        // var edgelabels = this.svg.append('g')
+        //     .attr('class', "linkLabels")
+        //     .selectAll('g')
+        //     .data(dataLinks)
+        //     .enter()
+        //     .append('text')
+        //     .style("pointer-events", "none")
+        //     .attr('class', 'edgelabel')
+        //     // .attr('id', function (d, i) {return 'linkId_'+d.type+i})
+        //     .attr('font-size', 10)
+        //     .attr('fill', '#aaa');
+        //
+        // edgelabels.append('textPath')
+        //     .attr('xlink:href', function (d, i) {return '#linkId_'+d.type+i})
+        //     .style("text-anchor", "middle")
+        //     .style("pointer-events", "none")
+        //     .attr("startOffset", "50%")
+        //     .text('hello world');
+
+        // node.on("click", (d) => {
+        //     console.log("clicked", d.id);
+        // });
 
         // node.append("title")
         //     .text((d) => { return d.id; });
 
-        this.simulation
-            .nodes(dataNodes)
-            .on("tick", () => {
-                this.ticked(link, node, text);
-            });
-        this.simulation.force("link")
-            .links(dataLinks);
+        this.defineSimulation(dataNodes, dataLinks, link, node, text, null);
 
         return this;
     }
@@ -111,6 +125,42 @@ export default class D3Graph {
         link = this.formatLink(link)
                 .merge(link);
 
+        const getPathsToId = (d)=> {
+            let src = d.source.id || d.source;
+            let target = d.target.id || d.target;
+            console.log('dis');
+            console.log(src)
+            console.log(target)
+            console.log('sid');
+            return 'linkId_'+btoa(src+target);
+        };
+
+        var linkPath = this.svg.select('.links')
+                        .selectAll('.linkPath')
+                        .data(dataLinks);
+        linkPath.exit().remove();
+        linkPath.enter().append('path').attr('d', (d) => {
+                return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y
+            }).attr('class', 'linkPath')
+            .attr('fill-opacity', 0)
+            .attr('stroke-opacity', 0)
+            .attr('fill', 'blue')
+            .attr('stroke', 'red')
+            .attr("id", getPathsToId)
+            .style("pointer-events", "none").merge(linkPath)
+
+        var linkLabel = this.svg.select('.links')
+                            .selectAll('.linkLabel')
+                            .data(dataLinks);
+        linkLabel.exit().remove();
+        linkLabel.enter().append('text').append('textPath')
+            .attr('xlink:href', (d) => {
+                return '#'+getPathsToId(d);
+            })
+            .style("pointer-events", "none")
+            .text((d) => {return 'hello world'})
+            .merge(linkLabel);
+
         var text = this.svg.select('.labels')
                     .selectAll('g')
                     .data(dataNodes);
@@ -121,15 +171,20 @@ export default class D3Graph {
                 .selectAll('g')
 
         // Redefine and restart simulation
-        this.simulation.nodes(dataNodes)
-            .on("tick", () => {
-                this.ticked(link, node, text);
-            });
-        this.simulation.force("link")
-            .links(dataLinks);
+        this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath);
         this.simulation.alphaTarget(0.3).restart();
 
         return this;
+    }
+
+    private defineSimulation(dataNodes: object[], dataLinks: object[], link: object, node: object, text: object, linkPath: object) {
+        this.simulation.nodes(dataNodes)
+            .on("tick", () => {
+                // this.ticked(link, node, null);
+                this.ticked(link, node, text, linkPath);
+            });
+        this.simulation.force("link")
+            .links(dataLinks);
     }
 
     private formatNode(node: object): object {
@@ -168,18 +223,22 @@ export default class D3Graph {
                 .text((d) => { return (new URL(d.id)).pathname; });
     }
 
-    private ticked(link, node, text): void {
+    private ticked(link, node, text, linkPath): void {
         let dims = this.getSvgDimensions();
-        link
+        link && link
             .attr("x1", (d) => { return this.placeWithBoundary(d.source.x, dims.x); })
             .attr("y1", (d) => { return this.placeWithBoundary(d.source.y, dims.y); })
             .attr("x2", (d) => { return this.placeWithBoundary(d.target.x, dims.x); })
             .attr("y2", (d) => { return this.placeWithBoundary(d.target.y, dims.y); });
-        node
+        node && node
             .attr("cx", (d) => { return this.placeWithBoundary(d.x, dims.x); })
             .attr("cy", (d) => { return this.placeWithBoundary(d.y, dims.y); });
-        text
+        text && text
             .attr("transform", (d) => { return `translate(${this.placeWithBoundary(d.x, dims.x)},${this.placeWithBoundary(d.y, dims.y)})`; })
+        linkPath && linkPath.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+                                           //console.log(d)
+                                           return path});
+
     }
     private placeWithBoundary(val: number, boundary: number) {
         return val;
