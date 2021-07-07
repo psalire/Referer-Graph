@@ -41,7 +41,6 @@ export default class D3Graph {
             .force("x", d3.forceX(dims.x / 2))
             .force("y", d3.forceY(dims.y / 2))
             .force("collision", d3.forceCollide().radius(this.radius+10))
-            .alphaTarget(0.3)
         this.data = new Data();
     }
 
@@ -163,7 +162,7 @@ export default class D3Graph {
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
-        this.simulation.restart();
+        this.simulation.alphaTarget(0.3).restart();
 
         return this;
     }
@@ -215,7 +214,7 @@ export default class D3Graph {
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
-                .text((d) => { return d.method });
+                .text((d) => { return d.method || 'n/a' });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
@@ -231,8 +230,11 @@ export default class D3Graph {
         text && text
             .attr("transform", (d) => { return `translate(${this.placeWithBoundary(d.x, dims.x)},${this.placeWithBoundary(d.y, dims.y)})`; })
         linkPath && linkPath.attr('d', (d) => {
-            var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-            return path
+            let sx = d.source.x || d.x;
+            let sy = d.source.y || d.y;
+            let tx = d.target.x || d.x;
+            let ty = d.target.y || d.y;
+            return 'M '+sx+' '+sy+' L '+tx+' '+ty
         });
         linkLabel && linkLabel.attr('transform', (d) => {
             if (d.target.x<d.source.x) {
@@ -267,7 +269,7 @@ export default class D3Graph {
     private getPathsToId(d) {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
-        let method = d.target.method || d.method || 'n/a';
+        let method = d.target.method || d.method || '';
         return 'linkId_'+btoa(src+target+method);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {
