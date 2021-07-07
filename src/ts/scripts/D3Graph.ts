@@ -7,7 +7,8 @@ export default class D3Graph {
     private simulation: any;
     public data: Data;
     private readonly simulationStrength = -300;
-    private readonly colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
+    // private readonly colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
+    private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 10;
 
     constructor(svgName='#graph') {
@@ -49,11 +50,8 @@ export default class D3Graph {
         var link = this.svg.append("g")
             .attr("class", "links")
             .selectAll("line")
-            .data(dataLinks)
-            .enter().append("line")
-            .attr("stroke", (d) => { return this.colorScheme(d.type); })
-            .attr("stroke-width", "2")
-            .attr("marker-end", "url(#arrow)");
+            .data(dataLinks);
+        link = this.formatLink(link);
 
         var node = this.svg.append("g")
             .attr("class", "nodes")
@@ -69,7 +67,7 @@ export default class D3Graph {
 
         text.append("text")
             .attr("x", 20)
-            .attr("y", ".31em")
+            // .attr("y", ".31em")
             .style("font-family", "sans-serif")
             .style("font-size", "0.7em")
             .text((d) => { return (new URL(d.id)).pathname; });
@@ -115,25 +113,15 @@ export default class D3Graph {
         // Exit any old links
         link.exit().remove();
         // Enter links
-        link = link
-                .enter().append("line")
-                .attr("stroke", (d) => { return this.colorScheme(d.type); })
-                .attr("stroke-width", "2")
-                .attr("marker-end", "url(#arrow)")
+        link = this.formatLink(link)
                 .merge(link);
 
         var text = this.svg.select('.labels')
                     .selectAll('g')
                     .data(dataNodes);
         text.exit().remove();
-        text = text.enter().append("g")
-                .append("text")
-                .attr("x", 20)
-                // .attr("y", 20)
-                .style("font-family", "sans-serif")
-                .style("font-size", "0.7em")
-                .text((d) => { return (new URL(d.id)).pathname; })
-                .merge(text);
+        text = text.enter().append("g");
+        this.formatText(text).merge(text);
         text = this.svg.select('.labels')
                 .selectAll('g')
 
@@ -169,6 +157,20 @@ export default class D3Graph {
                             if (!d3.event.active) this.simulation.alphaTarget(0);
                             this.dragended(d);
                         }));
+    }
+    private formatLink(link: object): object {
+        return link.enter().append("line")
+                .attr("stroke", (d) => { return this.colorScheme(d.type); })
+                .attr("stroke-width", "2")
+                .attr("marker-end", "url(#arrow)");
+    }
+    private formatText(text: object): object {
+        return text.append("text")
+                .attr("x", 15)
+                .attr("y", '0.31em')
+                .style("font-family", "sans-serif")
+                .style("font-size", "0.7em")
+                .text((d) => { return (new URL(d.id)).pathname; });
     }
 
     private ticked(link, node, text): void {

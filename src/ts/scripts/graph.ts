@@ -7,7 +7,7 @@ var d3Graph = new D3Graph();
 
 var isGraphCreated = false;
 var knownPaths = new Set();
-var knownPathsIndex = [];
+var knownPathsIndex = {};
 var knownLinks = new Set();
 
 const socket = io();
@@ -27,11 +27,12 @@ socket.on('data', (msg) => {
         let srcDstStr = src+dst;
         if (src!=dst && !(knownLinks.has(srcDstStr))) {
             knownLinks.add(srcDstStr);
-            let type = knownPathsIndex.indexOf(src);
-            if (type==-1) {
-                knownPathsIndex.push(src);
-                type = knownPathsIndex.indexOf(src);
+            let srcDstHosts = msg.referer.host+','+msg.host;
+            if (!(srcDstHosts in knownPathsIndex)) {
+                knownPathsIndex[srcDstHosts] = Math.random();
             }
+            let type = knownPathsIndex[srcDstHosts];
+            console.log(srcDstHosts);
             console.log(type)
             d3Graph.data.addLink(src, dst, type);
         }
