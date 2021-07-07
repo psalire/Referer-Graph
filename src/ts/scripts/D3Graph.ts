@@ -32,7 +32,7 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().distance(150).id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance(200).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
@@ -60,11 +60,11 @@ export default class D3Graph {
 
         var text = this.svg.append("g")
             .attr("class", "labels")
-            .selectAll(".nodeLabel")
-            .data(dataNodes)
+            // .selectAll(".nodeLabel")
+            // .data(dataNodes)
             .enter()
             // .append("g");
-        this.formatText(text);
+        // this.formatText(text);
 
         this.defineSimulation(dataNodes, dataLinks, link, node, text);
 
@@ -119,20 +119,20 @@ export default class D3Graph {
                             .data(dataLinks);
         linkLabel.exit().remove();
         linkLabel = linkLabel.enter().append('text')
-            .attr("dx", (d)=>{return 75-d.method.length*8})
+            .attr("dx", 20)
             .attr("dy", -2)
             .attr("id", (d) => {
-                return 'label_'+this.getPathsToId(d);
+                return 'labelPath_'+this.getPathsToId(d);
             })
             .attr('class', 'linkLabel')
             .style("font-family", "sans-serif")
-            .style("font-size", "12px")
+            .style("font-size", "11px")
             .style("pointer-events", "none")
             .append('textPath')
             .attr('xlink:href', (d) => {
                 return '#'+this.getPathsToId(d);
             })
-            .text((d) => {return d.method})
+            .text((d) => {return (new URL(d.target.id||d.target)).pathname})
             .merge(linkLabel);
 
         var text = this.svg.select('.labels')
@@ -193,11 +193,12 @@ export default class D3Graph {
     private formatText(text: object): object {
         return text.enter().append("text")
                 .attr('class', 'nodeLabel')
-                .attr("x", 22)
-                .attr("y", '0.31em')
+                .attr("x", 20)
+                // .attr("y", '0.31em')
                 .style("font-family", "sans-serif")
-                .style("font-size", "0.7em")
-                .text((d) => { return (new URL(d.id)).pathname; });
+                .style("font-size", "11px")
+                // .text((d) => { return (new URL(d.id)).pathname; });
+                .text((d) => { return d.method });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
@@ -218,7 +219,8 @@ export default class D3Graph {
         });
         linkLabel && linkLabel.attr('transform', (d) => {
             if (d.target.x<d.source.x) {
-                let dims = this.getBboxDimensions('label_'+this.getPathsToId(d));
+                let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
+                if (!dims) return 'rotate(0)';
                 var rx = dims.x+dims.width/2;
                 var ry = dims.y+dims.height/2;
                 return 'rotate(180 '+rx+' '+ry+')';
@@ -226,8 +228,7 @@ export default class D3Graph {
             else {
                 return 'rotate(0)';
             }
-        })
-        .attr('dy', (d) => (d.target.x<d.source.x) ? '10' : '-2');
+        });
     }
     private placeWithBoundary(val: number, boundary: number) {
         return val;
@@ -249,13 +250,16 @@ export default class D3Graph {
     private getPathsToId(d) {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
-        return 'linkId_'+btoa(src+target);
+        let method = d.target.method || d.method || '';
+        method!='' || console.log(JSON.stringify(d));
+        return 'linkId_'+btoa(src+target+method);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {
         let dims = document.getElementById(id).getBoundingClientRect();
         return {'x':dims.width, 'y':dims.height,'xoff':dims.x,'yoff':dims.y};
     }
     private getBboxDimensions(id: string): object {
+        if (!document.getElementById(id)) return null;
         return document.getElementById(id).getBBox();
     }
 }

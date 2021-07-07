@@ -8,10 +8,11 @@ export default class Data {
         this.links = [];
     }
 
-    public addNode(id: string, type: number): Data {
+    public addNode(id: string, method: string, type: number): Data {
         this.nodes.push({
             'id': id,
-            'type': type
+            'type': type,
+            'method': method
         });
         return this;
     }
