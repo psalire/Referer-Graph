@@ -222,7 +222,7 @@ export default class D3Graph {
             var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
             return path
         });
-        linkLabel && linkLabel.attr('transform', (d,i) => {
+        linkLabel && linkLabel.attr('transform', (d) => {
             if (d.target.x<d.source.x) {
                 let dims = this.getBboxDimensions('label_'+this.getPathsToId(d));
                 var rx = dims.x+dims.width/2;
@@ -231,6 +231,14 @@ export default class D3Graph {
             }
             else {
                 return 'rotate(0)';
+            }
+        })
+        .attr('dy', (d) => {
+            if (d.target.x<d.source.x) {
+                return '10';
+            }
+            else {
+                return '-2';
             }
         });
 
