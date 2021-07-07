@@ -6,10 +6,10 @@ export default class D3Graph {
     private svg: any;
     private simulation: any;
     public data: Data;
-    private readonly simulationStrength = -300;
+    private readonly simulationStrength = -400;
     // private readonly colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
-    private readonly radius = 18;
+    private readonly radius = 17;
 
     constructor(svgName='#graph') {
         this.svg = d3.select(svgName);
@@ -24,7 +24,7 @@ export default class D3Graph {
             .append("marker")
             .attr("id", "arrow")
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 22)
+            .attr("refX", 20)
             .attr("refY", 0)
             .attr("markerWidth", 8)
             .attr("markerHeight", 8)
@@ -33,13 +33,13 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().distance(200).id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance(150).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
             .force("x", d3.forceX(dims.x / 2))
             .force("y", d3.forceY(dims.y / 2))
-            // .force("collision", d3.forceCollide().radius(radius))
+            .force("collision", d3.forceCollide().radius(this.radius+2))
         this.data = new Data();
     }
 
@@ -75,7 +75,7 @@ export default class D3Graph {
         // node.append("title")
         //     .text((d) => { return d.id; });
 
-        this.defineSimulation(dataNodes, dataLinks, link, node, text, null);
+        this.defineSimulation(dataNodes, dataLinks, link, node, text);
 
         return this;
     }
@@ -106,43 +106,37 @@ export default class D3Graph {
         link = this.formatLink(link)
                 .merge(link);
 
-        const getPathsToId = (d)=> {
-            let src = d.source.id || d.source;
-            let target = d.target.id || d.target;
-            // console.log('dis');
-            // console.log(src)
-            // console.log(target)
-            // console.log('sid');
-            return 'linkId_'+btoa(src+target);
-        };
-
         var linkPath = this.svg.select('.links')
                         .selectAll('.linkPath')
                         .data(dataLinks);
         linkPath.exit().remove();
-        linkPath.enter().append('path').attr('d', (d) => {
+        linkPath = linkPath.enter().append('path').attr('d', (d) => {
                 return 'M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y
             }).attr('class', 'linkPath')
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
             .attr('fill', 'blue')
             .attr('stroke', 'red')
-            .attr("id", getPathsToId)
-            .style("pointer-events", "none").merge(linkPath)
+            .attr("id", this.getPathsToId)
+            .style("pointer-events", "none")
+            .merge(linkPath)
 
         var linkLabel = this.svg.select('.links')
                             .selectAll('.linkLabel')
                             .data(dataLinks);
         linkLabel.exit().remove();
-        linkLabel.enter().append('text')
-            .attr("dx", (d)=>{return 100-d.method.length*10})
+        linkLabel = linkLabel.enter().append('text')
+            .attr("dx", (d)=>{return 75-d.method.length*8})
             .attr("dy", -2)
+            .attr("id", (d) => {
+                return 'label_'+this.getPathsToId(d);
+            })
             .style("font-family", "sans-serif")
             .style("font-size", "12px")
-            .style("pointer-events", "none")
-            .append('textPath')
+            .style("pointer-events", "none");
+        linkLabel.append('textPath')
             .attr('xlink:href', (d) => {
-                return '#'+getPathsToId(d);
+                return '#'+this.getPathsToId(d);
             })
             .text((d) => {return d.method})
             .merge(linkLabel);
@@ -151,23 +145,24 @@ export default class D3Graph {
                     .selectAll('g')
                     .data(dataNodes);
         text.exit().remove();
-        text = text.enter().append("g");
+        text.enter().append("g");
         this.formatText(text).merge(text);
         text = this.svg.select('.labels')
                 .selectAll('g')
 
         // Redefine and restart simulation
-        this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath);
+        this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
         this.simulation.alphaTarget(0.3).restart();
 
         return this;
     }
 
-    private defineSimulation(dataNodes: object[], dataLinks: object[], link: object, node: object, text: object, linkPath: object) {
+    private defineSimulation(
+        dataNodes: object[], dataLinks: object[], link: object, node: object, text: object, linkPath?: object, linkLabel?: object
+    ) {
         this.simulation.nodes(dataNodes)
             .on("tick", () => {
-                // this.ticked(link, node, null);
-                this.ticked(link, node, text, linkPath);
+                this.ticked(link, node, text, linkPath, linkLabel);
             });
         this.simulation.force("link")
             .links(dataLinks);
@@ -209,7 +204,7 @@ export default class D3Graph {
                 .text((d) => { return (new URL(d.id)).pathname; });
     }
 
-    private ticked(link, node, text, linkPath): void {
+    private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
         let dims = this.getSvgDimensions();
         link && link
             .attr("x1", (d) => { return this.placeWithBoundary(d.source.x, dims.x); })
@@ -221,9 +216,21 @@ export default class D3Graph {
             .attr("cy", (d) => { return this.placeWithBoundary(d.y, dims.y); });
         text && text
             .attr("transform", (d) => { return `translate(${this.placeWithBoundary(d.x, dims.x)},${this.placeWithBoundary(d.y, dims.y)})`; })
-        linkPath && linkPath.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
-                                           //console.log(d)
-                                           return path});
+        linkPath && linkPath.attr('d', (d) => {
+            var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y;
+            return path
+        });
+        linkLabel && linkLabel.attr('transform', (d,i) => {
+            if (d.target.x<d.source.x) {
+                let dims = this.getBboxDimensions('label_'+this.getPathsToId(d));
+                var rx = dims.x+dims.width/2;
+                var ry = dims.y+dims.height/2;
+                return 'rotate(180 '+rx+' '+ry+')';
+            }
+            else {
+                return 'rotate(0)';
+            }
+        });
 
     }
     private placeWithBoundary(val: number, boundary: number) {
@@ -245,8 +252,16 @@ export default class D3Graph {
         d.fy = null;
     }
 
-    private getSvgDimensions(): {[key: string]:number} {
-        let dims = document.getElementById("graph").getBoundingClientRect();
-        return {'x':dims.width, 'y':dims.height};
+    private getPathsToId(d) {
+        let src = d.source.id || d.source;
+        let target = d.target.id || d.target;
+        return 'linkId_'+btoa(src+target);
+    };
+    private getSvgDimensions(id='graph'): {[key: string]:number} {
+        let dims = document.getElementById(id).getBoundingClientRect();
+        return {'x':dims.width, 'y':dims.height,'xoff':dims.x,'yoff':dims.y};
+    }
+    private getBboxDimensions(id: string): object {
+        return document.getElementById(id).getBBox();
     }
 }
