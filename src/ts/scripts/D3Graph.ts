@@ -60,9 +60,10 @@ export default class D3Graph {
 
         var text = this.svg.append("g")
             .attr("class", "labels")
-            .selectAll("g")
+            .selectAll(".nodeLabel")
             .data(dataNodes)
-            .enter().append("g");
+            .enter()
+            // .append("g");
         this.formatText(text);
 
         this.defineSimulation(dataNodes, dataLinks, link, node, text);
@@ -135,13 +136,14 @@ export default class D3Graph {
             .merge(linkLabel);
 
         var text = this.svg.select('.labels')
-                    .selectAll('g')
+                    .selectAll('.nodeLabel')
                     .data(dataNodes);
         text.exit().remove();
-        text.enter().append("g");
+        // text.enter()
+            // .append("g");
         this.formatText(text).merge(text);
         text = this.svg.select('.labels')
-                .selectAll('g')
+                .selectAll('.nodeLabel')
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
@@ -189,7 +191,8 @@ export default class D3Graph {
                 .attr("marker-end", "url(#arrow)");
     }
     private formatText(text: object): object {
-        return text.append("text")
+        return text.enter().append("text")
+                .attr('class', 'nodeLabel')
                 .attr("x", 22)
                 .attr("y", '0.31em')
                 .style("font-family", "sans-serif")

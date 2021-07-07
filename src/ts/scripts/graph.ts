@@ -25,7 +25,7 @@ socket.on('data', (msg) => {
             d3Graph.data.addNode(src, 1);
         }
         if (src==dst) return;
-        let srcDstStr = src+dst;
+        let srcDstStr = src+dst+msg.method;
         if (!(knownLinks.has(srcDstStr))) {
             knownLinks.add(srcDstStr);
             let srcDstHosts = msg.referer.host+','+msg.host;
