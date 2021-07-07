@@ -65,12 +65,7 @@ export default class D3Graph {
             .data(dataNodes)
             .enter().append("g");
 
-        text.append("text")
-            .attr("x", 20)
-            // .attr("y", ".31em")
-            .style("font-family", "sans-serif")
-            .style("font-size", "0.7em")
-            .text((d) => { return (new URL(d.id)).pathname; });
+        this.formatText(text);
 
         node.on("click", (d) => {
             console.log("clicked", d.id);
