@@ -288,8 +288,8 @@ export default class D3Graph implements iGraph {
         });
     }
     private placeWithBoundary(val: number, boundary: number) {
-        return val;
-        // return val<0 ? 0 : Math.min(val, boundary);
+        // return val;
+        return val<0 ? 0 : Math.min(val, boundary);
     }
     private dragstarted(d): void {
         d.fx = d.x;
