@@ -9,6 +9,7 @@
         "build-scripts": "webpack --config webpack.config.scripts.js",
         "build-scripts-watch": "webpack --config webpack.config.scripts.js --watch",
         "build-css": "webpack --config webpack.config.css.js",
+        "build-css-watch": "webpack --config webpack.config.css.js --watch",
         "start": "node dist/server/main.js",
         "build-start-example": "npm run build-example && npm run start-example",
         "build-example": "babel --extensions .ts ./example-server/src/ts -d ./example-server/dist",
