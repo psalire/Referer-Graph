@@ -10,15 +10,12 @@ var knownPathsIndex = {};
 var knownLinks = new Set();
 
 const socket = io();
+d3Graph.createGraph();
 socket.on('data', (msg) => {
     d3Graph.data.addDstNode(msg);
     if (msg.referer) {
         d3Graph.data.addSrcNode(msg);
         d3Graph.data.addLink(msg);
-        if (!isGraphCreated) {
-            isGraphCreated = true;
-            d3Graph.createGraph();
-        }
         d3Graph.updateGraph();
     }
 });
