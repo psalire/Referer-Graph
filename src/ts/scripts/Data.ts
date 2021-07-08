@@ -11,10 +11,8 @@ export default class Data {
         this.links = [];
     }
 
-    // public addNode(id: string, method: string, type: number): Data {
     public addDstNode(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
-        // let dstWithMethod = msg.method+dst;
         if (!(this.knownPaths.has(dst))) {
             this.knownPaths.add(dst);
             this.addNode(dst, msg.referer ? msg.method : null, 1);
@@ -32,7 +30,6 @@ export default class Data {
         }
         return this;
     }
-    // public addLink(src: string, dst: string, method: string, type: number): Data {
     public addLink(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
@@ -45,9 +42,6 @@ export default class Data {
                 this.knownPathsIndex.set(srcDstHosts, Math.random());
             }
             let type = this.knownPathsIndex.get(srcDstHosts);
-            console.log(srcDstHosts);
-            console.log(src,dst);
-            console.log(type)
             this.links.push({
                 'source': src,
                 'target': dst,
@@ -66,11 +60,8 @@ export default class Data {
         });
     }
     private updateNodeMethod(id: string, method: string) {
-        console.log('updating...');
         var i = this.nodes.findIndex(v => v.id==id&&v.method&&!v.method.includes(method));
-        console.log('updated: '+i+' '+JSON.stringify(this.nodes))
         i!=-1 && (this.nodes[i].method += '|'+method);
-        console.log('updated: '+JSON.stringify(this.nodes[i]))
     }
     public getNodes(): object[] {
         return this.nodes;

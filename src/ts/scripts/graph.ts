@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 var d3Graph = new D3Graph();
 
-const socket = ;
+const socket = io();
 d3Graph.createGraph();
 socket.on('data', (msg) => {
     d3Graph.data.addDstNode(msg);

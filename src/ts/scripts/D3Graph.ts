@@ -38,8 +38,6 @@ export default class D3Graph implements iGraph {
         this.simulation = d3.forceSimulation()
             .force("link", d3.forceLink().distance((d)=>{
                 try {
-                    console.log(JSON.stringify(document.getElementById('textPath_'+this.getPathsToId(d))))
-                    console.log(document.getElementById('textPath_'+this.getPathsToId(d)).textContent)
                     const text = document.getElementById('textPath_'+this.getPathsToId(d)).textContent;
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
@@ -100,8 +98,6 @@ export default class D3Graph implements iGraph {
         // Enter any new nodes
         node = this.formatNode(node)
                 .merge(node)
-                // .append("title")
-                // .text((d) => { return d.id; });
 
         // Update links
         var link = this.svg.select('.links')
@@ -166,10 +162,6 @@ export default class D3Graph implements iGraph {
                 return '#'+this.getPathsToId(d);
             })
             .text((d) => {
-                console.log('url');
-                console.log(JSON.stringify(d.source));
-                console.log(JSON.stringify(d.target));
-                console.log('lru');
                 return (new URL(d.target.id||d.target)).pathname
             })
             .merge(linkLabel);
@@ -178,8 +170,6 @@ export default class D3Graph implements iGraph {
                     .selectAll('.nodeLabel')
                     .data(dataNodes);
         text.exit().remove();
-        // text.enter()
-            // .append("g");
         this.formatText(text).merge(text);
         text = this.svg.select('.labels')
                 .selectAll('.nodeLabel')
@@ -205,12 +195,7 @@ export default class D3Graph implements iGraph {
     private formatNode(node: object): object {
         var dims = this.getSvgDimensions();
         return node.enter().append("circle")
-                .attr("r", (d)=>{
-                    console.log('cir')
-                    console.log(JSON.stringify(d))
-                    console.log('ric')
-                    return this.radius
-                })
+                .attr("r", this.radius)
                 // .attr("fill", (d) => { if (d.root == "true") return color(d.root); return color(d.type); })
                 .attr("fill", "#4477ff")
                 .attr("stroke", 'black')
@@ -242,11 +227,7 @@ export default class D3Graph implements iGraph {
                 .style("font-family", "sans-serif")
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
-                // .text((d) => { return (new URL(d.id)).pathname; });
                 .text((d) => {
-                    console.log('format')
-                    console.log(JSON.stringify(d));
-                    console.log('tamrof')
                     return d.method || (new URL(d.id)).pathname
                 });
     }
@@ -287,7 +268,6 @@ export default class D3Graph implements iGraph {
         });
     }
     private placeWithBoundary(val: number, boundary: number) {
-        // return val;
         return val<0 ? 0 : Math.min(val, boundary);
     }
     private dragstarted(d): void {
@@ -306,7 +286,6 @@ export default class D3Graph implements iGraph {
     private getPathsToId(d) {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
-        // let method = d.target.method || d.method || '';
         return 'linkId_'+btoa(src+target);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {
