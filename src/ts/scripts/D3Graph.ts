@@ -6,7 +6,7 @@ export default class D3Graph {
     private svg: any;
     private simulation: any;
     public data: Data;
-    private readonly simulationStrength = -400;
+    private readonly simulationStrength = -300;
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 18;
     private readonly linkDistance = 300;
@@ -34,12 +34,12 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().distance(this.linkDistance).id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance(this.linkDistance).strength(0.5).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
-            .force("x", d3.forceX(dims.x / 2))
-            .force("y", d3.forceY(dims.y / 2))
+            .force("x", d3.forceX(dims.x / 2).strength(0.05))
+            .force("y", d3.forceY(dims.y / 2).strength(0.05))
             .force("collision", d3.forceCollide().radius(this.radius+10))
         this.data = new Data();
     }
@@ -162,7 +162,7 @@ export default class D3Graph {
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
-        this.simulation.alphaTarget(0.3).restart();
+        this.simulation.alphaTarget(0.3).velocityDecay(0.5).restart();
 
         return this;
     }
@@ -214,7 +214,7 @@ export default class D3Graph {
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
-                .text((d) => { return d.method || 'n/a' });
+                .text((d) => { return d.method || console.log(JSON.stringify(d)) });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
