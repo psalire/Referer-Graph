@@ -44,8 +44,7 @@ export default class D3Graph implements iGraph {
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
                     context.font = `${this.fontSize} ${this.font}`;
-                    var length = context.measureText(text).width+(this.radius+this.circleStrokeWidth)*2+
-                                 context.measureText('==').width;
+                    var length = context.measureText(text+'===').width+(this.radius+this.circleStrokeWidth)*2;
                     d.target.method && (d.method = d.target.method);
                     return length;
                 }
