@@ -10,11 +10,9 @@ export default class D3Graph implements iGraph {
     private readonly simulationStrength = -300;
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 18;
-    // private readonly linkDistance = 300;
     private readonly circleStrokeWidth = 2;
     private readonly font = 'sans-serif';
     private readonly fontSize = '11px';
-    private longestLength = 1;
 
     constructor(svgName='graph') {
         this.svg = d3.select('#graph-container').append('svg').attr('id', svgName);
@@ -48,11 +46,7 @@ export default class D3Graph implements iGraph {
                     context.font = `${this.fontSize} ${this.font}`;
                     var length = context.measureText(text).width+(this.radius+this.circleStrokeWidth)*2+
                                  context.measureText('==').width;
-                    if (length>this.longestLength) {
-                        this.longestLength = length;
-                    }
                     d.target.method && (d.method = d.target.method);
-                    // return this.longestLength;
                     return length;
                 }
                 catch(e) {
@@ -60,9 +54,7 @@ export default class D3Graph implements iGraph {
                     return this.longestLength;
                 }
             }).id((d) => { return d.id; }))
-            // .force("link", d3.forceLink().distance(this.linkDistance).strength(0.5).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
-            // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
             .force("x", d3.forceX(dims.x / 2).strength(0.05))
             .force("y", d3.forceY(dims.y / 2).strength(0.05))

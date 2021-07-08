@@ -65,7 +65,7 @@ export default class Server {
             res.status(statusCode).end();
         });
 
-        this.io.on("connection", (socket) => {
+        this.io.on("connection", (socket: IOSocket) => {
             console.log(`socket ${socket.id} connected!`);
         });
 
