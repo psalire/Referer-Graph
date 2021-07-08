@@ -19,9 +19,9 @@ export default class Data {
             this.knownPaths.add(dst);
             this.addNode(dst, msg.referer ? msg.method : null, 1);
         }
-        // else {
-        //     this.updateNodeMethod(dst, msg.method);
-        // }
+        else {
+            this.updateNodeMethod(dst, msg.method);
+        }
         return this;
     }
     public addSrcNode(msg: {[key: string]: any}): Data {
@@ -68,7 +68,9 @@ export default class Data {
     private updateNodeMethod(id: string, method: string) {
         console.log('updating...');
         var i = this.nodes.findIndex(v => v.id==id&&v.method&&!v.method.includes(method));
+        console.log('updated: '+i+' '+JSON.stringify(this.nodes))
         i!=-1 && (this.nodes[i].method += '|'+method);
+        console.log('updated: '+JSON.stringify(this.nodes[i]))
     }
     public getNodes(): object[] {
         return this.nodes;

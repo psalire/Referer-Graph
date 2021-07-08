@@ -51,6 +51,7 @@ export default class D3Graph implements iGraph {
                     if (length>this.longestLength) {
                         this.longestLength = length;
                     }
+                    d.target.method && (d.method = d.target.method);
                     // return this.longestLength;
                     return length;
                 }
@@ -251,7 +252,12 @@ export default class D3Graph implements iGraph {
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
-                .text((d) => { return d.method || (new URL(d.id)).pathname });
+                .text((d) => {
+                    console.log('format')
+                    console.log(JSON.stringify(d));
+                    console.log('tamrof')
+                    return d.method || (new URL(d.id)).pathname
+                });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
@@ -266,6 +272,9 @@ export default class D3Graph implements iGraph {
             .attr("cy", (d) => { return this.placeWithBoundary(d.y, dims.y); });
         text && text
             .attr("transform", (d) => { return `translate(${this.placeWithBoundary(d.x, dims.x)},${this.placeWithBoundary(d.y, dims.y)})`; })
+            .text((d) => {
+                return d.method || (new URL(d.id)).pathname
+            });
         linkPath && linkPath.attr('d', (d) => {
             let sx = d.source.x || d.x;
             let sy = d.source.y || d.y;
