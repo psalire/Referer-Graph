@@ -1,6 +1,5 @@
 
 import D3Graph from "./D3Graph";
-import * as d3 from "d3";
 import { io } from "socket.io-client";
 
 var d3Graph = new D3Graph();
