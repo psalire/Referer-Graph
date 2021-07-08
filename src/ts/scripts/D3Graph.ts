@@ -10,14 +10,14 @@ export default class D3Graph implements iGraph {
     private readonly simulationStrength = -300;
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 18;
-    private readonly linkDistance = 300;
+    // private readonly linkDistance = 300;
     private readonly circleStrokeWidth = 2;
     private readonly font = 'sans-serif';
     private readonly fontSize = '11px';
     private longestLength = 1;
 
-    constructor(svgName='#graph') {
-        this.svg = d3.select(svgName);
+    constructor(svgName='graph') {
+        this.svg = d3.select('#graph-container').append('svg').attr('id', svgName);
         var zoomed = () => {
             this.svg
             .attr("transform", "translate("+d3.event.transform.x+","+d3.event.transform.y + ")"+" scale("+d3.event.transform.k+")");
