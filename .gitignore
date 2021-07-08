@@ -5,4 +5,4 @@ example-server/dist
 sqlite-dbs
 test/sqlite-dbs
 !test/sqlite-dbs/default-test.sqlite
-public/static/js
+public/static/**/*
