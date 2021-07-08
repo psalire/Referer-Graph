@@ -14,9 +14,9 @@ export default class Data {
     // public addNode(id: string, method: string, type: number): Data {
     public addDstNode(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
-        let dstWithMethod = msg.method+dst;
-        if (!(this.knownPaths.has(dstWithMethod))) {
-            this.knownPaths.add(dstWithMethod);
+        // let dstWithMethod = msg.method+dst;
+        if (!(this.knownPaths.has(dst))) {
+            this.knownPaths.add(dst);
             this.addNode(dst, msg.method, 1);
         }
         return this;
@@ -33,16 +33,17 @@ export default class Data {
     public addLink(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
-        if (src==dst) return;
+        if (src==dst) return this;
         let srcDstStr = src+dst;
-        if (!(this.knownLinks.has(srcDstStr))) {
+        if (!this.knownLinks.has(srcDstStr)) {
             this.knownLinks.add(srcDstStr);
             let srcDstHosts = msg.referer.host+','+msg.host;
-            if (!(this.knownPathsIndex.has(srcDstHosts))) {
+            if (!this.knownPathsIndex.has(srcDstHosts)) {
                 this.knownPathsIndex.set(srcDstHosts, Math.random());
             }
             let type = this.knownPathsIndex.get(srcDstHosts);
             console.log(srcDstHosts);
+            console.log(src,dst);
             console.log(type)
             this.links.push({
                 'source': src,

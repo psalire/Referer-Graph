@@ -14,7 +14,7 @@ export default class D3Graph implements iGraph {
     private readonly circleStrokeWidth = 2;
     private readonly font = 'sans-serif';
     private readonly fontSize = '11px';
-    private longestLength = 0;
+    private longestLength = 1;
 
     constructor(svgName='#graph') {
         this.svg = d3.select(svgName);
@@ -39,15 +39,24 @@ export default class D3Graph implements iGraph {
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
             .force("link", d3.forceLink().distance((d)=>{
-                const text = document.getElementById('textPath_'+this.getPathsToId(d)).textContent;
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                context.font = `${this.fontSize} ${this.font}`;
-                var length = context.measureText(text).width+(this.radius+this.circleStrokeWidth)*2+10;
-                if (length>this.longestLength) {
-                    this.longestLength = length;
+                try {
+                    console.log(JSON.stringify(document.getElementById('textPath_'+this.getPathsToId(d))))
+                    console.log(document.getElementById('textPath_'+this.getPathsToId(d)).textContent)
+                    const text = document.getElementById('textPath_'+this.getPathsToId(d)).textContent;
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    context.font = `${this.fontSize} ${this.font}`;
+                    var length = context.measureText(text).width+(this.radius+this.circleStrokeWidth)*2+10;
+                    if (length>this.longestLength) {
+                        this.longestLength = length;
+                    }
+                    // return this.longestLength;
+                    return length;
                 }
-                return this.longestLength;
+                catch(e) {
+                    console.error(e);
+                    return this.longestLength;
+                }
             }).id((d) => { return d.id; }))
             // .force("link", d3.forceLink().distance(this.linkDistance).strength(0.5).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
@@ -163,7 +172,13 @@ export default class D3Graph implements iGraph {
             .attr('xlink:href', (d) => {
                 return '#'+this.getPathsToId(d);
             })
-            .text((d) => {return (new URL(d.target.id||d.target)).pathname})
+            .text((d) => {
+                console.log('url');
+                console.log(JSON.stringify(d.source));
+                console.log(JSON.stringify(d.target));
+                console.log('lru');
+                return (new URL(d.target.id||d.target)).pathname
+            })
             .merge(linkLabel);
 
         var text = this.svg.select('.labels')
@@ -197,7 +212,12 @@ export default class D3Graph implements iGraph {
     private formatNode(node: object): object {
         var dims = this.getSvgDimensions();
         return node.enter().append("circle")
-                .attr("r", this.radius)
+                .attr("r", (d)=>{
+                    console.log('cir')
+                    console.log(JSON.stringify(d))
+                    console.log('ric')
+                    return this.radius
+                })
                 // .attr("fill", (d) => { if (d.root == "true") return color(d.root); return color(d.type); })
                 .attr("fill", "#4477ff")
                 .attr("stroke", 'black')
@@ -230,7 +250,7 @@ export default class D3Graph implements iGraph {
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
-                .text((d) => { return d.method });
+                .text((d) => { return d.method || (new URL(d.id)).pathname });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
@@ -285,8 +305,8 @@ export default class D3Graph implements iGraph {
     private getPathsToId(d) {
         let src = d.source.id || d.source;
         let target = d.target.id || d.target;
-        let method = d.target.method || d.method || '';
-        return 'linkId_'+btoa(src+target+method);
+        // let method = d.target.method || d.method || '';
+        return 'linkId_'+btoa(src+target);
     };
     private getSvgDimensions(id='graph'): {[key: string]:number} {
         let dims = document.getElementById(id).getBoundingClientRect();
