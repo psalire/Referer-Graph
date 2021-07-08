@@ -1,8 +1,9 @@
 
 import Data from './Data';
+import iGraph from './iGraph';
 import * as d3 from "d3";
 
-export default class D3Graph {
+export default class D3Graph implements iGraph {
     private svg: any;
     private simulation: any;
     public data: Data;
@@ -11,6 +12,9 @@ export default class D3Graph {
     private readonly radius = 18;
     private readonly linkDistance = 300;
     private readonly circleStrokeWidth = 2;
+    private readonly font = 'sans-serif';
+    private readonly fontSize = '11px';
+    private longestLength = 0;
 
     constructor(svgName='#graph') {
         this.svg = d3.select(svgName);
@@ -34,7 +38,18 @@ export default class D3Graph {
             .attr("d", "M0,-5L10,0L0,5");
         let dims = this.getSvgDimensions();
         this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink().distance(this.linkDistance).strength(0.5).id((d) => { return d.id; }))
+            .force("link", d3.forceLink().distance((d)=>{
+                const text = document.getElementById('textPath_'+this.getPathsToId(d)).textContent;
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                context.font = `${this.fontSize} ${this.font}`;
+                var length = context.measureText(text).width+(this.radius+this.circleStrokeWidth)*2+10;
+                if (length>this.longestLength) {
+                    this.longestLength = length;
+                }
+                return this.longestLength;
+            }).id((d) => { return d.id; }))
+            // .force("link", d3.forceLink().distance(this.linkDistance).strength(0.5).id((d) => { return d.id; }))
             .force("charge", d3.forceManyBody().strength(this.simulationStrength))
             // .force("charge", d3.forceManyBody())
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
@@ -140,10 +155,11 @@ export default class D3Graph {
                 return 'labelPath_'+this.getPathsToId(d);
             })
             .attr('class', 'linkLabel')
-            .style("font-family", "sans-serif")
-            .style("font-size", "11px")
+            .style("font-family", this.font)
+            .style("font-size", this.fontSize)
             .style("pointer-events", "none")
             .append('textPath')
+            .attr('id', (d)=>{return 'textPath_'+this.getPathsToId(d)})
             .attr('xlink:href', (d) => {
                 return '#'+this.getPathsToId(d);
             })
@@ -214,7 +230,7 @@ export default class D3Graph {
                 .style("font-size", "11px")
                 .style("pointer-events", "none")
                 // .text((d) => { return (new URL(d.id)).pathname; });
-                .text((d) => { return d.method || console.log(JSON.stringify(d)) });
+                .text((d) => { return d.method });
     }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
