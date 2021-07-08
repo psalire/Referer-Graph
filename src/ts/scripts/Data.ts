@@ -17,8 +17,11 @@ export default class Data {
         // let dstWithMethod = msg.method+dst;
         if (!(this.knownPaths.has(dst))) {
             this.knownPaths.add(dst);
-            this.addNode(dst, msg.method, 1);
+            this.addNode(dst, msg.referer ? msg.method : null, 1);
         }
+        // else {
+        //     this.updateNodeMethod(dst, msg.method);
+        // }
         return this;
     }
     public addSrcNode(msg: {[key: string]: any}): Data {
@@ -61,6 +64,11 @@ export default class Data {
             'method': method,
             'type': type
         });
+    }
+    private updateNodeMethod(id: string, method: string) {
+        console.log('updating...');
+        var i = this.nodes.findIndex(v => v.id==id&&v.method&&!v.method.includes(method));
+        i!=-1 && (this.nodes[i].method += '|'+method);
     }
     public getNodes(): object[] {
         return this.nodes;
