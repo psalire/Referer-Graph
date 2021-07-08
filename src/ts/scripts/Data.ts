@@ -3,6 +3,8 @@ export default class Data {
     private nodes: object[];
     private links: object[];
     private knownPaths: Set<string> = new Set();
+    private knownLinks: Set<string> = new Set();
+    private knownPathsIndex: Map<string,number> = new Map();
 
     constructor() {
         this.nodes = [];
@@ -27,13 +29,28 @@ export default class Data {
         }
         return this;
     }
-    public addLink(src: string, dst: string, method: string, type: number): Data {
-        this.links.push({
-            'source': src,
-            'target': dst,
-            'method': method,
-            'type': type
-        });
+    // public addLink(src: string, dst: string, method: string, type: number): Data {
+    public addLink(msg: {[key: string]: any}): Data {
+        let dst = msg.protocol+'://'+msg.host+msg.path;
+        let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
+        if (src==dst) return;
+        let srcDstStr = src+dst;
+        if (!(this.knownLinks.has(srcDstStr))) {
+            this.knownLinks.add(srcDstStr);
+            let srcDstHosts = msg.referer.host+','+msg.host;
+            if (!(this.knownPathsIndex.has(srcDstHosts))) {
+                this.knownPathsIndex.set(srcDstHosts, Math.random());
+            }
+            let type = this.knownPathsIndex.get(srcDstHosts);
+            console.log(srcDstHosts);
+            console.log(type)
+            this.links.push({
+                'source': src,
+                'target': dst,
+                'method': msg.method,
+                'type': type
+            });
+        }
         return this;
     }
 
