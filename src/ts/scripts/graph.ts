@@ -5,6 +5,8 @@ import { io } from "socket.io-client";
 
 function createButton(text: string): HTMLButtonElement {
     var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-primary mb-1';
     btn.textContent = text;
     return btn;
 }
@@ -26,13 +28,22 @@ window.onload = () => {
 
     var deleteBtn = createButton('Delete Graph');
     deleteBtn.onclick = ()=>{d3Graph.deleteGraph()};
+    var stopBtn = createButton('Stop Animation');
+    stopBtn.onclick = ()=>{
+        if (stopBtn.textContent.startsWith('Stop')) {
+            d3Graph.stopAnimation();
+            stopBtn.textContent = 'Start Animation';
+        }
+        else {
+            d3Graph.refreshGraph();
+            stopBtn.textContent = 'Stop Animation';
+        }
+    };
     var refreshBtn = createButton('Refresh Graph');
     refreshBtn.onclick = ()=>{d3Graph.refreshGraph()};
-    var stopBtn = createButton('Stop Animation');
-    stopBtn.onclick = ()=>{d3Graph.stopAnimation()};
     var btnContainer = document.getElementById('buttons');
     btnContainer.appendChild(deleteBtn);
-    btnContainer.appendChild(refreshBtn);
     btnContainer.appendChild(stopBtn);
+    btnContainer.appendChild(refreshBtn);
     window.dispatchEvent(new CustomEvent('graphLoaded'));
 }

@@ -3,7 +3,8 @@
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
 
 #sidebar {
-    --resizeable-width: 150px;
+    @extend .p-2;
+    --resizeable-width: 200px;
     width: var(--resizeable-width);
     min-width: var(--min-width);
 }
@@ -12,6 +13,11 @@
     float: right;
     width: 1px;
     z-index: 1;
+}
+
+.btn {
+    @extend .mx-auto;
+    max-width: 200px !important;
 }
 
 #handle::after {

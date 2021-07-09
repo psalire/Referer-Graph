@@ -4,7 +4,7 @@ window.addEventListener("graphLoaded", () => {
     // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
     const getResizeableElement = () => { return document.getElementById("sidebar"); };
     const getHandleElement = () => { return document.getElementById("handle"); };
-    const minPaneSize = 100;
+    const minPaneSize = 125;
     getResizeableElement().style.setProperty('--min-width', `${minPaneSize}px`);
 
     const setPaneWidth = (width) => {
