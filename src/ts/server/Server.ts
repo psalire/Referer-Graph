@@ -32,11 +32,7 @@ export default class Server {
         });
 
         this.app.get('/', (_, res) => {
-            res.render('index', {
-                title: 'Home',
-                header: 'Home',
-                content: 'Welcome home!'
-            });
+            res.render('index', {title: 'Web-App Flow Viewer'});
         });
 
         this.app.post('/request', async (req, res) => {
