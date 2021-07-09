@@ -189,7 +189,10 @@ export default class D3Graph implements iGraph {
     private formatNode(node: object): object {
         var dims = this.getSvgDimensions();
         return node.enter().append("circle")
-                .attr("r", this.radius)
+                .attr("r", (d)=> {
+                    console.log('node: '+JSON.stringify(d));
+                    return this.radius;
+                })
                 // .attr("fill", (d) => { if (d.root == "true") return color(d.root); return color(d.type); })
                 .attr("fill", "#4477ff")
                 .attr("stroke", 'black')
@@ -209,7 +212,10 @@ export default class D3Graph implements iGraph {
     }
     private formatLink(link: object): object {
         return link.enter().append("line")
-                .attr("stroke", (d) => { return this.colorScheme(d.type); })
+                .attr("stroke", (d) => {
+                    console.log('link'+JSON.stringify(d))
+                    return this.colorScheme(d.type);
+                })
                 .attr("stroke-width", "2")
                 .attr("marker-end", "url(#arrow)");
     }
