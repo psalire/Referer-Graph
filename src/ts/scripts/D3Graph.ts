@@ -5,8 +5,10 @@ import * as d3 from "d3";
 
 export default class D3Graph implements iGraph {
     private svg: any;
+    private svgId: string;
     private simulation: any;
     public data: Data;
+    private isAnimationStopped: boolean = false;
     private readonly simulationStrength = -300;
     private readonly colorScheme = d3.scaleSequential(d3.interpolateRainbow);
     private readonly radius = 18;
@@ -14,9 +16,10 @@ export default class D3Graph implements iGraph {
     private readonly font = 'sans-serif';
     private readonly fontSize = '11px';
 
-    constructor(data: Data, svgName='graph') {
+    constructor(data: Data, svgId='graph') {
         this.data = data;
-        this.svg = d3.select('#graph-container').append('svg').attr('id', svgName);
+        this.svg = d3.select('#graph-container').append('svg').attr('id', svgId);
+        this.svgId = svgId;
         var zoomed = () => {
             this.svg
             .attr("transform", "translate("+d3.event.transform.x+","+d3.event.transform.y + ")"+" scale("+d3.event.transform.k+")");
@@ -81,6 +84,65 @@ export default class D3Graph implements iGraph {
             .enter()
         // this.formatText(text);
 
+        // Update link labels
+        var linkPath = this.svg.select('.links')
+                        .selectAll('.linkPath')
+                        .data(dataLinks);
+        linkPath.exit().remove();
+        linkPath = linkPath.enter().append('path')
+            .attr('class', 'linkPath')
+            .attr('fill-opacity', 0)
+            .attr('stroke-opacity', 0)
+            .attr('fill', 'blue')
+            .attr('stroke', 'red')
+            .attr("id", this.getPathsToId)
+            .style("pointer-events", "none")
+            .merge(linkPath)
+
+        var linkLabel = this.svg.select('.links')
+                            .selectAll('.linkLabel')
+                            .data(dataLinks);
+        linkLabel.exit().remove();
+        linkLabel = linkLabel.enter().append('text')
+            .attr("dx", this.radius+this.circleStrokeWidth)
+            .attr("dy", -2)
+            .attr("id", (d) => {
+                return 'labelPath_'+this.getPathsToId(d);
+            })
+            .attr('transform', (d) => {
+                if (d.target.x<d.source.x) {
+                    let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
+                    if (!dims) return 'rotate(0)';
+                    var rx = dims.x+dims.width/2;
+                    var ry = dims.y+dims.height/2;
+                    return 'rotate(180 '+rx+' '+ry+')';
+                }
+                else {
+                    return 'rotate(0)';
+                }
+            })
+            .attr('class', 'linkLabel')
+            .style("font-family", this.font)
+            .style("font-size", this.fontSize)
+            .style("pointer-events", "none")
+            .append('textPath')
+            .attr('id', (d)=>{return 'textPath_'+this.getPathsToId(d)})
+            .attr('xlink:href', (d) => {
+                return '#'+this.getPathsToId(d);
+            })
+            .text((d) => {
+                return (new URL(d.target.id||d.target)).pathname
+            })
+            .merge(linkLabel);
+
+        var text = this.svg.select('.labels')
+                    .selectAll('.nodeLabel')
+                    .data(dataNodes);
+        text.exit().remove();
+        this.formatText(text).merge(text);
+        text = this.svg.select('.labels')
+                .selectAll('.nodeLabel')
+
         this.defineSimulation(dataNodes, dataLinks, link, node, text);
 
         return this;
@@ -91,15 +153,6 @@ export default class D3Graph implements iGraph {
         var dataLinks = this.data.getLinks();
         var dataNodes = this.data.getNodes();
 
-        // Update the nodes
-        var node = this.svg.select('.nodes')
-                    .selectAll("circle").data(dataNodes);
-        // Exit any old nodes
-        node.exit().remove();
-        // Enter any new nodes
-        node = this.formatNode(node)
-                .merge(node)
-
         // Update links
         var link = this.svg.select('.links')
                     .selectAll("line")
@@ -107,8 +160,15 @@ export default class D3Graph implements iGraph {
         // Exit any old links
         link.exit().remove();
         // Enter links
-        link = this.formatLink(link)
-                .merge(link);
+        link = this.formatLink(link).merge(link);
+
+        // Update the nodes
+        var node = this.svg.select('.nodes')
+        .selectAll("circle").data(dataNodes);
+        // Exit any old nodes
+        node.exit().remove();
+        // Enter any new nodes
+        node = this.formatNode(node).merge(node)
 
         // Update link labels
         var linkPath = this.svg.select('.links')
@@ -171,9 +231,34 @@ export default class D3Graph implements iGraph {
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
-        this.simulation.alphaTarget(0.3).velocityDecay(0.5).restart();
+        this.restartSimulation();
 
         return this;
+    }
+
+    public deleteGraph(): void {
+        this.simulation.nodes(this.data.getNodes()).on('tick', null);
+        this.svg.remove();
+        document.getElementById(this.svgId).remove();
+        this.svg = null;
+        this.svgId = null;
+    }
+
+    public refreshGraph(): D3Graph {
+        this.isAnimationStopped = false;
+        return this.updateGraph();
+    }
+
+    public stopAnimation(): D3Graph {
+        this.simulation.stop();
+        this.isAnimationStopped = true;
+        return this;
+    }
+
+    private restartSimulation(): void {
+        this.simulation.alphaTarget(0.3)
+            .velocityDecay(this.isAnimationStopped ? 1 : 0.5)
+            .restart();
     }
 
     private defineSimulation(
@@ -202,12 +287,16 @@ export default class D3Graph implements iGraph {
                 .attr("cy", dims.y/2)
                 .call(d3.drag()
                         .on("start", (d) => {
-                            if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
+                            if (!d3.event.active) {
+                                this.restartSimulation();
+                            }
                             this.dragstarted(d);
                         })
                         .on("drag", this.dragged)
                         .on("end", (d) => {
-                            if (!d3.event.active) this.simulation.alphaTarget(0);
+                            if (!d3.event.active) {
+                                this.simulation.alphaTarget(0);
+                            }
                             this.dragended(d);
                         }));
     }
