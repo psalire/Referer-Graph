@@ -1,5 +1,26 @@
 @use 'base';
 
-#graph {
-    border: 1px solid gainsboro;
+// https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
+
+#sidebar {
+    --resizeable-width: 150px;
+    width: var(--resizeable-width);
+    min-width: var(--min-width);
+}
+
+#handle {
+    float: right;
+    width: 1px;
+    z-index: 1;
+}
+
+#handle::after {
+    content: "";
+    width: 9px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: transparent;
+    cursor: ew-resize;
+    z-index: 2;
 }

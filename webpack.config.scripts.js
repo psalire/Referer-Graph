@@ -1,12 +1,16 @@
 
 const path = require('path');
+const scriptsPath = './src/ts/scripts/';
 
 module.exports = {
     mode: 'development',
-    entry: './src/ts/scripts/graph.ts',
+    entry: {
+        'graph': scriptsPath+'graph.ts',
+        'resizable-sidebar': scriptsPath+'resizable-sidebar.js'
+    },
     devtool: 'eval-source-map',
     output: {
-        filename: 'graph.js',
+        filename: '[name].js',
         path: path.resolve('./public/static/js/')
     },
     module: {
@@ -16,7 +20,7 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'babel-loader'
             }
-        ]
+        ],
     },
     resolve: {
         extensions: ['.ts', '.js']
