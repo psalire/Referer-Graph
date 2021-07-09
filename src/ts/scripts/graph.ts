@@ -1,8 +1,10 @@
 
 import D3Graph from "./D3Graph";
+import Data from "./Data"
 import { io } from "socket.io-client";
 
-var d3Graph = new D3Graph();
+var data = new Data();
+var d3Graph = new D3Graph(data);
 
 const socket = io();
 d3Graph.createGraph();

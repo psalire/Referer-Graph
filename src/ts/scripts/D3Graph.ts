@@ -14,7 +14,8 @@ export default class D3Graph implements iGraph {
     private readonly font = 'sans-serif';
     private readonly fontSize = '11px';
 
-    constructor(svgName='graph') {
+    constructor(data: Data, svgName='graph') {
+        this.data = data;
         this.svg = d3.select('#graph-container').append('svg').attr('id', svgName);
         var zoomed = () => {
             this.svg
