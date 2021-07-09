@@ -33,4 +33,6 @@ window.onload = () => {
     document.getElementById('sidebar').appendChild(deleteBtn);
     document.getElementById('sidebar').appendChild(refreshBtn);
     document.getElementById('sidebar').appendChild(stopBtn);
+    console.log('dispatching...')
+    window.dispatchEvent(new CustomEvent('graphLoaded'));
 }

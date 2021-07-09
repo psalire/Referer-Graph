@@ -1,5 +1,6 @@
 
-window.onload = () => {
+window.addEventListener("graphLoaded", () => {
+    console.log('graph.loaded.')
     // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
     const getResizeableElement = () => { return document.getElementById("sidebar"); };
     const getHandleElement = () => { return document.getElementById("handle"); };
@@ -38,4 +39,4 @@ window.onload = () => {
     };
 
     getHandleElement().addEventListener('mousedown', startDragging);
-}
+});
