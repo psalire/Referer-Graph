@@ -115,13 +115,7 @@ export default class D3Graph implements iGraph {
                         .data(dataLinks);
         linkPath.exit().remove();
         linkPath = linkPath.enter().append('path')
-            .attr('d', (d) => {
-                let sx = d.source.x || d.x;
-                let sy = d.source.y || d.y;
-                let tx = d.target.x || d.x;
-                let ty = d.target.y || d.y;
-                return 'M '+sx+' '+sy+' L '+tx+' '+ty
-            }).attr('class', 'linkPath')
+            .attr('class', 'linkPath')
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
             .attr('fill', 'blue')
@@ -137,6 +131,9 @@ export default class D3Graph implements iGraph {
         linkLabel = linkLabel.enter().append('text')
             .attr("dx", this.radius+this.circleStrokeWidth)
             .attr("dy", -2)
+            .attr("id", (d) => {
+                return 'labelPath_'+this.getPathsToId(d);
+            })
             .attr('transform', (d) => {
                 if (d.target.x<d.source.x) {
                     let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
@@ -148,9 +145,6 @@ export default class D3Graph implements iGraph {
                 else {
                     return 'rotate(0)';
                 }
-            })
-            .attr("id", (d) => {
-                return 'labelPath_'+this.getPathsToId(d);
             })
             .attr('class', 'linkLabel')
             .style("font-family", this.font)
@@ -252,6 +246,9 @@ export default class D3Graph implements iGraph {
             let sy = d.source.y || d.y;
             let tx = d.target.x || d.x;
             let ty = d.target.y || d.y;
+            // if ([sx,sy,tx,ty].some(v=>v===undefined)) {
+            //     console.log('ticked: '+JSON.stringify(d));
+            // }
             return 'M '+sx+' '+sy+' L '+tx+' '+ty
         });
         linkLabel && linkLabel.attr('transform', (d) => {
@@ -260,7 +257,7 @@ export default class D3Graph implements iGraph {
                 if (!dims) return 'rotate(0)';
                 var rx = dims.x+dims.width/2;
                 var ry = dims.y+dims.height/2;
-                return 'rotate(180 '+rx+' '+ry+')';
+                return `rotate(180 ${rx} ${ry})`;
             }
             else {
                 return 'rotate(0)';
@@ -268,7 +265,8 @@ export default class D3Graph implements iGraph {
         });
     }
     private placeWithBoundary(val: number, boundary: number) {
-        return val<0 ? 0 : Math.min(val, boundary);
+        // return val<0 ? 0 : Math.min(val, boundary);
+        return val;
     }
     private dragstarted(d): void {
         d.fx = d.x;
