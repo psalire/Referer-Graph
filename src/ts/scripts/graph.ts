@@ -30,9 +30,9 @@ window.onload = () => {
     refreshBtn.onclick = ()=>{d3Graph.refreshGraph()};
     var stopBtn = createButton('Stop Animation');
     stopBtn.onclick = ()=>{d3Graph.stopAnimation()};
-    document.getElementById('sidebar').appendChild(deleteBtn);
-    document.getElementById('sidebar').appendChild(refreshBtn);
-    document.getElementById('sidebar').appendChild(stopBtn);
-    console.log('dispatching...')
+    var btnContainer = document.getElementById('buttons');
+    btnContainer.appendChild(deleteBtn);
+    btnContainer.appendChild(refreshBtn);
+    btnContainer.appendChild(stopBtn);
     window.dispatchEvent(new CustomEvent('graphLoaded'));
 }
