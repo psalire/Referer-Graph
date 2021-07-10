@@ -38,7 +38,7 @@ window.onload = () => {
             stopBtn.textContent = 'Start Animation';
         }
         else {
-            d3Graph.refreshGraph();
+            d3Graph.refreshGraph(true);
             stopBtn.textContent = 'Stop Animation';
         }
     };

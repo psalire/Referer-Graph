@@ -246,8 +246,8 @@ export default class D3Graph implements iGraph {
     public clearGraph(): D3Graph {
         this.data.clear();
     }
-    public refreshGraph(): D3Graph {
-        this.isAnimationStopped = false;
+    public refreshGraph(startAnimation=false): D3Graph {
+        startAnimation && (this.isAnimationStopped = false);
         return this.updateGraph();
     }
 
