@@ -2,7 +2,28 @@
 
 .btn {
     @extend .mx-auto;
+    @extend .p-1;
     width: 150px !important;
+}
+
+#settings-btn {
+    font-size: 0.95em !important;
+}
+#settings-btn svg {
+    display: inline-block;
+    vertical-align: -.125em;
+    width: 1em;
+    height: 1em;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
