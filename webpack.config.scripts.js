@@ -6,7 +6,9 @@ module.exports = {
     mode: 'development',
     entry: {
         'graph': scriptsPath+'graph.ts',
-        'resizable-sidebar': scriptsPath+'resizable-sidebar.js'
+        'resizable-sidebar': scriptsPath+'resizable-sidebar.ts',
+        'settings': scriptsPath+'settings.ts',
+        'bootstrap-collapse': './node_modules/bootstrap/js/dist/collapse.js'
     },
     devtool: 'eval-source-map',
     output: {

@@ -38,4 +38,5 @@ window.addEventListener("graphLoaded", () => {
     };
 
     getHandleElement().addEventListener('mousedown', startDragging);
+    window.dispatchEvent(new CustomEvent('sidebarLoaded'));
 });

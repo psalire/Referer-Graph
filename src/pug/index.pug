@@ -3,10 +3,19 @@ extends base.pug
 block scripts
     script(src="/static/js/graph.js")
     script(src="/static/js/resizable-sidebar.js")
+    script(src="/static/js/bootstrap-collapse.js")
+    script(src="/static/js/settings.js")
 block header
-    button.px-2.float-end.border-0.bg-light
-        img(src="/static/image/gear-fill.svg", alt="Settings Icon")
-        |  Open Settings
+    button#settings-btn.px-2.border-0.bg-light.w-100.border-bottom(
+        data-bs-toggle="collapse"
+        data-bs-target="#settings-container"
+        aria-expanded="false"
+        aria-controls="settings-container"
+    )
+        img(src="/static/image/gear-fill.svg" alt="Settings Icon")
+        |  Close Settings
+    div#settings-container.collapse.show
+        div hello world
 block main
     section.d-flex.w-100.h-100.border-top
         aside#sidebar.border-end.p-1
