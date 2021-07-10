@@ -1,7 +1,7 @@
 
-export default interface IGraph {
-    createGraph(): IGraph;
-    updateGraph(): IGraph;
+export default interface iGraph {
+    createGraph(): iGraph;
+    updateGraph(): iGraph;
     deleteGraph(): void;
-    refreshGraph(): IGraph;
+    refreshGraph(): iGraph;
 }
