@@ -5,9 +5,9 @@ const scriptsPath = './src/ts/scripts/';
 module.exports = {
     mode: 'development',
     entry: {
-        'graph': scriptsPath+'graph.ts',
-        'resizable-sidebar': scriptsPath+'resizable-sidebar.ts',
-        'settings': scriptsPath+'settings.ts',
+        'resizable-sidebar': path.resolve(scriptsPath, 'resizable-sidebar.ts'),
+        'settings': path.resolve(scriptsPath, 'settings.ts'),
+        'graph': path.resolve(scriptsPath, 'graph.ts'),
         'bootstrap-collapse': './node_modules/bootstrap/js/dist/collapse.js'
     },
     devtool: 'eval-source-map',
