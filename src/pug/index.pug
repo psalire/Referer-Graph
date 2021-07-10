@@ -4,7 +4,9 @@ block scripts
     script(src="/static/js/graph.js")
     script(src="/static/js/resizable-sidebar.js")
 block header
-    h2.px-1=title
+    button.px-2.float-end.border-0.bg-light
+        img(src="/static/image/gear-fill.svg", alt="Settings Icon")
+        |  Open Settings
 block main
     section.d-flex.w-100.h-100.border-top
         aside#sidebar.border-end.p-1

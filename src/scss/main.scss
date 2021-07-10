@@ -1,5 +1,14 @@
 @use 'base';
 
+.btn {
+    @extend .mx-auto;
+    max-width: 200px !important;
+}
+
+header {
+    @extend .bg-light
+}
+
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
 
 #sidebar {
@@ -13,11 +22,6 @@
     float: right;
     width: 1px;
     z-index: 1;
-}
-
-.btn {
-    @extend .mx-auto;
-    max-width: 200px !important;
 }
 
 #handle::after {

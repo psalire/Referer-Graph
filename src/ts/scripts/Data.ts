@@ -69,4 +69,12 @@ export default class Data {
     public getLinks(): object[] {
         return this.links;
     }
+    public clear(): Data {
+        this.nodes.splice(0,this.nodes.length);
+        this.links.splice(0,this.links.length);
+        this.knownLinks.clear();
+        this.knownPaths.clear();
+        this.knownPathsIndex.clear();
+        return this;
+    }
 }

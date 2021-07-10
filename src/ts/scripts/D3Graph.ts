@@ -97,7 +97,6 @@ export default class D3Graph implements iGraph {
             .attr('stroke', 'red')
             .attr("id", this.getPathsToId)
             .style("pointer-events", "none")
-            .merge(linkPath)
 
         var linkLabel = this.svg.select('.links')
                             .selectAll('.linkLabel')
@@ -133,7 +132,6 @@ export default class D3Graph implements iGraph {
             .text((d) => {
                 return (new URL(d.target.id||d.target)).pathname
             })
-            .merge(linkLabel);
 
         var text = this.svg.select('.labels')
                     .selectAll('.nodeLabel')
@@ -152,6 +150,8 @@ export default class D3Graph implements iGraph {
         // var dims = this.getSvgDimensions();
         var dataLinks = this.data.getLinks();
         var dataNodes = this.data.getNodes();
+        console.log('links: '+JSON.stringify(dataLinks))
+        console.log('nodes: '+JSON.stringify(dataNodes))
 
         // Update links
         var link = this.svg.select('.links')
@@ -243,7 +243,9 @@ export default class D3Graph implements iGraph {
         this.svg = null;
         this.svgId = null;
     }
-
+    public clearGraph(): D3Graph {
+        this.data.clear();
+    }
     public refreshGraph(): D3Graph {
         this.isAnimationStopped = false;
         return this.updateGraph();

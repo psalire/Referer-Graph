@@ -26,8 +26,11 @@ window.onload = () => {
         }
     });
 
-    var deleteBtn = createButton('Delete Graph');
-    deleteBtn.onclick = ()=>{d3Graph.deleteGraph()};
+    var deleteBtn = createButton('Clear Graph');
+    deleteBtn.onclick = ()=>{
+        d3Graph.data.clear();
+        d3Graph.refreshGraph();
+    };
     var stopBtn = createButton('Stop Animation');
     stopBtn.onclick = ()=>{
         if (stopBtn.textContent.startsWith('Stop')) {
@@ -40,7 +43,9 @@ window.onload = () => {
         }
     };
     var refreshBtn = createButton('Refresh Graph');
-    refreshBtn.onclick = ()=>{d3Graph.refreshGraph()};
+    refreshBtn.onclick = ()=>{
+        d3Graph.refreshGraph()
+    };
     var btnContainer = document.getElementById('buttons');
     btnContainer.appendChild(deleteBtn);
     btnContainer.appendChild(stopBtn);
