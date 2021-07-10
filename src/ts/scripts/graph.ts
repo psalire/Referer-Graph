@@ -1,5 +1,6 @@
 
 import D3Graph from "./D3Graph";
+import DagreGraph from "./DagreGraph";
 import Data from "./Data"
 import { io } from "socket.io-client";
 
