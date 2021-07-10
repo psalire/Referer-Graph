@@ -2,11 +2,7 @@
 
 .btn {
     @extend .mx-auto;
-    max-width: 200px !important;
-}
-
-header {
-    @extend .bg-light
+    width: 150px !important;
 }
 
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
