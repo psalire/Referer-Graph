@@ -1,6 +1,5 @@
 
-import D3Graph from "./D3Graph";
-import DagreGraph from "./DagreGraph";
+import GraphBridge from "./GraphBridge";
 import Data from "./Data"
 import { io } from "socket.io-client";
 
@@ -13,8 +12,8 @@ function createButton(text: string): HTMLButtonElement {
 }
 
 window.onload = () => {
-    var data = new Data();
-    var d3Graph = new D3Graph(data);
+    var graph = new GraphBridge();
+    var d3Graph = graph.getActiveGraph();
 
     const socket = io();
     d3Graph.createGraph();
