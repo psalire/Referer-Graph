@@ -60,7 +60,6 @@ export default class D3Graph implements iGraph {
             .force("x", d3.forceX(dims.x / 2).strength(0.05))
             .force("y", d3.forceY(dims.y / 2).strength(0.05))
             .force("collision", d3.forceCollide().radius(this.radius+10))
-        this.data = new Data();
     }
 
     public createGraph(): D3Graph {

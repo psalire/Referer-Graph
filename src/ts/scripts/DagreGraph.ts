@@ -5,9 +5,10 @@ import dagreD3 from 'dagre-d3';
 import * as d3 from "d3";
 
 export default class DagreGraph implements iGraph {
+    public data: Data;
 
-    constructor() {
-
+    constructor(data: Data) {
+        this.data = data;
     }
 
     public createGraph(): DagreGraph {
