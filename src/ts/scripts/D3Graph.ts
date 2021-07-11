@@ -89,49 +89,13 @@ export default class D3Graph implements iGraph {
                         .selectAll('.linkPath')
                         .data(dataLinks);
         linkPath.exit().remove();
-        linkPath = linkPath.enter().append('path')
-            .attr('class', 'linkPath')
-            .attr('fill-opacity', 0)
-            .attr('stroke-opacity', 0)
-            .attr('fill', 'blue')
-            .attr('stroke', 'red')
-            .attr("id", this.getPathsToId)
-            .style("pointer-events", "none")
+        linkPath = this.formatLinkPath(linkPath);
 
         var linkLabel = this.svg.select('.links')
                             .selectAll('.linkLabel')
                             .data(dataLinks);
         linkLabel.exit().remove();
-        linkLabel = linkLabel.enter().append('text')
-            .attr("dx", this.radius+this.circleStrokeWidth)
-            .attr("dy", -2)
-            .attr("id", (d) => {
-                return 'labelPath_'+this.getPathsToId(d);
-            })
-            .attr('transform', (d) => {
-                if (d.target.x<d.source.x) {
-                    let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
-                    if (!dims) return 'rotate(0)';
-                    var rx = dims.x+dims.width/2;
-                    var ry = dims.y+dims.height/2;
-                    return 'rotate(180 '+rx+' '+ry+')';
-                }
-                else {
-                    return 'rotate(0)';
-                }
-            })
-            .attr('class', 'linkLabel')
-            .style("font-family", this.font)
-            .style("font-size", this.fontSize)
-            .style("pointer-events", "none")
-            .append('textPath')
-            .attr('id', (d)=>{return 'textPath_'+this.getPathsToId(d)})
-            .attr('xlink:href', (d) => {
-                return '#'+this.getPathsToId(d);
-            })
-            .text((d) => {
-                return (new URL(d.target.id||d.target)).pathname
-            })
+        linkLabel = this.formatLinkLabel(linkLabel);
 
         var text = this.svg.select('.labels')
                     .selectAll('.nodeLabel')
@@ -175,51 +139,15 @@ export default class D3Graph implements iGraph {
                         .selectAll('.linkPath')
                         .data(dataLinks);
         linkPath.exit().remove();
-        linkPath = linkPath.enter().append('path')
-            .attr('class', 'linkPath')
-            .attr('fill-opacity', 0)
-            .attr('stroke-opacity', 0)
-            .attr('fill', 'blue')
-            .attr('stroke', 'red')
-            .attr("id", this.getPathsToId)
-            .style("pointer-events", "none")
-            .merge(linkPath)
+        linkPath = this.formatLinkPath(linkPath)
+                        .merge(linkPath);
 
         var linkLabel = this.svg.select('.links')
                             .selectAll('.linkLabel')
                             .data(dataLinks);
         linkLabel.exit().remove();
-        linkLabel = linkLabel.enter().append('text')
-            .attr("dx", this.radius+this.circleStrokeWidth)
-            .attr("dy", -2)
-            .attr("id", (d) => {
-                return 'labelPath_'+this.getPathsToId(d);
-            })
-            .attr('transform', (d) => {
-                if (d.target.x<d.source.x) {
-                    let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
-                    if (!dims) return 'rotate(0)';
-                    var rx = dims.x+dims.width/2;
-                    var ry = dims.y+dims.height/2;
-                    return 'rotate(180 '+rx+' '+ry+')';
-                }
-                else {
-                    return 'rotate(0)';
-                }
-            })
-            .attr('class', 'linkLabel')
-            .style("font-family", this.font)
-            .style("font-size", this.fontSize)
-            .style("pointer-events", "none")
-            .append('textPath')
-            .attr('id', (d)=>{return 'textPath_'+this.getPathsToId(d)})
-            .attr('xlink:href', (d) => {
-                return '#'+this.getPathsToId(d);
-            })
-            .text((d) => {
-                return (new URL(d.target.id||d.target)).pathname
-            })
-            .merge(linkLabel);
+        linkLabel = this.formatLinkLabel(linkLabel)
+                        .merge(linkLabel);
 
         var text = this.svg.select('.labels')
                     .selectAll('.nodeLabel')
@@ -227,7 +155,7 @@ export default class D3Graph implements iGraph {
         text.exit().remove();
         this.formatText(text).merge(text);
         text = this.svg.select('.labels')
-                .selectAll('.nodeLabel')
+                .selectAll('.nodeLabel');
 
         // Redefine and restart simulation
         this.defineSimulation(dataNodes, dataLinks, link, node, text, linkPath, linkLabel);
@@ -323,6 +251,48 @@ export default class D3Graph implements iGraph {
                     return d.method || (new URL(d.id)).pathname
                 });
     }
+    private formatLinkPath(linkPath: object): object {
+        return linkPath.enter().append('path')
+            .attr('class', 'linkPath')
+            .attr('fill-opacity', 0)
+            .attr('stroke-opacity', 0)
+            .attr('fill', 'blue')
+            .attr('stroke', 'red')
+            .attr("id", this.getPathsToId)
+            .style("pointer-events", "none")
+    }
+    private formatLinkLabel(linkLabel: object): object {
+        return linkLabel.enter().append('text')
+            .attr("dx", this.radius+this.circleStrokeWidth)
+            .attr("dy", -2)
+            .attr("id", (d) => {
+                return 'labelPath_'+this.getPathsToId(d);
+            })
+            .attr('transform', (d) => {
+                if (d.target.x<d.source.x) {
+                    let dims = this.getBboxDimensions('labelPath_'+this.getPathsToId(d));
+                    if (!dims) return 'rotate(0)';
+                    var rx = dims.x+dims.width/2;
+                    var ry = dims.y+dims.height/2;
+                    return 'rotate(180 '+rx+' '+ry+')';
+                }
+                else {
+                    return 'rotate(0)';
+                }
+            })
+            .attr('class', 'linkLabel')
+            .style("font-family", this.font)
+            .style("font-size", this.fontSize)
+            .style("pointer-events", "none")
+            .append('textPath')
+            .attr('id', (d)=>{return 'textPath_'+this.getPathsToId(d)})
+            .attr('xlink:href', (d) => {
+                return '#'+this.getPathsToId(d);
+            })
+            .text((d) => {
+                return (new URL(d.target.id||d.target)).pathname
+            });
+    }
 
     private ticked(link: object, node: object, text: object, linkPath?: object, linkLabel?:object): void {
         let dims = this.getSvgDimensions();
@@ -344,9 +314,6 @@ export default class D3Graph implements iGraph {
             let sy = d.source.y || d.y;
             let tx = d.target.x || d.x;
             let ty = d.target.y || d.y;
-            // if ([sx,sy,tx,ty].some(v=>v===undefined)) {
-            //     console.log('ticked: '+JSON.stringify(d));
-            // }
             return 'M '+sx+' '+sy+' L '+tx+' '+ty
         });
         linkLabel && linkLabel.attr('transform', (d) => {
