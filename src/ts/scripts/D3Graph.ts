@@ -18,8 +18,11 @@ export default class D3Graph implements iGraph {
 
     constructor(data: Data, svgId='graph') {
         this.data = data;
-        this.svg = d3.select('#graph-container').append('svg').attr('id', svgId);
         this.svgId = svgId;
+    }
+
+    public createGraph(): D3Graph {
+        this.svg = d3.select('#graph-container').append('svg').attr('id', this.svgId);
         var zoomed = () => {
             this.svg
             .attr("transform", "translate("+d3.event.transform.x+","+d3.event.transform.y + ")"+" scale("+d3.event.transform.k+")");
@@ -59,10 +62,8 @@ export default class D3Graph implements iGraph {
             // .force("center", d3.forceCenter(dims.x / 2, dims.y / 2))
             .force("x", d3.forceX(dims.x / 2).strength(0.05))
             .force("y", d3.forceY(dims.y / 2).strength(0.05))
-            .force("collision", d3.forceCollide().radius(this.radius+10))
-    }
+            .force("collision", d3.forceCollide().radius(this.radius+10));
 
-    public createGraph(): D3Graph {
         var dataLinks = this.data.getLinks();
         var dataNodes = this.data.getNodes();
 
