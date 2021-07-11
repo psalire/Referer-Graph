@@ -1,6 +1,9 @@
-@use 'base';
+@use "base";
+@use "sass:map";
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/_variables";
 
-.btn {
+.graph-controls-btn {
     @extend .mx-auto;
     @extend .p-1;
     width: 150px !important;
@@ -8,12 +11,28 @@
 
 #settings-btn {
     font-size: 0.95em !important;
+    svg {
+        display: inline-block;
+        vertical-align: -.125em;
+        width: 1em;
+        height: 1em;
+    }
 }
-#settings-btn svg {
-    display: inline-block;
-    vertical-align: -.125em;
-    width: 1em;
-    height: 1em;
+
+#graph-style-container {
+    .graph-style-btn, img {
+        border-radius: 0.5rem;
+    }
+    .graph-style-btn {
+        @extend .mx-1;
+    }
+    .graph-style-label {
+        font-size: 0.75em;
+        color: $gray-700;
+    }
+    img {
+        border: 1px solid $gray-500;
+    }
 }
 
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
