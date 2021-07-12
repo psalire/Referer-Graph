@@ -47,17 +47,11 @@ export default class DagreGraph implements iGraph {
         }
 
         // Add states to the graph, set labels, and style
-        console.log('add nodes...');
         for (let node of this.data.getNodes()) {
             console.log(JSON.stringify(node));
             this.dagreGraph.setNode(node.id, {label: node.id});
         }
-        console.log('nodes: '+JSON.stringify(this.dagreGraph.nodes()))
-        console.log('add links...')
         for (let link of this.data.getLinks()) {
-            // this.dagreGraph.setNode(link.source, {label: node.id});
-            // this.dagreGraph.setNode(link.target, {label: node.id});
-            console.log(JSON.stringify(link));
             this.dagreGraph.setEdge(
                 link.source.id||link.source,
                 link.target.id||link.target,
@@ -76,8 +70,6 @@ export default class DagreGraph implements iGraph {
             });
         this.svg.call(zoom);
         // Run the renderer. This is what draws the final graph.
-        console.log('render...')
-        console.log(JSON.stringify(this.dagreGraph.nodes()))
         this.dagreGraph.nodes().forEach((v) => {
             console.log(v);
             console.log(this.dagreGraph.node(v))
@@ -89,11 +81,9 @@ export default class DagreGraph implements iGraph {
     public deleteGraph(): void {
         console.log('dagre.deleteGraph()...');
         for (let edge of this.dagreGraph.edges()) {
-            console.log(edge);
             this.dagreGraph.removeEdge(edge.v, edge.w);
         }
         for (let node of this.dagreGraph.nodes()) {
-            console.log(node);
             this.dagreGraph.removeNode(node.id);
         }
         d3.select('#graph-container').select('#graph').remove();
