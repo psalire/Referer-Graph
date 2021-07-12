@@ -3,6 +3,7 @@ import Data from './Data';
 import iGraph from './iGraph';
 import dagreD3 from 'dagre-d3';
 import * as d3 from "d3";
+import { createButton } from './createButton';
 
 export default class DagreGraph implements iGraph {
     public data: Data;
@@ -95,8 +96,12 @@ export default class DagreGraph implements iGraph {
         return this;
     }
     public getButtons(): HTMLButtonElement[] {
-
-        return [];
+        var deleteBtn = createButton('Clear Graph');
+        deleteBtn.onclick = ()=>{
+            this.data.clear();
+            this.updateGraph();
+        };
+        return [deleteBtn];
     }
     private getSvgDimensions(): {[key: string]:number} {
         let dims = document.getElementById(this.svgId).getBoundingClientRect();
