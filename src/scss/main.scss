@@ -3,6 +3,20 @@
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/_variables";
 
+// dagre style
+.node rect {
+    stroke: #333;
+    fill: #fff;
+}
+.node text {
+    pointer-events: none;
+}
+.edgePath path {
+    stroke: #333;
+    fill: #333;
+    stroke-width: 1.5px;
+}
+
 .graph-controls-btn {
     @extend .mx-auto;
     @extend .p-1;
@@ -18,7 +32,10 @@
         height: 1em;
     }
 }
-
+.settings-header-label {
+    @extend .text-center;
+    font-size: 0.95em;
+}
 #graph-style-container {
     .graph-style-btn, img {
         border-radius: 0.5rem;
@@ -33,12 +50,16 @@
     img {
         border: 1px solid $gray-500;
     }
+    .selected-graph img {
+        border: 2px solid $gray-600 !important;
+    }
 }
 
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
 
 #sidebar {
-    @extend .p-2;
+    @extend .px-2;
+    @extend .py-1;
     --resizeable-width: 200px;
     width: var(--resizeable-width);
     min-width: var(--min-width);

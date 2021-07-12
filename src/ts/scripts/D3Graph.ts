@@ -1,6 +1,7 @@
 
 import Data from './Data';
 import iGraph from './iGraph';
+import { createButton } from './createButton';
 import * as d3 from "d3";
 
 export default class D3Graph implements iGraph {
@@ -22,6 +23,7 @@ export default class D3Graph implements iGraph {
     }
 
     public createGraph(): D3Graph {
+        console.log('d3graph.createGraph()...')
         this.svg = d3.select('#graph-container').append('svg').attr('id', this.svgId);
         var zoomed = () => {
             this.svg
@@ -111,7 +113,6 @@ export default class D3Graph implements iGraph {
     }
 
     public updateGraph(): D3Graph {
-        // var dims = this.getSvgDimensions();
         var dataLinks = this.data.getLinks();
         var dataNodes = this.data.getNodes();
         console.log('links: '+JSON.stringify(dataLinks))
@@ -165,11 +166,21 @@ export default class D3Graph implements iGraph {
     }
 
     public deleteGraph(): void {
-        this.simulation.nodes(this.data.getNodes()).on('tick', null);
-        this.svg.remove();
-        document.getElementById(this.svgId).remove();
-        this.svg = null;
-        this.svgId = null;
+        console.log('d3graph.deleteGraph()...');
+        if (this.svg) {
+            this.simulation.stop();
+            this.simulation
+                .force("link", null)
+                .force("charge", null)
+                .force("x", null)
+                .force("y", null)
+                .force("collision", null);
+            this.simulation.nodes(this.data.getNodes()).on('tick', null);
+            d3.select('#graph-container').select('#'+this.svgId).remove();
+            // document.getElementById(this.svgId).remove();
+            this.svg = null;
+            this.isAnimationStopped = false;
+        }
     }
     public clearGraph(): D3Graph {
         this.data.clear();
@@ -178,11 +189,34 @@ export default class D3Graph implements iGraph {
         startAnimation && (this.isAnimationStopped = false);
         return this.updateGraph();
     }
-
     public stopAnimation(): D3Graph {
         this.simulation.stop();
         this.isAnimationStopped = true;
         return this;
+    }
+
+    public getButtons(): HTMLElement[] {
+        var deleteBtn = createButton('Clear Graph');
+        deleteBtn.onclick = ()=>{
+            this.data.clear();
+            this.refreshGraph();
+        };
+        var stopBtn = createButton('Stop Animation');
+        stopBtn.onclick = ()=>{
+            if (stopBtn.textContent.startsWith('Stop')) {
+                this.stopAnimation();
+                stopBtn.textContent = 'Start Animation';
+            }
+            else {
+                this.refreshGraph(true);
+                stopBtn.textContent = 'Stop Animation';
+            }
+        };
+        var refreshBtn = createButton('Refresh Graph');
+        refreshBtn.onclick = ()=>{
+            this.refreshGraph()
+        };
+        return [deleteBtn, stopBtn, refreshBtn];
     }
 
     private restartSimulation(): void {
@@ -351,8 +385,8 @@ export default class D3Graph implements iGraph {
         let target = d.target.id || d.target;
         return 'linkId_'+btoa(src+target);
     };
-    private getSvgDimensions(id='graph'): {[key: string]:number} {
-        let dims = document.getElementById(id).getBoundingClientRect();
+    private getSvgDimensions(): {[key: string]:number} {
+        let dims = document.getElementById(this.svgId).getBoundingClientRect();
         return {'x':dims.width, 'y':dims.height,'xoff':dims.x,'yoff':dims.y};
     }
     private getBboxDimensions(id: string): object {

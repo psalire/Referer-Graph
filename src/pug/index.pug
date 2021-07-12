@@ -1,6 +1,5 @@
 extends base.pug
 
-
 mixin btn-with-img(label, src, val)
     div.d-flex.flex-column
         span.text-center.graph-style-label=label
@@ -25,14 +24,15 @@ block header
         +gear-svg
         |  Close Settings
     div#settings-container.collapse.show.pb-2
-        div.text-center.settings-header-label Graph style:
+        div.settings-header-label Graph style:
         div#graph-style-container.container.d-flex.justify-content-center
             +btn-with-img("d3-force", "/static/image/d3-force-img.jpg")
             +btn-with-img("dagre", "/static/image/d3-force-img.jpg")
             
 block main
     section.d-flex.w-100.h-100.border-top
-        aside#sidebar.border-end.p-1
+        aside#sidebar.border-end
+            div.settings-header-label Controls
             div#buttons.d-flex.flex-column
             div#handle
         figure.flex-grow-1.d-flex.flex-column.h-100
