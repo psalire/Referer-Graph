@@ -10,10 +10,12 @@ export default class DagreGraph implements iGraph {
     private svgInner?: object;
     private svgId: string;
     private dagreGraph?: object;
+    private render: object;
 
     constructor(data: Data, svgId='graph') {
         this.data = data;
         this.svgId = svgId;
+        this.render = new dagreD3.render();
     }
 
     public createGraph(): DagreGraph {
@@ -45,15 +47,27 @@ export default class DagreGraph implements iGraph {
         }
 
         // Add states to the graph, set labels, and style
+        console.log('add nodes...');
         for (let node of this.data.getNodes()) {
             console.log(JSON.stringify(node));
             this.dagreGraph.setNode(node.id, {label: node.id});
         }
+        console.log('nodes: '+JSON.stringify(this.dagreGraph.nodes()))
+        console.log('add links...')
         for (let link of this.data.getLinks()) {
             // this.dagreGraph.setNode(link.source, {label: node.id});
             // this.dagreGraph.setNode(link.target, {label: node.id});
-            this.dagreGraph.setEdge(link.source, link.target, {label: link.method});
+            console.log(JSON.stringify(link));
+            this.dagreGraph.setEdge(
+                link.source.id||link.source,
+                link.target.id||link.target,
+                {label: link.target.method || link.method}
+            );
         }
+        console.log('links: '+JSON.stringify(this.dagreGraph.edges()))
+        console.log('nodes: '+JSON.stringify(this.dagreGraph.nodes()))
+        var len = this.dagreGraph.nodes().length;
+        console.log('last: '+JSON.stringify(this.dagreGraph.nodes()[len-1]))
 
         // Create the renderer
         var zoom = d3.zoom()
@@ -62,8 +76,13 @@ export default class DagreGraph implements iGraph {
             });
         this.svg.call(zoom);
         // Run the renderer. This is what draws the final graph.
-        var render = new dagreD3.render();
-        render(this.svgInner, this.dagreGraph);
+        console.log('render...')
+        console.log(JSON.stringify(this.dagreGraph.nodes()))
+        this.dagreGraph.nodes().forEach((v) => {
+            console.log(v);
+            console.log(this.dagreGraph.node(v))
+        })
+        this.render(this.svgInner, this.dagreGraph);
 
         return this;
     }
