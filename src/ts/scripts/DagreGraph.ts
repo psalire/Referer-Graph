@@ -31,13 +31,16 @@ export default class DagreGraph implements iGraph {
             });
         this.svg.call(zoom);
 
-        this.dagreGraph = new dagreD3.graphlib.Graph().setGraph({
+        this.dagreGraph = new dagreD3.graphlib.Graph({
             directed: true,
             compound: true
+        }).setGraph({
+            rankdir: 'LR'
         });
-        var initialScale = 0.75;
+        console.log(JSON.stringify(this.dagreGraph));
+
         this.svg.call(zoom.transform, d3.zoomIdentity.translate(
-            this.getSvgDimensions().x / 2, 20).scale(initialScale)
+            this.getSvgDimensions().x / 2, 20)
         );
 
         return this;
@@ -53,16 +56,26 @@ export default class DagreGraph implements iGraph {
             this.dagreGraph.setNode(node.id, {label: node.id});
         }
         for (let link of this.data.getLinks()) {
+            console.log('link')
+            console.log(JSON.stringify(link));
+            var method = link.target.method || link.method || '';
+            var sourceId = link.source.id||link.source;
+            var targetId = link.target.id||link.target;
+            var targetEdge = this.dagreGraph.edge(sourceId, targetId);
+            if (targetEdge) {
+                console.log('target')
+                console.log(JSON.stringify(targetEdge))
+                if (!targetEdge.label.includes(method)) {
+                    method = targetEdge+'|'+method;
+                }
+            }
+            console.log('method: '+method)
             this.dagreGraph.setEdge(
-                link.source.id||link.source,
-                link.target.id||link.target,
-                {label: link.target.method || link.method}
+                sourceId,
+                targetId,
+                {label: method}
             );
         }
-        console.log('links: '+JSON.stringify(this.dagreGraph.edges()))
-        console.log('nodes: '+JSON.stringify(this.dagreGraph.nodes()))
-        var len = this.dagreGraph.nodes().length;
-        console.log('last: '+JSON.stringify(this.dagreGraph.nodes()[len-1]))
 
         // Create the renderer
         var zoom = d3.zoom()
