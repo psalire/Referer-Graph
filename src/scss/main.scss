@@ -32,11 +32,17 @@
         height: 1em;
     }
 }
+#settings-inner {
+    > div {
+        @extend .px-1;
+    }
+}
 .settings-header-label {
     @extend .text-center;
     font-size: 0.95em;
 }
-#graph-style-container {
+/*
+#graph-layout-container {
     .graph-style-btn, img {
         border-radius: 0.5rem;
     }
@@ -54,6 +60,7 @@
         border: 2px solid $gray-600 !important;
     }
 }
+*/
 
 // https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
 

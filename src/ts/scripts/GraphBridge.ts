@@ -14,23 +14,27 @@ export default class GraphBridge {
 
     constructor(initialGraph='dagre') {
         this.setActiveGraph(initialGraph);
-        var graphStyleContainer = document.getElementById('graph-style-container');
-        for (let btn of graphStyleContainer.getElementsByTagName('button')) {
-            if (btn.value==initialGraph) {
-                btn.classList.add('selected-graph');
-                break;
-            }
-        }
+        var graphSelect = document.getElementById('graph-layout-select');
+        // var graphStyleContainer = document.getElementById('graph-layout-container');
 
-        for (let btn of graphStyleContainer.getElementsByTagName('button')) {
-            btn.onclick = () => {
-                if (!btn.classList.contains('selected-graph')) {
-                    this.setActiveGraph(btn.value);
-                    btn.classList.add('selected-graph');
-                }
-            }
-        }
-
+        // for (let btn of graphStyleContainer.getElementsByTagName('button')) {
+        //     if (btn.value==initialGraph) {
+        //         btn.classList.add('selected-graph');
+        //         break;
+        //     }
+        // }
+        // for (let btn of graphStyleContainer.getElementsByTagName('button')) {
+        //     btn.onclick = () => {
+        //         if (!btn.classList.contains('selected-graph')) {
+        //             btn.classList.add('selected-graph');
+        //             // graphSelect.value = btn.value;
+        //         }
+        //     }
+        // }
+        graphSelect.addEventListener('change', () => {
+            // document.getElementById(graphSelect.value+'-btn').click();
+            this.setActiveGraph(graphSelect.value);
+        });
     }
 
     public setActiveGraph(type: string): void {
