@@ -36,13 +36,14 @@ export default class DagreGraph implements iGraph {
             compound: true
         }).setGraph({
             rankdir: 'LR',
-            nodesep: '20'
+            nodesep: '20',
+            ranksep: '20'
         });
         console.log(JSON.stringify(this.dagreGraph));
 
-        this.svg.call(zoom.transform, d3.zoomIdentity.translate(
-            this.getSvgDimensions().x / 2, 20)
-        );
+        // this.svg.call(zoom.transform, d3.zoomIdentity.translate(
+        //     this.getSvgDimensions().x / 2, 20)
+        // );
 
         return this;
     }
