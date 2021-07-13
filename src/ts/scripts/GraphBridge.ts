@@ -7,12 +7,12 @@ import iGraph from './iGraph';
 export default class GraphBridge {
     public data: Data = new Data();
     private graphs: Map<string,iGraph> = new Map([
+        ['dagre', new DagreGraph(this.data)],
         ['d3-force', new D3Graph(this.data)],
-        ['dagre', new DagreGraph(this.data)]
     ]);
     private activeGraph?: iGraph;
 
-    constructor(initialGraph='d3-force') {
+    constructor(initialGraph='dagre') {
         this.setActiveGraph(initialGraph);
         var graphStyleContainer = document.getElementById('graph-style-container');
         for (let btn of graphStyleContainer.getElementsByTagName('button')) {
