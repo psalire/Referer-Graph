@@ -35,7 +35,8 @@ export default class DagreGraph implements iGraph {
             directed: true,
             compound: true
         }).setGraph({
-            rankdir: 'LR'
+            rankdir: 'LR',
+            nodesep: '20'
         });
         console.log(JSON.stringify(this.dagreGraph));
 
