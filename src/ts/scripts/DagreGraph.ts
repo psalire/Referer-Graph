@@ -113,6 +113,8 @@ export default class DagreGraph implements iGraph {
         var deleteBtn = createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
+            this.deleteGraph();
+            this.createGraph();
             this.updateGraph();
         };
         return [deleteBtn];
