@@ -41,6 +41,18 @@
     @extend .text-center;
     font-size: 0.95em;
 }
+
+#filter-input {
+    textarea {
+        height: 10px;
+    }
+}
+#filter-input-text {
+    width: 200px;
+}
+#filter-input-delimeter {
+    width: 50px;
+}
 /*
 #graph-layout-container {
     .graph-style-btn, img {

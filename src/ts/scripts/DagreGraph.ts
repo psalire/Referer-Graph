@@ -94,7 +94,7 @@ export default class DagreGraph implements iGraph {
 
         return this;
     }
-    public deleteGraph(): void {
+    public deleteGraph(): DagreGraph {
         console.log('dagre.deleteGraph()...');
         for (let edge of this.dagreGraph.edges()) {
             this.dagreGraph.removeEdge(edge.v, edge.w);
@@ -105,20 +105,24 @@ export default class DagreGraph implements iGraph {
         d3.select('#graph-container').select('#graph').remove();
         this.svg = null;
         this.dagreGraph = null;
+        return this;
     }
     public refreshGraph(): DagreGraph {
-
-        return this;
+        return this.deleteGraph()
+                   .createGraph()
+                   .updateGraph();
     }
     public getButtons(): HTMLButtonElement[] {
         var deleteBtn = createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
-            this.deleteGraph();
-            this.createGraph();
-            this.updateGraph();
+            this.refreshGraph();
         };
-        return [deleteBtn];
+        var refreshBtn = createButton('Refresh Graph');
+        refreshBtn.onclick = ()=>{
+            this.refreshGraph();
+        }
+        return [deleteBtn, refreshBtn];
     }
     private getSvgDimensions(): {[key: string]:number} {
         let dims = document.getElementById(this.svgId).getBoundingClientRect();

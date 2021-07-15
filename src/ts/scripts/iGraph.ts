@@ -2,7 +2,7 @@
 export default interface iGraph {
     createGraph(): iGraph;
     updateGraph(): iGraph;
-    deleteGraph(): void;
+    deleteGraph(): iGraph;
     refreshGraph(): iGraph;
     getButtons(): HTMLButtonElement[];
 }

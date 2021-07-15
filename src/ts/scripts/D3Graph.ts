@@ -165,7 +165,7 @@ export default class D3Graph implements iGraph {
         return this;
     }
 
-    public deleteGraph(): void {
+    public deleteGraph(): D3Graph {
         console.log('d3graph.deleteGraph()...');
         if (this.svg) {
             this.simulation.stop();
@@ -181,6 +181,7 @@ export default class D3Graph implements iGraph {
             this.svg = null;
             this.isAnimationStopped = false;
         }
+        return this;
     }
     public clearGraph(): D3Graph {
         this.data.clear();
