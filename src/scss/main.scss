@@ -5,16 +5,19 @@
 
 // dagre style
 .node rect {
-    stroke: #333;
-    fill: #fff;
+    stroke: $dark;
+    fill: $white;
 }
 .node text {
     pointer-events: none;
 }
 .edgePath path {
-    stroke: #333;
-    fill: #333;
+    stroke: $dark;
+    fill: $dark;
     stroke-width: 1.5px;
+}
+tspan {
+    @extend .user-select-none;
 }
 
 .graph-controls-btn {
