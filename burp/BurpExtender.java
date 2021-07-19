@@ -24,7 +24,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     */
     @Override
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
-        callbacks.setExtensionName("Event listeners");
+        callbacks.setExtensionName("Requests Visualizer");
         callbacks.registerHttpListener(this);
         callbacks.registerExtensionStateListener(this);
 
