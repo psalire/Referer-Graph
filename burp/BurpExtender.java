@@ -5,9 +5,14 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.net.URL;
 import java.net.MalformedURLException;
+
 import java.awt.Component;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonStructure;
@@ -24,6 +29,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     private final String extensionName = "Referer Graph";
 
     private JPanel uiPanel;
+    private JToggleButton uiOnOffButton;
 
     /**
     * implement IBurpExtender
@@ -45,6 +51,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             @Override
             public void run() {
                 uiPanel = new JPanel();
+
+                uiOnOffButton = new JToggleButton();
+                uiOnOffButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg) {
+                        writer.printlnOut("actionEvent: "+arg.paramString());
+                    }
+                });
+                uiOnOffButton.setText("Hello world!");
+
+                uiPanel.add(uiOnOffButton);
 
                 callbacks.customizeUiComponent(uiPanel);
 
