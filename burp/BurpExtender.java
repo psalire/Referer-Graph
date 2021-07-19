@@ -26,7 +26,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         callbacks.setExtensionName("Event listeners");
         callbacks.registerHttpListener(this);
-        callbacks.registerScannerListener(this);
         callbacks.registerExtensionStateListener(this);
 
         this.callbacks = callbacks;
@@ -47,29 +46,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
-        List<String> headersList = requestInfo.getHeaders();
-        // String rawRequest = this.burpHelpers.bytesToString(messageInfo.getRequest());
-        String referer = null;
 
-        // For all HTTP headers, skipping the request header
-        for (int i=1; i<headersList.size(); i++) {
-            String headerStr = headersList.get(i);
-            try {
-                Matcher matchHeader = this.reHeader.matcher(headerStr);
-                matchHeader.find();
-                String name = matchHeader.group(1);
-                String value = matchHeader.group(2);
-                if (name.equals("Referer")) {
-                    referer = value;
-                    break;
-                }
-            }
-            catch (Exception e) {
-                this.writer.printlnOut("[BurpExtender] See error log for details. Affected header: "+headerStr);
-                this.writer.printlnErr(e.toString());
-                this.writer.printlnErr(e.getStackTrace().toString());
-            }
-        }
         String requestBody = this.writer.jsonToString(
             Json.createObjectBuilder().addAll(
                 JsonHelper.getRequestJson(requestInfo, this.writer)
@@ -87,6 +64,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     */
     @Override
     public void extensionUnloaded() {
-        this.writer.printlnOut("Extension was unloaded");
+        this.writer.printlnOut("[BurpExtender] Extension was unloaded");
     }
 }
