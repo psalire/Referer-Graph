@@ -12,7 +12,7 @@ import javax.json.JsonObject;
 import javax.json.JsonArray;
 import javax.json.Json;
 
-public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListener, IExtensionStateListener {
+public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
     private Pattern reHeader;
@@ -80,14 +80,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IScannerListe
         this.writer.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
         this.writer.printlnOut("--------------------");
-    }
-
-    /**
-    * implement IScannerListener
-    */
-    @Override
-    public void newScanIssue(IScanIssue issue) {
-        this.writer.printlnOut("New scan issue: " + issue.getIssueName());
     }
 
     /**
