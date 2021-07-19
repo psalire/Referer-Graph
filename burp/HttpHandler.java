@@ -16,6 +16,10 @@ public class HttpHandler {
         this.requestEndpoint = URI.create("http://localhost:8000/request");
     }
 
+    /**
+    * Forward request to Node server
+    * @param jsonStr String raw string of JSON to POST
+    */
     public void postJson(String jsonStr) {
         HttpRequest request = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1).uri(
             this.requestEndpoint
