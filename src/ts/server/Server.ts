@@ -32,7 +32,7 @@ export default class Server {
         });
 
         this.app.get('/', (_, res) => {
-            res.render('index', {title: 'Web-App Flow Viewer'});
+            res.render('index', {title: 'Referer Graph'});
         });
 
         this.app.post('/request', async (req, res) => {
