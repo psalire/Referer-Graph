@@ -71,7 +71,6 @@ export default class GraphBridge {
         return this.activeGraph;
     }
     private applyFilter(filter: string, delimeter: string, noti?: boolean): void {
-        var hostsFilterSuccess = document.getElementById('filter-input-success');
         try {
             var filterArr = filter.split(delimeter).filter(v=>v.length>0);
             console.log('Saving filter: ');
@@ -80,29 +79,37 @@ export default class GraphBridge {
             if (!noti) {
                 return;
             }
-            hostsFilterSuccess.classList.remove('invisible');
-            hostsFilterSuccess.classList.add('visible');
-            setTimeout(() => {
-                hostsFilterSuccess.classList.remove('visible');
-                hostsFilterSuccess.classList.add('invisible');
-            }, 3000);
+            this.displayFilterSuccessMessage();
         }
         catch(e) {
             if (!noti) {
                 return;
             }
-            hostsFilterSuccess.classList.remove('text-success');
-            hostsFilterSuccess.classList.add('text-danger');
-            hostsFilterSuccess.textContent = 'Failed';
-            hostsFilterSuccess.classList.remove('invisible');
-            hostsFilterSuccess.classList.add('visible');
-            setTimeout(() => {
-                hostsFilterSuccess.classList.remove('visible');
-                hostsFilterSuccess.classList.remove('text-danger');
-                hostsFilterSuccess.classList.add('invisible');
-                hostsFilterSuccess.classList.add('text-success');
-                hostsFilterSuccess.textContent = 'Success';
-            }, 3000);
+            this.displayFilterErrorMessage();
         }
+    }
+    private displayFilterSuccessMessage(): void {
+        var hostsFilterSuccess = document.getElementById('filter-input-success');
+        hostsFilterSuccess.classList.remove('invisible');
+        hostsFilterSuccess.classList.add('visible');
+        setTimeout(() => {
+            hostsFilterSuccess.classList.remove('visible');
+            hostsFilterSuccess.classList.add('invisible');
+        }, 3000);
+    }
+    private displayFilterErrorMessage(): void {
+        var hostsFilterSuccess = document.getElementById('filter-input-success');
+        hostsFilterSuccess.classList.remove('text-success');
+        hostsFilterSuccess.classList.add('text-danger');
+        hostsFilterSuccess.textContent = 'Failed';
+        hostsFilterSuccess.classList.remove('invisible');
+        hostsFilterSuccess.classList.add('visible');
+        setTimeout(() => {
+            hostsFilterSuccess.classList.remove('visible');
+            hostsFilterSuccess.classList.remove('text-danger');
+            hostsFilterSuccess.classList.add('invisible');
+            hostsFilterSuccess.classList.add('text-success');
+            hostsFilterSuccess.textContent = 'Success';
+        }, 3000);
     }
 }

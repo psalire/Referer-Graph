@@ -7,10 +7,17 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import java.awt.Component;
+import java.awt.LayoutManager;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import javax.json.JsonArrayBuilder;
@@ -26,10 +33,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     private Pattern reHeader;
     private Writer writer;
     private HttpHandler httpHandler;
+    private String serverAddress;
+    private String serverPort;
+    private boolean isTrafficForwarded;
     private final String extensionName = "Referer Graph";
 
-    private JPanel uiPanel;
-    private JToggleButton uiOnOffButton;
+    private JPanel uiPanel = new JPanel();
 
     /**
     * implement IBurpExtender
@@ -44,28 +53,66 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
         this.burpHelpers = callbacks.getHelpers();
         this.reHeader = Pattern.compile("^(.+): (.+)$");
         this.writer = new Writer(callbacks.getStdout(), callbacks.getStderr());
-        this.httpHandler = new HttpHandler(this.writer);
+        this.serverAddress = "localhost";
+        this.serverPort = "8000";
+        this.isTrafficForwarded = false;
+        this.httpHandler = new HttpHandler(this.writer, this.serverAddress, this.serverPort);
 
+        // Setup Burp UI
         SwingUtilities.invokeLater(new Runnable()
         {
             @Override
             public void run() {
-                uiPanel = new JPanel();
+                GridBagLayout uiGridLayout = new GridBagLayout();
+                uiPanel = new JPanel(uiGridLayout);
+                GridBagConstraints uiGridConstraints = new GridBagConstraints();
 
-                uiOnOffButton = new JToggleButton();
+                JToggleButton uiOnOffButton = new JToggleButton();
                 uiOnOffButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg) {
                         writer.printlnOut("actionEvent: "+arg.paramString());
+                        isTrafficForwarded = !isTrafficForwarded;
+                        String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
+                        uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
                     }
                 });
-                uiOnOffButton.setText("Hello world!");
 
-                uiPanel.add(uiOnOffButton);
+                JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
+                JTextField uiAddressText = new JTextField(serverAddress, 10);
+                JTextField uiPortText = new JTextField(serverPort, 4);
+                JLabel uiAddressLabel = new JLabel("RefererGraph Server Address:Port");
+                uiAddressLabel.setLabelFor(uiAddressText);
+                uiAddressPortPanel.add(uiAddressLabel);
+                uiAddressPortPanel.add(uiAddressText);
+                uiAddressPortPanel.add(uiPortText);
+
+                JButton uiApplyButton = new JButton();
+                uiApplyButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg) {
+                        writer.printlnOut("actionEvent: "+arg.paramString());
+                        writer.printlnOut("Address: "+uiAddressText.getText());
+                        writer.printlnOut("Port: "+uiPortText.getText());
+                        httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
+                    }
+                });
+                uiApplyButton.setText("Apply");
+
+                uiGridConstraints.gridx = 0;
+                uiGridConstraints.gridy = 0;
+                uiPanel.add(uiOnOffButton, uiGridConstraints);
+                uiGridConstraints.gridx = 0;
+                uiGridConstraints.gridy = 1;
+                uiPanel.add(uiAddressPortPanel, uiGridConstraints);
+                uiGridConstraints.gridx = 0;
+                uiGridConstraints.gridy = 2;
+                uiPanel.add(uiApplyButton, uiGridConstraints);
 
                 callbacks.customizeUiComponent(uiPanel);
 
                 // add the custom tab to Burp's UI
                 callbacks.addSuiteTab(BurpExtender.this);
+
+                uiOnOffButton.doClick(); // Turn on forwarding
             }
         });
     }
@@ -74,13 +121,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     * implement ITab
     */
     @Override
-    public String getTabCaption()
-    {
+    public String getTabCaption() {
         return this.extensionName;
     }
     @Override
-    public Component getUiComponent()
-    {
+    public Component getUiComponent() {
         return this.uiPanel;
     }
 
@@ -89,8 +134,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     */
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        if (messageIsRequest) {
-            return; // Only record requests with responses
+        if (messageIsRequest || !isTrafficForwarded) {
+            return; // Only record requests with responses & if listening on
         }
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);

@@ -10,10 +10,10 @@ public class HttpHandler {
     private Writer logOutput;
     private URI requestEndpoint;
 
-    public HttpHandler(Writer logOutput) {
+    public HttpHandler(Writer logOutput, String address, String port) {
         this.client = HttpClient.newHttpClient();
         this.logOutput = logOutput;
-        this.requestEndpoint = URI.create("http://localhost:8000/request");
+        this.setRequestEndpoint(address, port);
     }
 
     /**
@@ -51,5 +51,9 @@ public class HttpHandler {
                 this.logOutput.printlnErr("\n");
             }
         });
+    }
+
+    public void setRequestEndpoint(String address, String port) {
+        this.requestEndpoint = URI.create("http://"+address+":"+port+"/request");
     }
 }
