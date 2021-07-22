@@ -4,6 +4,7 @@
     "description": "",
     "main": "dist/server/main.js",
     "scripts": {
+        "build-all": "npm run build && npm run build-scripts && npm run build-css",
         "build-start": "npm run build && npm start",
         "build": "babel --extensions .ts ./src/ts/server -d ./dist/server",
         "build-scripts": "webpack --config webpack.config.scripts.js",
