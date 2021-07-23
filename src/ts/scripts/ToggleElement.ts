@@ -12,7 +12,7 @@ export default class ToggleElement {
     }
     public toggleStyle(key: string): ToggleElement {
         var vals = this.toggleValues.get(key);
-        if (!vals || !this.elem) return;
+        if (!vals || !this.elem) return this;
         if (this.elem.classList.contains(vals[0])) {
             this.elem.classList.remove(vals[0]);
             this.elem.classList.add(vals[1]);
