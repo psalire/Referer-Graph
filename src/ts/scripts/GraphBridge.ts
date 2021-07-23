@@ -4,6 +4,7 @@ import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
 import StyledButton from './StyledButton';
+import ToggleElement from './StyledButton';
 import { createButton } from './createButton';
 
 export default class GraphBridge {
@@ -15,12 +16,13 @@ export default class GraphBridge {
     private activeGraph?: iGraph;
     private isLiveUpdateOn: boolean;
     private isLiveUpdateBtn: StyledButton;
+    private hostsFilterSuccessElem: ToggleElement;
 
     constructor(initialGraph='dagre') {
         this.isLiveUpdateOn = true;
         this.isLiveUpdateBtn = new StyledButton(this.getIsLiveButtonText(), 'btn-success', true);
         this.isLiveUpdateBtn.addToggleValue('color', 'btn-success', 'btn-secondary');
-        this.isLiveUpdateBtn.button.onclick = ()=>{
+        this.isLiveUpdateBtn.getButton().onclick = ()=>{
             this.isLiveUpdateOn = !this.isLiveUpdateOn;
             this.isLiveUpdateBtn.toggleStyle('color');
             this.isLiveUpdateBtn.setText(this.getIsLiveButtonText(), true);
@@ -37,13 +39,17 @@ export default class GraphBridge {
         var hostsFilterBtn = document.getElementById('filter-input-btn');
         var hostsFilterText = document.getElementById('filter-input-text');
         var hostsFilterDelimeter = document.getElementById('filter-input-delimeter');
-        var hostsFilterSuccess = document.getElementById('filter-input-success');
         hostsFilterText.value = 'ico,jpg,png,gif,css';
         hostsFilterDelimeter.value = ',';
         hostsFilterBtn.addEventListener('click', () => {
             this.applyFilter(hostsFilterText.value, hostsFilterDelimeter.value, true);
             this.activeGraph.refreshGraph();
         });
+
+        this.hostsFilterSuccessElem = new ToggleElement(document.getElementById('filter-input-success'));
+        this.hostsFilterSuccessElem.addToggleValue('visible', 'visible', 'invisible')
+                                   .addToggleValue('color', 'text-success', 'text-danger');
+
         this.applyFilter(hostsFilterText.value, hostsFilterDelimeter.value);
     }
 
@@ -54,13 +60,12 @@ export default class GraphBridge {
             selectedGraph && selectedGraph.classList.remove('selected-graph');
         }
         this.activeGraph = this.graphs.get(type);
-        this.activeGraph.createGraph()
-                        .updateGraph();
+        this.activeGraph.createGraph().updateGraph();
 
         var btnContainer = document.getElementById('buttons');
         if (btnContainer) {
             btnContainer.innerHTML = '';
-            btnContainer.appendChild(this.isLiveUpdateBtn.button);
+            btnContainer.appendChild(this.isLiveUpdateBtn.getButton());
             for (let btn of this.activeGraph.getButtons()) {
                 btnContainer.appendChild(btn);
             }
@@ -88,27 +93,21 @@ export default class GraphBridge {
         }
     }
     private displayFilterSuccessMessage(): void {
-        var hostsFilterSuccess = document.getElementById('filter-input-success');
-        hostsFilterSuccess.classList.remove('invisible');
-        hostsFilterSuccess.classList.add('visible');
+        this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
+                                   .toggleStyle('visible');
         setTimeout(() => {
-            hostsFilterSuccess.classList.remove('visible');
-            hostsFilterSuccess.classList.add('invisible');
+            this.hostsFilterSuccessElem.toggleStyle('visible');
         }, 3000);
     }
     private displayFilterErrorMessage(): void {
-        var hostsFilterSuccess = document.getElementById('filter-input-success');
-        hostsFilterSuccess.classList.remove('text-success');
-        hostsFilterSuccess.classList.add('text-danger');
-        hostsFilterSuccess.textContent = 'Failed';
-        hostsFilterSuccess.classList.remove('invisible');
-        hostsFilterSuccess.classList.add('visible');
+        this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
+                                   .toggleStyle('visible')
+                                   .toggleStyle('color');
+        this.hostsFilterSuccessElem.getElem().textContent = 'Error';
         setTimeout(() => {
-            hostsFilterSuccess.classList.remove('visible');
-            hostsFilterSuccess.classList.remove('text-danger');
-            hostsFilterSuccess.classList.add('invisible');
-            hostsFilterSuccess.classList.add('text-success');
-            hostsFilterSuccess.textContent = 'Success';
+            this.hostsFilterSuccessElem.toggleStyle('visible')
+                                       .toggleStyle('color');
+            this.hostsFilterSuccessElem.getElem().textContent = 'Success';
         }, 3000);
     }
 }
