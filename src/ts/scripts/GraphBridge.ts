@@ -3,6 +3,7 @@ import D3Graph from './D3Graph';
 import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
+import StyledButton from './StyledButton';
 import { createButton } from './createButton';
 
 export default class GraphBridge {
@@ -13,22 +14,16 @@ export default class GraphBridge {
     ]);
     private activeGraph?: iGraph;
     private isLiveUpdateOn: boolean;
-    private isLiveUpdateBtn: HTMLButtonElement;
+    private isLiveUpdateBtn: StyledButton;
 
     constructor(initialGraph='dagre') {
         this.isLiveUpdateOn = true;
-        this.isLiveUpdateBtn = createButton(this.getIsLiveButtonText(), 'btn-success', true);
-        this.isLiveUpdateBtn.onclick = ()=>{
+        this.isLiveUpdateBtn = new StyledButton(this.getIsLiveButtonText(), 'btn-success', true);
+        this.isLiveUpdateBtn.addToggleValue('color', 'btn-success', 'btn-secondary');
+        this.isLiveUpdateBtn.button.onclick = ()=>{
             this.isLiveUpdateOn = !this.isLiveUpdateOn;
-            if (this.getIsLiveUpdateOn()) {
-                this.isLiveUpdateBtn.classList.remove('btn-secondary');
-                this.isLiveUpdateBtn.classList.add('btn-success');
-            }
-            else {
-                this.isLiveUpdateBtn.classList.remove('btn-success');
-                this.isLiveUpdateBtn.classList.add('btn-secondary');
-            }
-            this.isLiveUpdateBtn.innerHTML = this.getIsLiveButtonText();
+            this.isLiveUpdateBtn.toggleStyle('color');
+            this.isLiveUpdateBtn.setText(this.getIsLiveButtonText(), true);
         };
 
         this.setActiveGraph(initialGraph);
@@ -64,8 +59,7 @@ export default class GraphBridge {
         var btnContainer = document.getElementById('buttons');
         if (btnContainer) {
             btnContainer.innerHTML = '';
-            console.log(JSON.stringify(this.isLiveUpdateBtn));
-            btnContainer.appendChild(this.isLiveUpdateBtn);
+            btnContainer.appendChild(this.isLiveUpdateBtn.button);
             for (let btn of this.activeGraph.getButtons()) {
                 btnContainer.appendChild(btn);
             }
