@@ -24,6 +24,7 @@ export default class GraphBridge {
             this.isLiveUpdateOn = !this.isLiveUpdateOn;
             this.isLiveUpdateBtn.toggleStyle('color');
             this.isLiveUpdateBtn.setText(this.getIsLiveButtonText(), true);
+            this.isLiveUpdateOn && this.activeGraph.refreshGraph();
         };
 
         this.setActiveGraph(initialGraph);
@@ -80,14 +81,10 @@ export default class GraphBridge {
             console.log('Saving filter: ');
             console.log(filterArr);
             this.data.setFilters(filterArr);
-            if (notify) {
-                this.displayFilterSuccessMessage();
-            }
+            notify && this.displayFilterSuccessMessage();
         }
         catch(e) {
-            if (notify) {
-                this.displayFilterErrorMessage();
-            }
+            notify && this.displayFilterErrorMessage();
         }
     }
     private displayFilterSuccessMessage(): void {
