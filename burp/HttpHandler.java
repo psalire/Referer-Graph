@@ -6,14 +6,21 @@ import java.net.http.HttpResponse;
 import java.net.URI;
 
 public class HttpHandler {
-    private HttpClient client;
+    private HttpClient client = HttpClient.newHttpClient();
     private Writer logOutput;
     private URI requestEndpoint;
+    private String serverAddress = "localhost";
+    private String serverPort = "8000";
 
     public HttpHandler(Writer logOutput, String address, String port) {
-        this.client = HttpClient.newHttpClient();
         this.logOutput = logOutput;
+        this.serverAddress = address;
+        this.serverPort = port;
         this.setRequestEndpoint(address, port);
+    }
+    public HttpHandler(Writer logOutput) {
+        this.logOutput = logOutput;
+        this.setRequestEndpoint(this.serverAddress, this.serverPort);
     }
 
     /**
@@ -54,6 +61,14 @@ public class HttpHandler {
     }
 
     public void setRequestEndpoint(String address, String port) {
+        this.serverAddress = address;
+        this.serverPort = port;
         this.requestEndpoint = URI.create("http://"+address+":"+port+"/request");
+    }
+    public String getServerAddress() {
+        return this.serverAddress;
+    }
+    public String getServerPort() {
+        return this.serverPort;
     }
 }
