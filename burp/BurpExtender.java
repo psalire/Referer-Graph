@@ -62,16 +62,15 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         if (messageIsRequest || !this.burpUi.getIsTrafficForwarded()) {
-            return; // Only record requests with responses & if listening on
+            return; // Only record requests with responses & if forwarding is on
         }
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
-        IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
-
         if (this.burpUi.getIsLimitInScope() && !this.callbacks.isInScope(requestInfo.getUrl())) {
             this.writer.printlnOut("[BurpExtender] Ignoring, not in scope: "+requestInfo.getUrl());
             return;
         }
+        IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
 
         String requestBody = this.writer.jsonToString(
             Json.createObjectBuilder().addAll(
