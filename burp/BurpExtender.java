@@ -13,6 +13,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JButton;
@@ -39,6 +40,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     private final String extensionName = "Referer Graph";
 
     private JPanel uiPanel = new JPanel();
+    private GridBagConstraints uiGridConstraints = new GridBagConstraints();
 
     /**
     * implement IBurpExtender
@@ -65,7 +67,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             public void run() {
                 GridBagLayout uiGridLayout = new GridBagLayout();
                 uiPanel = new JPanel(uiGridLayout);
-                GridBagConstraints uiGridConstraints = new GridBagConstraints();
 
                 JToggleButton uiOnOffButton = new JToggleButton();
                 uiOnOffButton.addActionListener(new ActionListener() {
@@ -80,7 +81,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
                 JTextField uiAddressText = new JTextField(serverAddress, 10);
                 JTextField uiPortText = new JTextField(serverPort, 4);
-                JLabel uiAddressLabel = new JLabel("RefererGraph Server Address:Port");
+                JLabel uiAddressLabel = new JLabel("Referer Graph Server Address:Port");
                 uiAddressLabel.setLabelFor(uiAddressText);
                 uiAddressPortPanel.add(uiAddressLabel);
                 uiAddressPortPanel.add(uiAddressText);
@@ -97,15 +98,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 });
                 uiApplyButton.setText("Apply");
 
-                uiGridConstraints.gridx = 0;
-                uiGridConstraints.gridy = 0;
-                uiPanel.add(uiOnOffButton, uiGridConstraints);
-                uiGridConstraints.gridx = 0;
-                uiGridConstraints.gridy = 1;
-                uiPanel.add(uiAddressPortPanel, uiGridConstraints);
-                uiGridConstraints.gridx = 0;
-                uiGridConstraints.gridy = 2;
-                uiPanel.add(uiApplyButton, uiGridConstraints);
+                addComponentAtCoor(0, 0, uiOnOffButton);
+                addComponentAtCoor(0, 1, uiAddressPortPanel);
+                addComponentAtCoor(0, 2, uiApplyButton);
 
                 callbacks.customizeUiComponent(uiPanel);
 
@@ -115,6 +110,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 uiOnOffButton.doClick(); // Turn on forwarding
             }
         });
+    }
+
+    private void addComponentAtCoor(int x, int y, JComponent component) {
+        this.uiGridConstraints.gridx = x;
+        this.uiGridConstraints.gridy = y;
+        this.uiPanel.add(component, this.uiGridConstraints);
     }
 
     /**
