@@ -14,7 +14,7 @@ export default class Data {
 
     public addDstNode(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
-        if (!(this.knownPaths.has(dst))) {
+        if (!this.knownPaths.has(dst)) {
             this.knownPaths.add(dst);
             this.addNode(dst, msg.referer ? msg.method : null, 1);
         }
@@ -25,7 +25,7 @@ export default class Data {
     }
     public addSrcNode(msg: {[key: string]: any}): Data {
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
-        if (!(this.knownPaths.has(src))) {
+        if (!this.knownPaths.has(src)) {
             this.knownPaths.add(src);
             this.addNode(src, null, 1);
         }
@@ -50,6 +50,9 @@ export default class Data {
                 'type': type
             });
         }
+        else {
+            this.updateLinkMethod(src, dst, msg.method);
+        }
         return this;
     }
     public setFilters(filters: string[]): void {
@@ -67,8 +70,21 @@ export default class Data {
         });
     }
     private updateNodeMethod(id: string, method: string) {
-        var i = this.nodes.findIndex(v => v.id==id&&v.method&&!v.method.includes(method));
+        var i = this.nodes.findIndex(v => {
+            console.log('V: '+JSON.stringify(v));
+            return v.id==id&&v.method&&!v.method.includes(method)
+        });
         i!=-1 && (this.nodes[i].method += '|'+method);
+    }
+    private updateLinkMethod(src: string, dst: string, method: string) {
+        console.log('UPDATING LINK: '+src+','+dst+','+method);
+        var i = this.links.findIndex(v => {
+            return v.source==src&&v.target==dst&&v.method&&!v.method.includes(method)
+        });
+        console.log('i: '+i);
+        console.log('links: '+JSON.stringify(this.links));
+        console.log('link: '+JSON.stringify(this.links[i]));
+        i!=-1 && (this.links[i].method += '|'+method);
     }
     public getNodes(): object[] {
         console.log('getNodes(): '+JSON.stringify(this.nodes))

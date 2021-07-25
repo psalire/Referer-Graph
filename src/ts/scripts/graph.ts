@@ -12,9 +12,7 @@ window.onload = () => {
         if (msg.referer) {
             graph.data.addSrcNode(msg);
             graph.data.addLink(msg);
-            if (graph.getIsLiveUpdateOn()) {
-                graph.getActiveGraph().updateGraph();
-            }
+            graph.getIsLiveUpdateOn() && graph.getActiveGraph().updateGraph();
         }
     });
 
