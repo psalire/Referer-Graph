@@ -36,7 +36,7 @@ public class HttpHandler {
             "Content-Type", "application/json"
         ).build();
 
-        this.logOutput.printlnOut(request.toString());
+        // this.logOutput.printlnOut(request.toString());
         this.client.sendAsync(
             request,
             HttpResponse.BodyHandlers.ofString()

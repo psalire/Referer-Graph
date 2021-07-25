@@ -13,6 +13,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 
 public class BurpConfigUI implements Runnable {
@@ -25,6 +26,7 @@ public class BurpConfigUI implements Runnable {
     private String serverAddress = "localhost";
     private String serverPort = "8000";
     private boolean isTrafficForwarded = false;
+    private boolean isLimitInScope = true;
 
     public BurpConfigUI(IBurpExtenderCallbacks callbacks, BurpExtender burpExtender, HttpHandler httpHandler, Writer writer) {
         this.callbacks = callbacks;
@@ -63,12 +65,16 @@ public class BurpConfigUI implements Runnable {
         uiAddressPortPanel.add(uiAddressText);
         uiAddressPortPanel.add(uiPortText);
 
+        JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
+
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
                 writer.printlnOut("actionEvent: "+arg.paramString());
                 writer.printlnOut("Address: "+uiAddressText.getText());
                 writer.printlnOut("Port: "+uiPortText.getText());
+                writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
+                isLimitInScope = uiInScopeCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
             }
         });
@@ -76,7 +82,8 @@ public class BurpConfigUI implements Runnable {
 
         addComponentAtCoor(0, 0, uiOnOffButton);
         addComponentAtCoor(0, 1, uiAddressPortPanel);
-        addComponentAtCoor(0, 2, uiApplyButton);
+        addComponentAtCoor(0, 2, uiInScopeCheckbox);
+        addComponentAtCoor(0, 3, uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
@@ -96,5 +103,8 @@ public class BurpConfigUI implements Runnable {
     }
     public boolean getIsTrafficForwarded() {
         return this.isTrafficForwarded;
+    }
+    public boolean getIsLimitInScope() {
+        return this.isLimitInScope;
     }
 }

@@ -80,6 +80,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
 
+        if (this.burpUi.getIsLimitInScope() && !this.callbacks.isInScope(requestInfo.getUrl())) {
+            this.writer.printlnOut("[BurpExtender] Ignoring, not in scope: "+requestInfo.getUrl());
+            return;
+        }
+
         String requestBody = this.writer.jsonToString(
             Json.createObjectBuilder().addAll(
                 JsonHelper.getRequestJson(requestInfo, this.writer)
@@ -87,9 +92,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 JsonHelper.getResponseJson(responseInfo, this.writer)
             ).build()
         );
-        this.writer.printlnOut(requestBody);
+        // this.writer.printlnOut(requestBody);
         this.httpHandler.postJson(requestBody);
-        this.writer.printlnOut("--------------------");
+        // this.writer.printlnOut("--------------------");
     }
 
     /**
