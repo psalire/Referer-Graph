@@ -7,18 +7,6 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import java.awt.Component;
-import java.awt.LayoutManager;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import javax.json.JsonArrayBuilder;
