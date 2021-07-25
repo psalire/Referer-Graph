@@ -2,8 +2,8 @@
 export default class Data {
     private nodes: object[];
     private links: object[];
-    private knownPaths: Set<string> = new Set();
-    private knownLinks: Set<string> = new Set();
+    private knownPathsSet: Set<string> = new Set();
+    private knownLinksSet: Set<string> = new Set();
     private knownPathsIndex: Map<string,number> = new Map();
     private filters?: string[];
 
@@ -14,8 +14,8 @@ export default class Data {
 
     public addDstNode(msg: {[key: string]: any}): Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
-        if (!this.knownPaths.has(dst)) {
-            this.knownPaths.add(dst);
+        if (!this.knownPathsSet.has(dst)) {
+            this.knownPathsSet.add(dst);
             this.addNode(dst, msg.referer ? msg.method : null, 1);
         }
         else {
@@ -25,8 +25,8 @@ export default class Data {
     }
     public addSrcNode(msg: {[key: string]: any}): Data {
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
-        if (!this.knownPaths.has(src)) {
-            this.knownPaths.add(src);
+        if (!this.knownPathsSet.has(src)) {
+            this.knownPathsSet.add(src);
             this.addNode(src, null, 1);
         }
         return this;
@@ -36,8 +36,8 @@ export default class Data {
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
         if (src==dst) return this;
         let srcDstStr = src+dst;
-        if (!this.knownLinks.has(srcDstStr)) {
-            this.knownLinks.add(srcDstStr);
+        if (!this.knownLinksSet.has(srcDstStr)) {
+            this.knownLinksSet.add(srcDstStr);
             let srcDstHosts = msg.referer.host+','+msg.host;
             if (!this.knownPathsIndex.has(srcDstHosts)) {
                 this.knownPathsIndex.set(srcDstHosts, Math.random());
@@ -103,6 +103,7 @@ export default class Data {
             return this.links.filter(
                 val => this.filters.every(
                     f => {
+                        // d3.js changes the object, so have to check val.{source,target}.id
                         var sourceVal = val.source.id || val.source;
                         var targetVal = val.target.id || val.target;
                         return !sourceVal.includes(f) && !targetVal.includes(f)
@@ -115,8 +116,8 @@ export default class Data {
     public clear(): Data {
         this.nodes.splice(0,this.nodes.length);
         this.links.splice(0,this.links.length);
-        this.knownLinks.clear();
-        this.knownPaths.clear();
+        this.knownLinksSet.clear();
+        this.knownPathsSet.clear();
         this.knownPathsIndex.clear();
         return this;
     }
