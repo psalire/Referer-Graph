@@ -111,7 +111,7 @@ export default class DagreGraph implements iGraph {
                 console.log(btoa(v));
                 this.tooltips.push(new Tooltip(document.getElementById(btoa(v)), {
                     container: 'body',
-                    placement: 'auto',
+                    placement: 'right',
                     trigger: 'click',
                     html: true
                 }));
@@ -132,6 +132,7 @@ export default class DagreGraph implements iGraph {
         d3.select('#graph-container').select('#graph').remove();
         this.svg = null;
         this.dagreGraph = null;
+        this.tooltips.splice(0, this.tooltips.length);
         this.dataSet.clear();
         return this;
     }
