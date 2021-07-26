@@ -3,7 +3,7 @@ import Data from './Data';
 import iGraph from './iGraph';
 import dagreD3 from 'dagre-d3';
 import * as d3 from "d3";
-import { createButton } from './createButton';
+import StyledButton from './StyledButton';
 
 export default class DagreGraph implements iGraph {
     public data: Data;
@@ -113,12 +113,12 @@ export default class DagreGraph implements iGraph {
                    .updateGraph();
     }
     public getButtons(): HTMLButtonElement[] {
-        var deleteBtn = createButton('Clear Graph');
+        var deleteBtn = StyledButton.createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
             this.refreshGraph();
         };
-        var refreshBtn = createButton('Refresh Graph');
+        var refreshBtn = StyledButton.createButton('Refresh Graph');
         refreshBtn.onclick = ()=>{
             this.refreshGraph();
         }

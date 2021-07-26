@@ -1,14 +1,26 @@
 
+import { Tooltip } from 'bootstrap';
 import ToggleElement from './ToggleElement';
-import { createButton } from './createButton';
 
 export default class StyledButton extends ToggleElement  {
 
     constructor(text: string, btnStyle='btn-primary', useInnerHtml=false) {
         super();
-        this.elem = createButton(text, btnStyle, useInnerHtml);
+        this.elem = StyledButton.createButton(text, btnStyle, useInnerHtml);
     }
 
+    public static createButton(text: string, btnStyle='btn-primary', useInnerHtml=false): HTMLButtonElement {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `btn ${btnStyle} mb-1 graph-controls-btn`;
+        if (useInnerHtml) {
+            btn.innerHTML = text;
+        }
+        else {
+            btn.textContent = text;
+        }
+        return btn;
+    }
     public setText(text: string, useInnerHtml=false) {
         if (!this.elem) return;
         if (useInnerHtml) {

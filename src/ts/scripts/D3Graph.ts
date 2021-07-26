@@ -1,7 +1,7 @@
 
 import Data from './Data';
 import iGraph from './iGraph';
-import { createButton } from './createButton';
+import StyledButton from './StyledButton';
 import * as d3 from "d3";
 
 export default class D3Graph implements iGraph {
@@ -197,12 +197,12 @@ export default class D3Graph implements iGraph {
     }
 
     public getButtons(): HTMLElement[] {
-        var deleteBtn = createButton('Clear Graph');
+        var deleteBtn = StyledButton.createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
             this.refreshGraph();
         };
-        var stopBtn = createButton('Stop Animation');
+        var stopBtn = StyledButton.createButton('Stop Animation');
         stopBtn.onclick = ()=>{
             if (stopBtn.textContent.startsWith('Stop')) {
                 this.stopAnimation();
@@ -213,7 +213,7 @@ export default class D3Graph implements iGraph {
                 stopBtn.textContent = 'Stop Animation';
             }
         };
-        var refreshBtn = createButton('Refresh Graph');
+        var refreshBtn = StyledButton.createButton('Refresh Graph');
         refreshBtn.onclick = ()=>{
             this.refreshGraph()
         };
