@@ -16,7 +16,7 @@ export default class Data {
         let dst = msg.protocol+'://'+msg.host+msg.path;
         if (!this.knownPathsSet.has(dst)) {
             this.knownPathsSet.add(dst);
-            this.addNode(dst, msg.referer ? msg.method : null, 1);
+            this.addNode(dst, msg.referer ? msg.method : null, msg.statusCode, 1);
         }
         else {
             this.updateNodeMethod(dst, msg.method);
@@ -27,7 +27,7 @@ export default class Data {
         let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
         if (!this.knownPathsSet.has(src)) {
             this.knownPathsSet.add(src);
-            this.addNode(src, null, 1);
+            this.addNode(src, null, null, 1);
         }
         return this;
     }
@@ -62,10 +62,11 @@ export default class Data {
         this.filters = undefined;
     }
 
-    private addNode(id: string, method: string, type: number): void {
+    private addNode(id: string, method: string, statusCode: number, type: number): void {
         this.nodes.push({
             'id': id,
             'method': method,
+            'statusCode': statusCode,
             'type': type
         });
     }
@@ -81,9 +82,6 @@ export default class Data {
         var i = this.links.findIndex(v => {
             return v.source==src&&v.target==dst&&v.method&&!v.method.includes(method)
         });
-        console.log('i: '+i);
-        console.log('links: '+JSON.stringify(this.links));
-        console.log('link: '+JSON.stringify(this.links[i]));
         i!=-1 && (this.links[i].method += '|'+method);
     }
     public getNodes(): object[] {
@@ -112,6 +110,16 @@ export default class Data {
             )
         }
         return this.links;
+    }
+    public getNode(index: number): object {
+        if (this.filters !== undefined) {
+            return this.nodes.filter(
+                val => this.filters.every(
+                    f => !val.id.includes(f)
+                )
+            )[index];
+        }
+        return this.nodes[index];
     }
     public clear(): Data {
         this.nodes.splice(0,this.nodes.length);

@@ -14,13 +14,15 @@ export default class DagreGraph implements iGraph {
     private dagreGraph?: object;
     private render: object;
     private tooltips: object[];
-    private dataSet: Set<string>;
+    private dataMap: Map<string,number>;
+    private tooltipSet: Set<string>;
 
     constructor(data: Data, svgId='graph') {
         this.data = data;
         this.svgId = svgId;
         this.tooltips = [];
-        this.dataSet = new Set();
+        this.dataMap = new Map();
+        this.tooltipSet = new Set();
         this.render = new dagreD3.render();
     }
 
@@ -53,15 +55,18 @@ export default class DagreGraph implements iGraph {
         return this;
     }
     public updateGraph(): DagreGraph {
+        console.log('dagre.updateGraph()...');
         var dataNodes = this.data.getNodes();
         if (dataNodes.length==0) {
             return this;
         }
 
         // Add states to the graph, set labels, and style
-        for (let node of dataNodes) {
+        for (let i=0; i<dataNodes.length; i++) {
+            let node = dataNodes[i];
             console.log(JSON.stringify(node));
             this.dagreGraph.setNode(node.id, {label: node.id});
+            this.dataMap.set(btoa(node.id), i);
         }
         for (let link of this.data.getLinks()) {
             console.log('link')
@@ -100,14 +105,15 @@ export default class DagreGraph implements iGraph {
         this.render(this.svgInner, this.dagreGraph);
 
         this.svgInner.selectAll(".node")
-            .attr("title", (v) => "hello title")
+            .attr("title", (v) => {
+                let dataNode = this.data.getNode(this.dataMap.get(btoa(v)));
+                return `Status Code: ${dataNode.statusCode}`;
+            })
             .attr("data-bs-toggle", (v) => "tooltip")
             .attr("id", (v) => btoa(v))
             .each((v) => {
-                if (this.dataSet.has(btoa(v))) {
-                    return;
-                }
-                this.dataSet.add(btoa(v));
+                if (this.tooltipSet.has(btoa(v))) return;
+                this.tooltipSet.add(btoa(v));
                 console.log(btoa(v));
                 this.tooltips.push(new Tooltip(document.getElementById(btoa(v)), {
                     container: 'body',
@@ -133,7 +139,11 @@ export default class DagreGraph implements iGraph {
         this.svg = null;
         this.dagreGraph = null;
         this.tooltips.splice(0, this.tooltips.length);
-        this.dataSet.clear();
+        this.tooltipSet.clear();
+        this.dataMap.clear();
+        for (let elem of document.body.getElementsByClassName('tooltip')) {
+            elem.remove();
+        }
         return this;
     }
     public refreshGraph(): DagreGraph {
