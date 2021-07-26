@@ -23,12 +23,7 @@ block scripts
     script(src="/static/js/bootstrap-collapse.js")
     script(src="/static/js/settings.js")
 block header
-    button#settings-btn.px-2.border-0.bg-light.w-100.border-bottom.user-select-none(
-        data-bs-toggle="collapse"
-        data-bs-target="#settings-container"
-        aria-expanded="true"
-        aria-controls="settings-container"
-    )
+    button#settings-btn.px-2.border-0.bg-light.w-100.border-bottom.user-select-none
         +gear-svg
         |  Close Settings
     div#settings-container.collapse.show
@@ -38,9 +33,6 @@ block header
                 select#graph-layout-select.form-select.p-1(aria-label="Select graph layout")
                     option(value="dagre") dagre
                     option(value="d3-force") d3-force
-                //- div#graph-layout-container.container.d-flex.justify-content-center
-                //-     +btn-with-img("dagre", "/static/image/d3-force-img.jpg")
-                //-     +btn-with-img("d3-force", "/static/image/d3-force-img.jpg")
             div
                 +filter-textarea-group("URL Filter & Delimeter", "filter-input")
             
