@@ -74,15 +74,7 @@ export default class DagreGraph implements iGraph {
             var method = link.target.method || link.method || '';
             var sourceId = link.source.id||link.source;
             var targetId = link.target.id||link.target;
-            // var targetEdge = this.dagreGraph.edge(sourceId, targetId);
-            // if (targetEdge) {
-            //     console.log('target')
-            //     console.log(JSON.stringify(targetEdge))
-            //     if (!targetEdge.label.includes(method)) {
-            //         method = targetEdge.label+'|'+method;
-            //     }
-            // }
-            console.log('method: '+method)
+
             this.dagreGraph.setEdge(
                 sourceId,
                 targetId,
