@@ -108,7 +108,7 @@ export default class DagreGraph implements iGraph {
                 this.tooltipSet.add(btoa(v));
                 console.log(btoa(v));
                 this.tooltips.push(new Tooltip(document.getElementById(btoa(v)), {
-                    container: 'body',
+                    container: '#graph-container',
                     placement: 'right',
                     trigger: 'click',
                     html: true
