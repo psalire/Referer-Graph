@@ -40,7 +40,7 @@ export default class Server {
             var statusCode = 204;
             try {
                 var requestData = req.body.requestData;
-                // var responseData = req.body.respsonseData;
+                var responseData = req.body.responseData;
 
                 await this.db.addHost(requestData.host);
                 await this.db.addPath(requestData.path, requestData.host);
@@ -51,7 +51,7 @@ export default class Server {
                         requestData.host
                     );
                 }
-                this.io.emit('data', requestData);
+                this.io.emit('data', {...requestData, ...responseData});
             }
             catch(e) {
                 console.error(e);
