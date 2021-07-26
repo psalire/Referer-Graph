@@ -3,6 +3,7 @@ import Data from './Data';
 import iGraph from './iGraph';
 import dagreD3 from 'dagre-d3';
 import * as d3 from "d3";
+import { Tooltip } from 'bootstrap';
 import StyledButton from './StyledButton';
 
 export default class DagreGraph implements iGraph {
@@ -12,10 +13,14 @@ export default class DagreGraph implements iGraph {
     private svgId: string;
     private dagreGraph?: object;
     private render: object;
+    private tooltips: object[];
+    private dataSet: Set<string>;
 
     constructor(data: Data, svgId='graph') {
         this.data = data;
         this.svgId = svgId;
+        this.tooltips = [];
+        this.dataSet = new Set();
         this.render = new dagreD3.render();
     }
 
@@ -48,12 +53,13 @@ export default class DagreGraph implements iGraph {
         return this;
     }
     public updateGraph(): DagreGraph {
-        if (this.data.getNodes().length==0) {
+        var dataNodes = this.data.getNodes();
+        if (dataNodes.length==0) {
             return this;
         }
 
         // Add states to the graph, set labels, and style
-        for (let node of this.data.getNodes()) {
+        for (let node of dataNodes) {
             console.log(JSON.stringify(node));
             this.dagreGraph.setNode(node.id, {label: node.id});
         }
@@ -85,12 +91,33 @@ export default class DagreGraph implements iGraph {
                 this.svgInner.select('g').attr("transform", d3.event.transform);
             });
         this.svg.call(zoom);
+        // this.dagreGraph.nodes().forEach((v) => {
+        //     console.log(v);
+        //     console.log(this.dagreGraph.node(v))
+        // })
+
         // Run the renderer. This is what draws the final graph.
-        this.dagreGraph.nodes().forEach((v) => {
-            console.log(v);
-            console.log(this.dagreGraph.node(v))
-        })
         this.render(this.svgInner, this.dagreGraph);
+
+        this.svgInner.selectAll(".node")
+            .attr("title", (v) => "hello title")
+            .attr("data-bs-toggle", (v) => "tooltip")
+            .attr("id", (v) => btoa(v))
+            .each((v) => {
+                if (this.dataSet.has(btoa(v))) {
+                    return;
+                }
+                this.dataSet.add(btoa(v));
+                console.log(btoa(v));
+                this.tooltips.push(new Tooltip(document.getElementById(btoa(v)), {
+                    container: 'body',
+                    placement: 'auto',
+                    trigger: 'click',
+                    html: true
+                }));
+                console.log(this.tooltips.length)
+                console.log(this.tooltips)
+            });
 
         return this;
     }
@@ -105,6 +132,7 @@ export default class DagreGraph implements iGraph {
         d3.select('#graph-container').select('#graph').remove();
         this.svg = null;
         this.dagreGraph = null;
+        this.dataSet.clear();
         return this;
     }
     public refreshGraph(): DagreGraph {

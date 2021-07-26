@@ -4,17 +4,26 @@
 @import "~bootstrap/scss/_variables";
 
 // dagre style
-.node rect {
-    stroke: $dark;
-    fill: $light;
+.nodes {
+    .node {
+        rect {
+            stroke: $dark;
+            fill: $light;
+        }
+        rect:hover {
+            cursor: pointer;
+        }
+        text {
+            pointer-events: none;
+        }
+    }
 }
-.node text {
-    pointer-events: none;
-}
-.edgePath path {
-    stroke: $dark;
-    fill: $dark;
-    stroke-width: 1.5px;
+.edgePaths {
+    .edgePath path {
+        stroke: $dark;
+        fill: $dark;
+        stroke-width: 1.5px;
+    }
 }
 tspan {
     @extend .user-select-none;

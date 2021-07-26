@@ -1,5 +1,4 @@
 
-import { Tooltip } from 'bootstrap';
 import ToggleElement from './ToggleElement';
 
 export default class StyledButton extends ToggleElement  {
