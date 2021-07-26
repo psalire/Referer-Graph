@@ -59,7 +59,7 @@ public class BurpConfigUI implements Runnable {
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
         JTextField uiAddressText = new JTextField(this.httpHandler.getServerAddress(), 10);
         JTextField uiPortText = new JTextField(this.httpHandler.getServerPort(), 4);
-        JLabel uiAddressLabel = new JLabel("Referer Graph Server Address:Port");
+        JLabel uiAddressLabel = new JLabel("Referer Graph Server (Address:Port)");
         uiAddressLabel.setLabelFor(uiAddressText);
         uiAddressPortPanel.add(uiAddressLabel);
         uiAddressPortPanel.add(uiAddressText);
