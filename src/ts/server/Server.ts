@@ -61,6 +61,19 @@ export default class Server {
             res.status(statusCode).end();
         });
 
+        this.app.post('/updateFilepath', (req, res) => {
+            console.log(req.body);
+            var statusCode = 204;
+            try {
+                this.db.updateDBPath(req.body.path, req.body.filename);
+            }
+            catch(e) {
+                console.error(e);
+                statusCode = 500;
+            }
+            res.status(statusCode).end();
+        })
+
         this.io.on("connection", (socket: IOSocket) => {
             console.log(`socket ${socket.id} connected!`);
         });

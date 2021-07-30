@@ -32,4 +32,8 @@ export default class DatabaseFacade {
     ): Promise<any> {
         return this.sqliteDb.srcDsts.bulkInsert(srcDsts, srcHost, dstHost);
     }
+
+    public updateDBPath(dbPath: string, dbName: string) {
+        this.sqliteDb.setDB(dbPath, dbName);
+    }
 }

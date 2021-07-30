@@ -12,6 +12,10 @@ export default class SqliteDatabase {
     public srcDsts: SrcDstTable;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
+        this.setDB(dbPath, dbName);
+    }
+
+    public setDB(dbPath: string, dbName: string) {
         this.sequelize = new Sequelize({
             dialect: 'sqlite',
             storage: path.join(dbPath, dbName),
@@ -110,7 +114,6 @@ export default class SqliteDatabase {
 
         this.sync();
     }
-
     public authenticate(): Promise<any> {
         return this.sequelize.authenticate();
     }
