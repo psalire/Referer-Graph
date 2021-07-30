@@ -77,6 +77,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 JsonHelper.getRequestJson(requestInfo, this.writer)
             ).addAll(
                 JsonHelper.getResponseJson(responseInfo, this.writer)
+            ).add(
+                "save", this.burpUi.getIsSaveTraffic()
             ).build()
         );
         // this.writer.printlnOut(requestBody);

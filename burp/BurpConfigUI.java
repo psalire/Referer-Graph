@@ -27,6 +27,7 @@ public class BurpConfigUI implements Runnable {
     private String serverPort = "8000";
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
+    private boolean isSaveTraffic = true;
 
     public BurpConfigUI(IBurpExtenderCallbacks callbacks, BurpExtender burpExtender, HttpHandler httpHandler, Writer writer) {
         this.callbacks = callbacks;
@@ -46,16 +47,6 @@ public class BurpConfigUI implements Runnable {
         GridBagLayout uiGridLayout = new GridBagLayout();
         uiPanel = new JPanel(uiGridLayout);
 
-        JToggleButton uiOnOffButton = new JToggleButton();
-        uiOnOffButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                isTrafficForwarded = !isTrafficForwarded;
-                String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
-                uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
-            }
-        });
-
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
         JTextField uiAddressText = new JTextField(this.httpHandler.getServerAddress(), 10);
         JTextField uiPortText = new JTextField(this.httpHandler.getServerPort(), 4);
@@ -66,6 +57,7 @@ public class BurpConfigUI implements Runnable {
         uiAddressPortPanel.add(uiPortText);
 
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
+        JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
 
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
@@ -75,15 +67,28 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("Port: "+uiPortText.getText());
                 writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
                 isLimitInScope = uiInScopeCheckbox.isSelected();
+                isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
             }
         });
         uiApplyButton.setText("Apply");
 
+        JToggleButton uiOnOffButton = new JToggleButton();
+        uiOnOffButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                isTrafficForwarded = !isTrafficForwarded;
+                String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
+                uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
+                uiApplyButton.setEnabled(isTrafficForwarded);
+            }
+        });
+
         addComponentAtCoor(0, 0, uiOnOffButton);
         addComponentAtCoor(0, 1, uiAddressPortPanel);
         addComponentAtCoor(0, 2, uiInScopeCheckbox);
-        addComponentAtCoor(0, 3, uiApplyButton);
+        addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
+        addComponentAtCoor(0, 4, uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
@@ -106,5 +111,8 @@ public class BurpConfigUI implements Runnable {
     }
     public boolean getIsLimitInScope() {
         return this.isLimitInScope;
+    }
+    public boolean getIsSaveTraffic() {
+        return this.isSaveTraffic;
     }
 }
