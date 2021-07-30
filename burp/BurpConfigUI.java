@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -14,7 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import java.io.File;
 
 public class BurpConfigUI implements Runnable {
     private JPanel uiPanel = new JPanel();
@@ -50,7 +53,7 @@ public class BurpConfigUI implements Runnable {
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
         JTextField uiAddressText = new JTextField(this.httpHandler.getServerAddress(), 10);
         JTextField uiPortText = new JTextField(this.httpHandler.getServerPort(), 4);
-        JLabel uiAddressLabel = new JLabel("Referer Graph Server (Address:Port)");
+        JLabel uiAddressLabel = new JLabel("Referer Graph Server (Address:Port):");
         uiAddressLabel.setLabelFor(uiAddressText);
         uiAddressPortPanel.add(uiAddressLabel);
         uiAddressPortPanel.add(uiAddressText);
@@ -58,6 +61,32 @@ public class BurpConfigUI implements Runnable {
 
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
+
+        JPanel uiFileChooserPanel = new JPanel(new FlowLayout());
+        JLabel uiFileTextFieldLabel = new JLabel("Directory:");
+        JTextField uiFileTextField = new JTextField(14);
+        JButton uiFileChooserButton = new JButton("Browse...");
+        uiFileTextFieldLabel.setLabelFor(uiFileTextField);
+        uiFileTextField.setEditable(false);
+
+        JFileChooser uiFileChooser = new JFileChooser();
+        uiFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        JFrame uiFrameFileChooser = new JFrame("Choose Directory");
+        uiFrameFileChooser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        uiFileChooserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = uiFileChooser.getSelectedFile();
+                    uiFileTextField.setText(file.getAbsolutePath());
+                }
+            }
+        });
+        uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath());
+        uiFileChooserPanel.add(uiFileTextFieldLabel);
+        uiFileChooserPanel.add(uiFileTextField);
+        uiFileChooserPanel.add(uiFileChooserButton);
 
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
@@ -88,7 +117,8 @@ public class BurpConfigUI implements Runnable {
         addComponentAtCoor(0, 1, uiAddressPortPanel);
         addComponentAtCoor(0, 2, uiInScopeCheckbox);
         addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
-        addComponentAtCoor(0, 4, uiApplyButton);
+        addComponentAtCoor(0, 4, uiFileChooserPanel);
+        addComponentAtCoor(0, 5, uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
