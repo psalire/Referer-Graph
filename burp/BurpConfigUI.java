@@ -121,6 +121,14 @@ public class BurpConfigUI implements Runnable {
                 isLimitInScope = uiInScopeCheckbox.isSelected();
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
+                if (uiSaveToSqliteCheckbox.isSelected()) {
+                    filepath = uiFileTextField.getText();
+                    filename = uiFilenameTextField.getText();
+                    String requestBody = writer.jsonToString(
+                        JsonHelper.getSavejson(filepath, filename, writer).build()
+                    );
+                    httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
+                }
             }
         });
         uiApplyButton.setText("Apply");

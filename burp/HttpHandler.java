@@ -9,6 +9,7 @@ public class HttpHandler {
     private HttpClient client = HttpClient.newHttpClient();
     private Writer logOutput;
     private URI requestEndpoint;
+    private URI updateFilepathEndpoint;
     private String serverAddress = "localhost";
     private String serverPort = "8000";
 
@@ -28,8 +29,11 @@ public class HttpHandler {
     * @param jsonStr String raw string of JSON to POST
     */
     public void postJson(String jsonStr) {
+        this.postJson(jsonStr, this.requestEndpoint);
+    }
+    public void postJson(String jsonStr, URI endpoint) {
         HttpRequest request = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1).uri(
-            this.requestEndpoint
+            endpoint
         ).POST(
             HttpRequest.BodyPublishers.ofString(jsonStr)
         ).header(
@@ -63,12 +67,20 @@ public class HttpHandler {
     public void setRequestEndpoint(String address, String port) {
         this.serverAddress = address;
         this.serverPort = port;
-        this.requestEndpoint = URI.create("http://"+address+":"+port+"/request");
+        String url = "http://"+address+":"+port;
+        this.requestEndpoint = URI.create(url+"/request");
+        this.updateFilepathEndpoint = URI.create(url+"/updateFilepath");
     }
     public String getServerAddress() {
         return this.serverAddress;
     }
     public String getServerPort() {
         return this.serverPort;
+    }
+    public URI getRequestEndpointURI() {
+        return this.requestEndpoint;
+    }
+    public URI getUpdateFilepathEndpointURI() {
+        return this.updateFilepathEndpoint;
     }
 }
