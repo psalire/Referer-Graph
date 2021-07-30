@@ -28,6 +28,7 @@ public class BurpConfigUI implements Runnable {
     private BurpExtender burpExtender;
     private String serverAddress = "localhost";
     private String serverPort = "8000";
+    private String filename = "default.sqlite";
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
     private boolean isSaveTraffic = true;
@@ -59,16 +60,12 @@ public class BurpConfigUI implements Runnable {
         uiAddressPortPanel.add(uiAddressText);
         uiAddressPortPanel.add(uiPortText);
 
-        JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
-        JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
-
         JPanel uiFileChooserPanel = new JPanel(new FlowLayout());
         JLabel uiFileTextFieldLabel = new JLabel("Directory:");
         JTextField uiFileTextField = new JTextField(14);
         JButton uiFileChooserButton = new JButton("Browse...");
         uiFileTextFieldLabel.setLabelFor(uiFileTextField);
         uiFileTextField.setEditable(false);
-
         JFileChooser uiFileChooser = new JFileChooser();
         uiFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         JFrame uiFrameFileChooser = new JFrame("Choose Directory");
@@ -87,6 +84,27 @@ public class BurpConfigUI implements Runnable {
         uiFileChooserPanel.add(uiFileTextFieldLabel);
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
+
+        // JPanel uiFilenamePanel = new JPanel(new FlowLayout());
+        JLabel uiFilenameTextFieldLabel = new JLabel("Filename:");
+        JTextField uiFilenameTextField = new JTextField(8);
+        uiFilenameTextFieldLabel.setLabelFor(uiFilenameTextField);
+        uiFilenameTextField.setText(this.filename);
+        uiFileChooserPanel.add(uiFilenameTextFieldLabel);
+        uiFileChooserPanel.add(uiFilenameTextField);
+
+        JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
+        JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
+        uiSaveToSqliteCheckbox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+                uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+                uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+                uiFilenameTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+                uiFilenameTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+            }
+        });
 
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
@@ -118,7 +136,8 @@ public class BurpConfigUI implements Runnable {
         addComponentAtCoor(0, 2, uiInScopeCheckbox);
         addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
         addComponentAtCoor(0, 4, uiFileChooserPanel);
-        addComponentAtCoor(0, 5, uiApplyButton);
+        // addComponentAtCoor(0, 5, uiFilenamePanel);
+        addComponentAtCoor(0, 6, uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
