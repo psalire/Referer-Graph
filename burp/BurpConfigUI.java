@@ -28,10 +28,11 @@ public class BurpConfigUI implements Runnable {
     private BurpExtender burpExtender;
     private String serverAddress = "localhost";
     private String serverPort = "8000";
+    private String filepath;
     private String filename = "default.sqlite";
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
-    private boolean isSaveTraffic = true;
+    private boolean isSaveTraffic = false;
 
     public BurpConfigUI(IBurpExtenderCallbacks callbacks, BurpExtender burpExtender, HttpHandler httpHandler, Writer writer) {
         this.callbacks = callbacks;
@@ -80,16 +81,15 @@ public class BurpConfigUI implements Runnable {
                 }
             }
         });
-        uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath());
-        uiFileChooserPanel.add(uiFileTextFieldLabel);
-        uiFileChooserPanel.add(uiFileTextField);
-        uiFileChooserPanel.add(uiFileChooserButton);
-
-        // JPanel uiFilenamePanel = new JPanel(new FlowLayout());
+        this.filepath = uiFileChooser.getCurrentDirectory().getAbsolutePath();
+        uiFileTextField.setText(this.filepath);
         JLabel uiFilenameTextFieldLabel = new JLabel("Filename:");
         JTextField uiFilenameTextField = new JTextField(8);
         uiFilenameTextFieldLabel.setLabelFor(uiFilenameTextField);
         uiFilenameTextField.setText(this.filename);
+        uiFileChooserPanel.add(uiFileTextFieldLabel);
+        uiFileChooserPanel.add(uiFileTextField);
+        uiFileChooserPanel.add(uiFileChooserButton);
         uiFileChooserPanel.add(uiFilenameTextFieldLabel);
         uiFileChooserPanel.add(uiFilenameTextField);
 
@@ -105,6 +105,11 @@ public class BurpConfigUI implements Runnable {
                 uiFilenameTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
             }
         });
+        uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+        uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+        uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+        uiFilenameTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+        uiFilenameTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
 
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
@@ -136,8 +141,7 @@ public class BurpConfigUI implements Runnable {
         addComponentAtCoor(0, 2, uiInScopeCheckbox);
         addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
         addComponentAtCoor(0, 4, uiFileChooserPanel);
-        // addComponentAtCoor(0, 5, uiFilenamePanel);
-        addComponentAtCoor(0, 6, uiApplyButton);
+        addComponentAtCoor(0, 5, uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
@@ -154,6 +158,12 @@ public class BurpConfigUI implements Runnable {
     }
     public String getServerPort() {
         return this.serverPort;
+    }
+    public String getFilename() {
+        return this.filename;
+    }
+    public String getFilepath() {
+        return this.filepath;
     }
     public boolean getIsTrafficForwarded() {
         return this.isTrafficForwarded;

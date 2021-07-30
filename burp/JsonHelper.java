@@ -128,4 +128,18 @@ public class JsonHelper {
             Json.createObjectBuilder().add("statusCode", responseInfo.getStatusCode())
         );
     }
+    /**
+    * Json helper. Build JSON with save data
+    */
+    public static JsonObjectBuilder getSavejson(
+        String path,
+        String filename,
+        Writer writer
+    ) {
+        return Json.createObjectBuilder().add(
+            "path", path
+        ).add(
+            "filename", filename
+        );
+    }
 }
