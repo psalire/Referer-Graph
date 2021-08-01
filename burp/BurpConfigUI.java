@@ -52,7 +52,7 @@ public class BurpConfigUI implements Runnable {
     private void notifyChangesMade() {
         this.uiApplyButton.setText("*Apply");
     }
-    private void clearChangesMade() {
+    private void clearNotificationChangesMade() {
         this.uiApplyButton.setText("Apply");
     }
 
@@ -124,6 +124,7 @@ public class BurpConfigUI implements Runnable {
         // Apply button
         this.uiApplyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
+                clearNotificationChangesMade();
                 writer.printlnOut("actionEvent: "+arg.paramString());
                 writer.printlnOut("Address: "+uiAddressText.getText());
                 writer.printlnOut("Port: "+uiPortText.getText());
@@ -137,7 +138,6 @@ public class BurpConfigUI implements Runnable {
                     );
                     httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
                 }
-                clearChangesMade();
             }
         });
 
@@ -152,12 +152,17 @@ public class BurpConfigUI implements Runnable {
             }
         });
 
-        addComponentAtCoor(0, 0, uiOnOffButton);
-        addComponentAtCoor(0, 1, uiAddressPortPanel);
-        addComponentAtCoor(0, 2, uiInScopeCheckbox);
-        addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
-        addComponentAtCoor(0, 4, uiFileChooserPanel);
-        addComponentAtCoor(0, 5, this.uiApplyButton);
+        JComponent[] componentsOrdered = {
+            uiOnOffButton,
+            uiAddressPortPanel,
+            uiInScopeCheckbox,
+            uiSaveToSqliteCheckbox,
+            uiFileChooserPanel,
+            this.uiApplyButton
+        };
+        for (int i=0; i<componentsOrdered.length; i++) {
+            addComponentAtCoor(0, i, componentsOrdered[i]);
+        }
 
         callbacks.customizeUiComponent(uiPanel);
 
