@@ -6,7 +6,10 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -21,6 +24,7 @@ import java.io.File;
 
 public class BurpConfigUI implements Runnable {
     private JPanel uiPanel = new JPanel();
+    private JButton uiApplyButton = new JButton("Apply");
     private GridBagConstraints uiGridConstraints = new GridBagConstraints();
     private Writer writer;
     private IBurpExtenderCallbacks callbacks;
@@ -45,21 +49,36 @@ public class BurpConfigUI implements Runnable {
         this.uiGridConstraints.gridy = y;
         this.uiPanel.add(component, this.uiGridConstraints);
     }
+    private void notifyChangesMade() {
+        this.uiApplyButton.setText("*Apply");
+    }
+    private void clearChangesMade() {
+        this.uiApplyButton.setText("Apply");
+    }
 
     @Override
     public void run() {
         GridBagLayout uiGridLayout = new GridBagLayout();
         uiPanel = new JPanel(uiGridLayout);
+        class NotifyOnKeypress extends KeyAdapter {
+            public void keyReleased(KeyEvent e) {
+                notifyChangesMade();
+            }
+        }
 
+        // Address:Port fields
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
         JTextField uiAddressText = new JTextField(this.httpHandler.getServerAddress(), 10);
         JTextField uiPortText = new JTextField(this.httpHandler.getServerPort(), 4);
         JLabel uiAddressLabel = new JLabel("Referer Graph Server (Address:Port):");
+        uiAddressText.addKeyListener(new NotifyOnKeypress());
+        uiPortText.addKeyListener(new NotifyOnKeypress());
         uiAddressLabel.setLabelFor(uiAddressText);
         uiAddressPortPanel.add(uiAddressLabel);
         uiAddressPortPanel.add(uiAddressText);
         uiAddressPortPanel.add(uiPortText);
 
+        // SQLite file chooser
         JPanel uiFileChooserPanel = new JPanel(new FlowLayout());
         JLabel uiFileTextFieldLabel = new JLabel("Filepath:");
         JTextField uiFileTextField = new JTextField(14);
@@ -77,6 +96,7 @@ public class BurpConfigUI implements Runnable {
                     sqliteFile = uiFileChooser.getSelectedFile();
                     uiFileTextField.setText(getFilepath()+File.separator+getFilename());
                 }
+                notifyChangesMade();
             }
         });
         uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite");
@@ -84,22 +104,25 @@ public class BurpConfigUI implements Runnable {
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
 
+        // Checkboxes
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
         uiSaveToSqliteCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
                 writer.printlnOut("actionEvent: "+arg.paramString());
-                uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-                uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-                uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+                boolean isCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
+                uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
+                uiFileTextField.setEnabled(isCheckboxEnabled);
+                uiFileChooserButton.setEnabled(isCheckboxEnabled);
+                notifyChangesMade();
             }
         });
         uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
         uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
         uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
 
-        JButton uiApplyButton = new JButton();
-        uiApplyButton.addActionListener(new ActionListener() {
+        // Apply button
+        this.uiApplyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
                 writer.printlnOut("actionEvent: "+arg.paramString());
                 writer.printlnOut("Address: "+uiAddressText.getText());
@@ -114,9 +137,9 @@ public class BurpConfigUI implements Runnable {
                     );
                     httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
                 }
+                clearChangesMade();
             }
         });
-        uiApplyButton.setText("Apply");
 
         JToggleButton uiOnOffButton = new JToggleButton();
         uiOnOffButton.addActionListener(new ActionListener() {
@@ -134,7 +157,7 @@ public class BurpConfigUI implements Runnable {
         addComponentAtCoor(0, 2, uiInScopeCheckbox);
         addComponentAtCoor(0, 3, uiSaveToSqliteCheckbox);
         addComponentAtCoor(0, 4, uiFileChooserPanel);
-        addComponentAtCoor(0, 5, uiApplyButton);
+        addComponentAtCoor(0, 5, this.uiApplyButton);
 
         callbacks.customizeUiComponent(uiPanel);
 
