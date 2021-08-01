@@ -51,10 +51,10 @@ public class BurpConfigUI implements Runnable {
         this.uiGridConstraints.gridy = y;
         this.uiPanel.add(component, this.uiGridConstraints);
     }
-    private void notifyChangesMade() {
+    private void indicateChangesMade() {
         this.uiApplyButton.setText("*Apply");
     }
-    private void clearNotificationChangesMade() {
+    private void clearChangesMade() {
         this.uiApplyButton.setText("Apply");
     }
 
@@ -64,7 +64,7 @@ public class BurpConfigUI implements Runnable {
         uiPanel = new JPanel(uiGridLayout);
         class NotifyOnKeypress extends KeyAdapter {
             public void keyReleased(KeyEvent e) {
-                notifyChangesMade();
+                indicateChangesMade();
             }
         }
 
@@ -99,7 +99,7 @@ public class BurpConfigUI implements Runnable {
                     sqliteFile = uiFileChooser.getSelectedFile();
                     uiFileTextField.setText(getFilepath()+File.separator+getFilename());
                 }
-                notifyChangesMade();
+                indicateChangesMade();
             }
         });
         uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite");
@@ -116,7 +116,7 @@ public class BurpConfigUI implements Runnable {
         uiInScopeCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
                 writer.printlnOut("actionEvent: "+arg.paramString());
-                notifyChangesMade();
+                indicateChangesMade();
             }
         });
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
@@ -127,7 +127,7 @@ public class BurpConfigUI implements Runnable {
                 uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
                 uiFileTextField.setEnabled(isCheckboxEnabled);
                 uiFileChooserButton.setEnabled(isCheckboxEnabled);
-                notifyChangesMade();
+                indicateChangesMade();
             }
         });
         boolean isSqliteCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
@@ -139,7 +139,7 @@ public class BurpConfigUI implements Runnable {
         // Apply button
         this.uiApplyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
-                clearNotificationChangesMade();
+                clearChangesMade();
                 writer.printlnOut("actionEvent: "+arg.paramString());
                 writer.printlnOut("Address: "+uiAddressText.getText());
                 writer.printlnOut("Port: "+uiPortText.getText());
