@@ -93,4 +93,13 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     public void extensionUnloaded() {
         this.writer.printlnOut("[BurpExtender] Extension was unloaded");
     }
+
+    /**
+    * Call processHttpMessage() on getProxyHistory()
+    */
+    public void sendAllProxyHistory() {
+        for (IHttpRequestResponse messageInfo: this.callbacks.getProxyHistory()) {
+            this.processHttpMessage(0, false, messageInfo);
+        }
+    }
 }

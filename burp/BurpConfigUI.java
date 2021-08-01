@@ -110,6 +110,12 @@ public class BurpConfigUI implements Runnable {
         // Send traffic buttons
         JButton uiSendSqliteTrafficButton = new JButton("Send SQLite history");
         JButton uiSendBurpTrafficButton = new JButton("Send ALL Burp Proxy history");
+        uiSendBurpTrafficButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                burpExtender.sendAllProxyHistory();
+            }
+        });
 
         // Checkboxes
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
