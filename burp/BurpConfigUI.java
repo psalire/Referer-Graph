@@ -28,8 +28,7 @@ public class BurpConfigUI implements Runnable {
     private BurpExtender burpExtender;
     private String serverAddress = "localhost";
     private String serverPort = "8000";
-    private String filepath;
-    private String filename = "default.sqlite";
+    private File sqliteFile;
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
     private boolean isSaveTraffic = false;
@@ -68,7 +67,6 @@ public class BurpConfigUI implements Runnable {
         uiFileTextFieldLabel.setLabelFor(uiFileTextField);
         uiFileTextField.setEditable(false);
         JFileChooser uiFileChooser = new JFileChooser();
-        uiFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         JFrame uiFrameFileChooser = new JFrame("Choose Directory");
         uiFrameFileChooser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         uiFileChooserButton.addActionListener(new ActionListener() {
@@ -76,22 +74,15 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("actionEvent: "+arg.paramString());
                 int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
                 if (option == JFileChooser.APPROVE_OPTION) {
-                    File file = uiFileChooser.getSelectedFile();
-                    uiFileTextField.setText(file.getAbsolutePath());
+                    sqliteFile = uiFileChooser.getSelectedFile();
+                    uiFileTextField.setText(getFilepath()+File.separator+getFilename());
                 }
             }
         });
-        this.filepath = uiFileChooser.getCurrentDirectory().getAbsolutePath();
-        uiFileTextField.setText(this.filepath);
-        JLabel uiFilenameTextFieldLabel = new JLabel("Filename:");
-        JTextField uiFilenameTextField = new JTextField(8);
-        uiFilenameTextFieldLabel.setLabelFor(uiFilenameTextField);
-        uiFilenameTextField.setText(this.filename);
+        uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite");
         uiFileChooserPanel.add(uiFileTextFieldLabel);
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
-        uiFileChooserPanel.add(uiFilenameTextFieldLabel);
-        uiFileChooserPanel.add(uiFilenameTextField);
 
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
@@ -101,15 +92,11 @@ public class BurpConfigUI implements Runnable {
                 uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
                 uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
                 uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-                uiFilenameTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-                uiFilenameTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
             }
         });
         uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
         uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
         uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-        uiFilenameTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-        uiFilenameTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
 
         JButton uiApplyButton = new JButton();
         uiApplyButton.addActionListener(new ActionListener() {
@@ -122,10 +109,8 @@ public class BurpConfigUI implements Runnable {
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
                 if (uiSaveToSqliteCheckbox.isSelected()) {
-                    filepath = uiFileTextField.getText();
-                    filename = uiFilenameTextField.getText();
                     String requestBody = writer.jsonToString(
-                        JsonHelper.getSavejson(filepath, filename, writer).build()
+                        JsonHelper.getSavejson(getFilepath(), getFilename(), writer).build()
                     );
                     httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
                 }
@@ -168,10 +153,10 @@ public class BurpConfigUI implements Runnable {
         return this.serverPort;
     }
     public String getFilename() {
-        return this.filename;
+        return sqliteFile.getName();
     }
     public String getFilepath() {
-        return this.filepath;
+        return sqliteFile.getParent();
     }
     public boolean getIsTrafficForwarded() {
         return this.isTrafficForwarded;

@@ -7,6 +7,7 @@ import SrcDstTable from './SrcDstTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
+    private filepath: string;
     public hosts: HostsTable;
     public paths: PathsTable;
     public srcDsts: SrcDstTable;
@@ -16,9 +17,19 @@ export default class SqliteDatabase {
     }
 
     public setDB(dbPath: string, dbName: string) {
+        console.log(dbPath);
+        console.log(dbName);
+        var resolvedPath = path.resolve(path.join(dbPath, dbName));
+        if (resolvedPath==this.filepath) {
+            console.log(`[SqliteDatabase] ${resolvedPath} is already active`);
+            return;
+        }
+        this.filepath = resolvedPath;
+        console.log(`[SqliteDatabase] Set new db ${resolvedPath}`);
+
         this.sequelize = new Sequelize({
             dialect: 'sqlite',
-            storage: path.join(dbPath, dbName),
+            storage: this.filepath,
             logging: false
         });
 
