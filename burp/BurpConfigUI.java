@@ -61,13 +61,13 @@ public class BurpConfigUI implements Runnable {
         uiAddressPortPanel.add(uiPortText);
 
         JPanel uiFileChooserPanel = new JPanel(new FlowLayout());
-        JLabel uiFileTextFieldLabel = new JLabel("Directory:");
+        JLabel uiFileTextFieldLabel = new JLabel("Filepath:");
         JTextField uiFileTextField = new JTextField(14);
         JButton uiFileChooserButton = new JButton("Browse...");
         uiFileTextFieldLabel.setLabelFor(uiFileTextField);
         uiFileTextField.setEditable(false);
         JFileChooser uiFileChooser = new JFileChooser();
-        JFrame uiFrameFileChooser = new JFrame("Choose Directory");
+        JFrame uiFrameFileChooser = new JFrame("SQLite File Chooser");
         uiFrameFileChooser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         uiFileChooserButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
