@@ -18,8 +18,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
+import javax.swing.JSeparator;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import java.io.File;
 
 public class BurpConfigUI implements Runnable {
@@ -70,12 +72,13 @@ public class BurpConfigUI implements Runnable {
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
         JTextField uiAddressText = new JTextField(this.httpHandler.getServerAddress(), 10);
         JTextField uiPortText = new JTextField(this.httpHandler.getServerPort(), 4);
-        JLabel uiAddressLabel = new JLabel("Referer Graph Server (Address:Port):");
+        JLabel uiAddressLabel = new JLabel("Referer Graph Server:");
         uiAddressText.addKeyListener(new NotifyOnKeypress());
         uiPortText.addKeyListener(new NotifyOnKeypress());
         uiAddressLabel.setLabelFor(uiAddressText);
         uiAddressPortPanel.add(uiAddressLabel);
         uiAddressPortPanel.add(uiAddressText);
+        uiAddressPortPanel.add(new JLabel(":"));
         uiAddressPortPanel.add(uiPortText);
 
         // SQLite file chooser
@@ -104,8 +107,18 @@ public class BurpConfigUI implements Runnable {
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
 
+        // Send traffic buttons
+        JButton uiSendSqliteTrafficButton = new JButton("Send SQLite history");
+        JButton uiSendBurpTrafficButton = new JButton("Send ALL Burp Proxy history");
+
         // Checkboxes
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
+        uiInScopeCheckbox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                notifyChangesMade();
+            }
+        });
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
         uiSaveToSqliteCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
@@ -117,9 +130,11 @@ public class BurpConfigUI implements Runnable {
                 notifyChangesMade();
             }
         });
-        uiFileTextFieldLabel.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-        uiFileTextField.setEnabled(uiSaveToSqliteCheckbox.isSelected());
-        uiFileChooserButton.setEnabled(uiSaveToSqliteCheckbox.isSelected());
+        boolean isSqliteCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
+        uiFileTextFieldLabel.setEnabled(isSqliteCheckboxEnabled);
+        uiFileTextField.setEnabled(isSqliteCheckboxEnabled);
+        uiFileChooserButton.setEnabled(isSqliteCheckboxEnabled);
+        uiSendSqliteTrafficButton.setEnabled(isSqliteCheckboxEnabled);
 
         // Apply button
         this.uiApplyButton.addActionListener(new ActionListener() {
@@ -133,14 +148,19 @@ public class BurpConfigUI implements Runnable {
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
                 if (uiSaveToSqliteCheckbox.isSelected()) {
+                    uiSendSqliteTrafficButton.setEnabled(true);
                     String requestBody = writer.jsonToString(
                         JsonHelper.getSavejson(getFilepath(), getFilename(), writer).build()
                     );
                     httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
                 }
+                else {
+                    uiSendSqliteTrafficButton.setEnabled(false);
+                }
             }
         });
 
+        // Traffic on/off toggle button
         JToggleButton uiOnOffButton = new JToggleButton();
         uiOnOffButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
@@ -149,16 +169,24 @@ public class BurpConfigUI implements Runnable {
                 String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
                 uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
                 uiApplyButton.setEnabled(isTrafficForwarded);
+                uiSendSqliteTrafficButton.setEnabled(uiSaveToSqliteCheckbox.isSelected() && isTrafficForwarded);
+                uiSendBurpTrafficButton.setEnabled(isTrafficForwarded);
             }
         });
 
+        JLabel uiDivider = new JLabel("------------------------------------------");
+        uiDivider.setEnabled(false);
         JComponent[] componentsOrdered = {
             uiOnOffButton,
             uiAddressPortPanel,
             uiInScopeCheckbox,
             uiSaveToSqliteCheckbox,
             uiFileChooserPanel,
-            this.uiApplyButton
+            this.uiApplyButton,
+            uiDivider,
+            new JLabel("On-demand:"),
+            uiSendSqliteTrafficButton,
+            uiSendBurpTrafficButton
         };
         for (int i=0; i<componentsOrdered.length; i++) {
             addComponentAtCoor(0, i, componentsOrdered[i]);
