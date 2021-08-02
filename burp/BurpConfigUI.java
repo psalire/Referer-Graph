@@ -102,7 +102,9 @@ public class BurpConfigUI implements Runnable {
                 indicateChangesMade();
             }
         });
-        uiFileTextField.setText(uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite");
+        String defaultSqliteFilepath = uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite";
+        uiFileTextField.setText(defaultSqliteFilepath);
+        this.sqliteFile = new File(defaultSqliteFilepath);
         uiFileChooserPanel.add(uiFileTextFieldLabel);
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
@@ -150,6 +152,7 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("Address: "+uiAddressText.getText());
                 writer.printlnOut("Port: "+uiPortText.getText());
                 writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
+                writer.printlnOut("Filepath: "+getFilepath()+File.separator+getFilename());
                 isLimitInScope = uiInScopeCheckbox.isSelected();
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
