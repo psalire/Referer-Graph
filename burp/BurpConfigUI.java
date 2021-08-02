@@ -22,6 +22,7 @@ import javax.swing.JSeparator;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
 public class BurpConfigUI implements Runnable {
@@ -105,6 +106,15 @@ public class BurpConfigUI implements Runnable {
         String defaultSqliteFilepath = uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite";
         uiFileTextField.setText(defaultSqliteFilepath);
         this.sqliteFile = new File(defaultSqliteFilepath);
+        uiFileChooser.setFileFilter(new FileFilter() {
+            public boolean accept(File pathname) {
+                String absPath = pathname.getAbsolutePath();
+                return absPath.endsWith(".sqlite");
+            }
+            public String getDescription() {
+                return ".sqlite";
+            }
+        });
         uiFileChooserPanel.add(uiFileTextFieldLabel);
         uiFileChooserPanel.add(uiFileTextField);
         uiFileChooserPanel.add(uiFileChooserButton);
