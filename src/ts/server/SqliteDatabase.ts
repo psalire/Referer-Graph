@@ -43,7 +43,7 @@ export default class SqliteDatabase {
                 }
             },
             {
-                timestamps: true,
+                timestamps: false,
                 createdAt: false
             }
         );
@@ -66,7 +66,7 @@ export default class SqliteDatabase {
                 }
             },
             {
-                timestamps: true,
+                timestamps: false,
                 createdAt: false
             }
         );
@@ -93,7 +93,7 @@ export default class SqliteDatabase {
                 }
             },
             {
-                timestamps: true,
+                timestamps: false,
                 createdAt: false
             }
         );
