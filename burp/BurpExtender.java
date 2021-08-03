@@ -6,6 +6,12 @@ import java.util.regex.Matcher;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import java.awt.Component;
 import javax.swing.SwingUtilities;
 
@@ -67,7 +73,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
         if (this.burpUi.getIsLimitInScope() && !this.callbacks.isInScope(requestInfo.getUrl())) {
-            this.writer.printlnOut("[BurpExtender] Ignoring, not in scope: "+requestInfo.getUrl());
+            // this.writer.printlnOut("[BurpExtender] Ignoring, not in scope: "+requestInfo.getUrl());
             return;
         }
         IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
@@ -100,6 +106,36 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     public void sendAllProxyHistory() {
         for (IHttpRequestResponse messageInfo: this.callbacks.getProxyHistory()) {
             this.processHttpMessage(0, false, messageInfo);
+        }
+    }
+    /**
+    * Send all SQLite records
+    */
+    public void sendSqliteHistory() {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        }
+        catch (ClassNotFoundException e) {
+            writer.printlnOut("[BurpExtender] sendSqliteHistory(): See error log");
+            writer.printlnErr(e.getMessage());
+        }
+        String url = "jdbc:sqlite:"+this.burpUi.getFullFilepath();
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+            if (conn == null) {
+                throw new SQLException("conn==null");
+            }
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT host FROM hosts");
+            while (rs.next()) {
+                writer.printlnOut(rs.getString("host"));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            writer.printlnOut("[BurpExtender] sendSqliteHistory(): See error log");
+            writer.printlnErr(e.getMessage());
         }
     }
 }

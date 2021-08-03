@@ -122,6 +122,12 @@ public class BurpConfigUI implements Runnable {
         // Send traffic buttons
         JButton uiSendSqliteTrafficButton = new JButton("Send SQLite history");
         JButton uiSendBurpTrafficButton = new JButton("Send ALL Burp Proxy history");
+        uiSendSqliteTrafficButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg) {
+                writer.printlnOut("actionEvent: "+arg.paramString());
+                burpExtender.sendSqliteHistory();
+            }
+        });
         uiSendBurpTrafficButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg) {
                 writer.printlnOut("actionEvent: "+arg.paramString());
@@ -162,7 +168,7 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("Address: "+uiAddressText.getText());
                 writer.printlnOut("Port: "+uiPortText.getText());
                 writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
-                writer.printlnOut("Filepath: "+getFilepath()+File.separator+getFilename());
+                writer.printlnOut("Filepath: "+getFullFilepath());
                 isLimitInScope = uiInScopeCheckbox.isSelected();
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
@@ -232,6 +238,9 @@ public class BurpConfigUI implements Runnable {
     }
     public String getFilepath() {
         return sqliteFile.getParent();
+    }
+    public String getFullFilepath() {
+        return getFilepath()+File.separator+getFilename();
     }
     public boolean getIsTrafficForwarded() {
         return this.isTrafficForwarded;
