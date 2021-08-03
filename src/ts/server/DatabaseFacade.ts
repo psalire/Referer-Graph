@@ -8,6 +8,13 @@ export default class DatabaseFacade {
         this.sqliteDb = new SqliteDatabase(dbPath, dbName);
     }
 
+    public addProtocol(protocol: string): Promise<any> {
+        return this.sqliteDb.protocols.insert([protocol]);
+    }
+    public addProtocols(protocols: string[]): Promise<any> {
+        return this.sqliteDb.hosts.bulkInsert(protocols.map(val=>[val]));
+    }
+
     public addHost(host: string): Promise<any> {
         return this.sqliteDb.hosts.insert([host]);
     }
@@ -20,6 +27,13 @@ export default class DatabaseFacade {
     }
     public addPaths(paths: string[], host: string): Promise<any> {
         return this.sqliteDb.paths.bulkInsert(paths.map(val=>[val]), host);
+    }
+
+    public addPathQuery(query: string, path: string): Promise<any> {
+        return this.sqliteDb.queries.insert([query], path);
+    }
+    public addPathQueries(queries: string[], path: string): Promise<any> {
+        return this.sqliteDb.queries.bulkInsert(queries.map(val=>[val]), path);
     }
 
     public addSrcDstMapping(

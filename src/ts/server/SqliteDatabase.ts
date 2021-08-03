@@ -1,15 +1,19 @@
 
 import { Sequelize, DataTypes } from 'sequelize';
 import * as path from 'path';
+import ProtocolsTable from './ProtocolsTable';
 import HostsTable from './HostsTable';
 import PathsTable from './PathsTable';
+import QueriesTable from './QueriesTable';
 import SrcDstTable from './SrcDstTable';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
     private filepath: string;
+    public protocols: ProtocolsTable;
     public hosts: HostsTable;
     public paths: PathsTable;
+    public queries: QueriesTable;
     public srcDsts: SrcDstTable;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
@@ -33,6 +37,20 @@ export default class SqliteDatabase {
             logging: false
         });
 
+        var protocolsModel = this.sequelize.define(
+            'Protocol',
+            {
+                protocol: {
+                    type: DataTypes.TEXT,
+                    allowNull: false,
+                    unique: true
+                }
+            },
+            {
+                timestamps: false,
+                createdAt: false
+            }
+        );
         var hostsModel = this.sequelize.define(
             'Host',
             {
@@ -61,6 +79,29 @@ export default class SqliteDatabase {
                     unique: 'pathsComposite',
                     references: {
                         model: hostsModel,
+                        key: 'id'
+                    }
+                }
+            },
+            {
+                timestamps: false,
+                createdAt: false
+            }
+        );
+        var queriesModel = this.sequelize.define(
+            'Query',
+            {
+                query: {
+                    type: DataTypes.TEXT,
+                    allowNull: false,
+                    unique: 'queryComposite'
+                },
+                PathId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'queryComposite',
+                    references: {
+                        model: pathsModel,
                         key: 'id'
                     }
                 }
@@ -118,9 +159,16 @@ export default class SqliteDatabase {
                 allowNull: false
             }
         });
+        pathsModel.hasMany(queriesModel, {
+            foreignKey: {
+                allowNull: false
+            }
+        });
 
+        this.protocols = new ProtocolsTable(protocolsModel);
         this.hosts = new HostsTable(hostsModel);
         this.paths = new PathsTable(pathsModel, hostsModel);
+        this.queries = new QueriesTable(queriesModel, pathsModel);
         this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
 
         this.sync();

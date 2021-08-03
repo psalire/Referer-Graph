@@ -11,6 +11,7 @@ export default class Server {
     private io: IOServer;
     private db: DatabaseFacade;
     private port: number;
+    private protocolsSet: Set<string> = new Set();
 
     public constructor(port=8000) {
         this.port = port;
@@ -42,9 +43,20 @@ export default class Server {
                 var requestData = req.body.requestData;
                 var responseData = req.body.responseData;
 
+                if (!this.protocolsSet.has(requestData.protocol)) {
+                    await this.db.addProtocol(requestData.protocol);
+                    this.protocolsSet.add(requestData.protocol);
+                }
                 await this.db.addHost(requestData.host);
                 await this.db.addPath(requestData.path, requestData.host);
+                await this.db.addPathQuery(requestData.query, requestData.path);
                 if (requestData.referer) {
+                    if (!this.protocolsSet.has(requestData.referer.protocol)) {
+                        await this.db.addProtocol(requestData.referer.protocol);
+                        this.protocolsSet.add(requestData.referer.protocol);
+                    }
+                    await this.db.addPath(requestData.referer.path, requestData.referer.host);
+                    await this.db.addPathQuery(requestData.referer.query, requestData.referer.path);
                     await this.db.addSrcDstMapping(
                         [requestData.referer.path, requestData.path],
                         requestData.referer.host,
