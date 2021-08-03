@@ -127,9 +127,15 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 throw new SQLException("conn==null");
             }
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT host FROM hosts");
+            ResultSet rs = stmt.executeQuery(
+                "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost, dh.host AS dstHost FROM SrcDsts"
+                +" JOIN Paths AS s ON srcPathId=s.id"
+                +" JOIN Paths AS d ON dstPathid=d.id"
+                +" JOIN Hosts AS sh ON s.hostid=sh.id"
+                +" JOIN Hosts AS dh ON d.hostid=dh.id"
+            );
             while (rs.next()) {
-                writer.printlnOut(rs.getString("host"));
+                writer.printlnOut(rs.getString("srcHost"));
             }
             conn.close();
         }
