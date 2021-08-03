@@ -26,9 +26,6 @@ export default class QueriesTable extends aSqliteTable {
         return pathObj;
     }
     public async insert(vals: string[], path?: string): Promise<any> {
-        if (vals[0]==null) {
-            return;
-        }
         this.validateValuesLength(vals);
 
         var pathObj = await this.getPathObj(path);
@@ -44,7 +41,7 @@ export default class QueriesTable extends aSqliteTable {
     }
     public async bulkInsert(vals: string[][], path?: string): Promise<any> {
         var pathObj = await this.getPathObj(path);
-        return this.model.bulkCreate(vals.flat().filter((v)=>v!=null).map((val) => {
+        return this.model.bulkCreate(vals.flat().map((val) => {
             return {
                 path: val,
                 PathId: pathObj.id
