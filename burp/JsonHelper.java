@@ -114,6 +114,31 @@ public class JsonHelper {
     /**
     * Json helper. Build JSON with relevant request data
     */
+    public static JsonObjectBuilder getRequestJson(
+        String method, String host, String path, String protocol,
+        String query, String referer, Writer writer
+    ) {
+        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+        jsonObjectBuilder.add(
+            "method", method
+        ).add(
+            "host", host
+        ).add(
+            "path", path
+        ).add(
+            "protocol", protocol
+        );
+        addPotentialNullToJson(jsonObjectBuilder, "query", query);
+        addPotentialNullToJson(jsonObjectBuilder, "referer", getRefererJson(referer, writer));
+
+        return Json.createObjectBuilder().add(
+            "requestData",
+            jsonObjectBuilder.build()
+        );
+    }
+    /**
+    * Json helper. Build JSON with relevant request data
+    */
     public static JsonObjectBuilder getResponseJson(
         IResponseInfo responseInfo,
         Writer writer
@@ -121,6 +146,15 @@ public class JsonHelper {
         return Json.createObjectBuilder().add(
             "responseData",
             Json.createObjectBuilder().add("statusCode", responseInfo.getStatusCode())
+        );
+    }
+    /**
+    * Json helper. Build JSON with relevant request data
+    */
+    public static JsonObjectBuilder getResponseJson(int statusCode, Writer writer) {
+        return Json.createObjectBuilder().add(
+            "responseData",
+            Json.createObjectBuilder().add("statusCode", statusCode)
         );
     }
     /**

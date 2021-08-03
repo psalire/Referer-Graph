@@ -138,11 +138,19 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 +" JOIN Queries as dq ON dstPathId=dq.PathId"
             );
             while (rs.next()) {
-                writer.printlnOut(
-                    rs.getString("srcHost")+"/"+rs.getString("srcPath")+"->"+rs.getString("dstHost")+"/"+rs.getString("dstPath")
+                String requestBody = this.writer.jsonToString(
+                    Json.createObjectBuilder().addAll(
+                        JsonHelper.getRequestJson("GET", rs.getString("dstHost"), rs.getString("dstPath"), "https",
+                        rs.getString("dstQuery"), "https://"+rs.getString("srcHost")+rs.getString("srcPath"), this.writer)
+                    ).addAll(
+                        JsonHelper.getResponseJson(200, this.writer)
+                    ).add(
+                        "save", this.burpUi.getIsSaveTraffic()
+                    ).build()
                 );
-                writer.printlnOut("srcQuery: "+rs.getString("srcQuery"));
-                writer.printlnOut("dstQuery: "+rs.getString("dstQuery"));
+                this.writer.printlnOut(requestBody);
+                this.httpHandler.postJson(requestBody);
+                this.writer.printlnOut("--------------------");
             }
             conn.close();
         }
