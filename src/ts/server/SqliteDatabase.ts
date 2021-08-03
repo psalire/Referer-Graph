@@ -93,12 +93,12 @@ export default class SqliteDatabase {
             {
                 query: {
                     type: DataTypes.TEXT,
-                    allowNull: true,
+                    allowNull: false,
                     unique: 'queryComposite'
                 },
                 PathId: {
                     type: DataTypes.INTEGER,
-                    allowNull: true,
+                    allowNull: false,
                     unique: 'queryComposite',
                     references: {
                         model: pathsModel,
@@ -161,7 +161,7 @@ export default class SqliteDatabase {
         });
         pathsModel.hasMany(queriesModel, {
             foreignKey: {
-                allowNull: true
+                allowNull: false
             }
         });
 

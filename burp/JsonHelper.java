@@ -18,12 +18,7 @@ public class JsonHelper {
         String name,
         String value
     ) {
-        if (value==null) {
-            jsonObjectBuilder.addNull(name);
-        }
-        else {
-            jsonObjectBuilder.add(name, value);
-        }
+        jsonObjectBuilder.add(name, value==null ? "" : value);
     }
     public static void addPotentialNullToJson(
         JsonObjectBuilder jsonObjectBuilder,

@@ -128,14 +128,21 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             }
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(
-                "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost, dh.host AS dstHost FROM SrcDsts"
+                "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost,"
+                +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery FROM SrcDsts"
                 +" JOIN Paths AS s ON srcPathId=s.id"
                 +" JOIN Paths AS d ON dstPathid=d.id"
                 +" JOIN Hosts AS sh ON s.hostid=sh.id"
                 +" JOIN Hosts AS dh ON d.hostid=dh.id"
+                +" JOIN Queries as sq ON srcPathId=sq.PathId"
+                +" JOIN Queries as dq ON dstPathId=dq.PathId"
             );
             while (rs.next()) {
-                writer.printlnOut(rs.getString("srcHost"));
+                writer.printlnOut(
+                    rs.getString("srcHost")+"/"+rs.getString("srcPath")+"->"+rs.getString("dstHost")+"/"+rs.getString("dstPath")
+                );
+                writer.printlnOut("srcQuery: "+rs.getString("srcQuery"));
+                writer.printlnOut("dstQuery: "+rs.getString("dstQuery"));
             }
             conn.close();
         }
