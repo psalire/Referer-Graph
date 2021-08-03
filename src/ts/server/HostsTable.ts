@@ -13,7 +13,7 @@ export default class HostsTable extends aSqliteTable {
         return this.model.create({
             host: vals[0],
         }).catch((e) => {
-            if (!this.isUniqueViolationError(e, 1)) {
+            if (!this.isUniqueViolationError(e, undefined, 1)) {
                 throw e;
             }
             return null;
