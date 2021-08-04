@@ -63,10 +63,6 @@ public class HttpHandler {
             }
         });
     }
-    public void postIsSqliteOn(boolean isOn) {
-        String url = "http://"+this.serverAddress+":"+this.serverPort;
-        this.postJson("{}", URI.create(url+"/sqlite/"+(isOn?"ON":"OFF")));
-    }
 
     public void setRequestEndpoint(String address, String port) {
         this.serverAddress = address;
@@ -81,10 +77,16 @@ public class HttpHandler {
     public String getServerPort() {
         return this.serverPort;
     }
+    public String getFullURL() {
+        return "http://"+this.serverAddress+":"+this.serverPort;
+    }
     public URI getRequestEndpointURI() {
         return this.requestEndpoint;
     }
     public URI getUpdateFilepathEndpointURI() {
         return this.updateFilepathEndpoint;
+    }
+    public URI getSqliteEndpointURI(boolean isOn) {
+        return URI.create(this.getFullURL()+"/sqlite/"+(isOn?"ON":"OFF"));
     }
 }

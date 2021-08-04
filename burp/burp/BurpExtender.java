@@ -151,8 +151,13 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             writer.printlnErr(e.getMessage());
         }
     }
-
+    public void updateSqliteFilepath() {
+        String requestBody = writer.jsonToString(
+            JsonHelper.getSavejson(this.burpUi.getFilepath(), this.burpUi.getFilename(), writer).build()
+        );
+        httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
+    }
     public void updateSqliteOnOff(boolean isOn) {
-        this.httpHandler.postIsSqliteOn(isOn);
+        this.httpHandler.postJson("{}", this.httpHandler.getSqliteEndpointURI(isOn));
     }
 }

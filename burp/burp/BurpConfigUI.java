@@ -220,10 +220,7 @@ public class BurpConfigUI implements Runnable {
                 uiSendSqliteTrafficButton.setEnabled(isSqliteOn);
                 burpExtender.updateSqliteOnOff(isSqliteOn);
                 if (isSqliteOn) {
-                    String requestBody = writer.jsonToString(
-                        JsonHelper.getSavejson(getFilepath(), getFilename(), writer).build()
-                    );
-                    httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
+                    burpExtender.updateSqliteFilepath();
                 }
             }
         });
