@@ -1,10 +1,7 @@
 package burp;
 
-import java.sql.DriverManager;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.awt.Component;
 import javax.swing.SwingUtilities;
@@ -14,10 +11,10 @@ import javax.json.Json;
 public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
-    // private Pattern reHeader = Pattern.compile("^(.+): (.+)$");
     private Writer writer;
     private HttpHandler httpHandler;
     private BurpConfigUI burpUi;
+    private SqliteReader sqliteReader;
     private final String extensionName = "Referer Graph";
 
     /**
@@ -34,6 +31,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
         this.writer = new Writer(callbacks.getStdout(), callbacks.getStderr());
         this.httpHandler = new HttpHandler(this.writer);
         this.burpUi = new BurpConfigUI(callbacks, BurpExtender.this, this.httpHandler, this.writer);
+        this.sqliteReader = new SqliteReader(this.writer);
 
         // Setup Burp UI
         SwingUtilities.invokeLater(burpUi);
@@ -105,30 +103,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     */
     public void sendSqliteHistory() {
         try {
-            Class.forName("org.sqlite.JDBC");
-        }
-        catch (ClassNotFoundException e) {
-            writer.printlnOut("[BurpExtender] sendSqliteHistory(): See error log");
-            writer.printlnErr(e.getMessage());
-        }
-        String url = "jdbc:sqlite:"+this.burpUi.getFullFilepath();
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url);
-            if (conn == null) {
-                throw new SQLException("conn==null");
-            }
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(
-                "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost,"
-                +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery FROM SrcDsts"
-                +" JOIN Paths AS s ON srcPathId=s.id"
-                +" JOIN Paths AS d ON dstPathid=d.id"
-                +" JOIN Hosts AS sh ON s.hostid=sh.id"
-                +" JOIN Hosts AS dh ON d.hostid=dh.id"
-                +" JOIN Queries as sq ON srcPathId=sq.PathId"
-                +" JOIN Queries as dq ON dstPathId=dq.PathId"
-            );
+            this.sqliteReader.openConnection(this.burpUi.getFullFilepath());
+            ResultSet rs = this.sqliteReader.selectAllData();
             while (rs.next()) {
                 String requestBody = this.writer.jsonToString(
                     Json.createObjectBuilder().addAll(
@@ -144,7 +120,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                 this.httpHandler.postJson(requestBody);
                 this.writer.printlnOut("--------------------");
             }
-            conn.close();
+            this.sqliteReader.closeConnection();
         }
         catch (SQLException e) {
             writer.printlnOut("[BurpExtender] sendSqliteHistory(): See error log");
