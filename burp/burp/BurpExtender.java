@@ -151,4 +151,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             writer.printlnErr(e.getMessage());
         }
     }
+
+    public void updateSqliteOnOff(boolean isOn) {
+        this.httpHandler.postIsSqliteOn(isOn);
+    }
 }

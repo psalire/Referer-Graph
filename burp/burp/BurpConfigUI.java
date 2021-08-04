@@ -210,19 +210,20 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("Port: "+uiPortText.getText());
                 writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
                 writer.printlnOut("Filepath: "+getFullFilepath());
+                writer.printlnOut("Sqlite: "+uiSaveToSqliteCheckbox.isSelected());
                 isLimitInScope = uiInScopeCheckbox.isSelected();
                 isNo404TrafficForwarded = uiNoForward404Checkbox.isSelected();
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
-                if (uiSaveToSqliteCheckbox.isSelected()) {
-                    uiSendSqliteTrafficButton.setEnabled(true);
+
+                boolean isSqliteOn = uiSaveToSqliteCheckbox.isSelected();
+                uiSendSqliteTrafficButton.setEnabled(isSqliteOn);
+                burpExtender.updateSqliteOnOff(isSqliteOn);
+                if (isSqliteOn) {
                     String requestBody = writer.jsonToString(
                         JsonHelper.getSavejson(getFilepath(), getFilename(), writer).build()
                     );
                     httpHandler.postJson(requestBody, httpHandler.getUpdateFilepathEndpointURI());
-                }
-                else {
-                    uiSendSqliteTrafficButton.setEnabled(false);
                 }
             }
         });

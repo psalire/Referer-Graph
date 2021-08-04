@@ -12,6 +12,7 @@ export default class Server {
     private db: DatabaseFacade;
     private port: number;
     private protocolsSet: Set<string> = new Set();
+    private isSaveToSqliteOn: boolean = false;
 
     public constructor(port=8000) {
         this.port = port;
@@ -39,35 +40,53 @@ export default class Server {
         this.app.post('/request', async (req, res) => {
             console.log(req.body);
             var statusCode = 204;
-            try {
-                var requestData = req.body.requestData;
-                var responseData = req.body.responseData;
-
-                if (!this.protocolsSet.has(requestData.protocol)) {
-                    await this.db.addProtocol(requestData.protocol);
-                    this.protocolsSet.add(requestData.protocol);
-                }
-                await this.db.addHost(requestData.host);
-                await this.db.addPath(requestData.path, requestData.host);
-                await this.db.addPathQuery(requestData.query, requestData.path);
-                if (requestData.referer) {
-                    if (!this.protocolsSet.has(requestData.referer.protocol)) {
-                        await this.db.addProtocol(requestData.referer.protocol);
-                        this.protocolsSet.add(requestData.referer.protocol);
+            var requestData = req.body.requestData;
+            var responseData = req.body.responseData;
+            if (this.isSaveToSqliteOn==true) {
+                try {
+                    if (!this.protocolsSet.has(requestData.protocol)) {
+                        await this.db.addProtocol(requestData.protocol);
+                        this.protocolsSet.add(requestData.protocol);
                     }
-                    await this.db.addPath(requestData.referer.path, requestData.referer.host);
-                    await this.db.addPathQuery(requestData.referer.query, requestData.referer.path);
-                    await this.db.addSrcDstMapping(
-                        [requestData.referer.path, requestData.path],
-                        requestData.referer.host,
-                        requestData.host
-                    );
+                    await this.db.addHost(requestData.host);
+                    await this.db.addPath(requestData.path, requestData.host);
+                    await this.db.addPathQuery(requestData.query, requestData.path);
+                    if (requestData.referer) {
+                        if (!this.protocolsSet.has(requestData.referer.protocol)) {
+                            await this.db.addProtocol(requestData.referer.protocol);
+                            this.protocolsSet.add(requestData.referer.protocol);
+                        }
+                        await this.db.addPath(requestData.referer.path, requestData.referer.host);
+                        await this.db.addPathQuery(requestData.referer.query, requestData.referer.path);
+                        await this.db.addSrcDstMapping(
+                            [requestData.referer.path, requestData.path],
+                            requestData.referer.host,
+                            requestData.host
+                        );
+                    }
                 }
-                this.io.emit('data', {...requestData, ...responseData});
+                catch(e) {
+                    console.error(e);
+                    statusCode = 500;
+                }
             }
-            catch(e) {
-                console.error(e);
-                statusCode = 500;
+            this.io.emit('data', {...requestData, ...responseData});
+
+            res.status(statusCode).end();
+        });
+
+        this.app.post('/sqlite/:isSqliteOn', (req, res) => {
+            var statusCode = 204;
+            var isSqliteOnStr = req.params.isSqliteOn.toUpperCase();
+            if (isSqliteOnStr=='ON') {
+                this.isSaveToSqliteOn = true;
+            }
+            else if (isSqliteOnStr=='OFF') {
+                this.isSaveToSqliteOn = false;
+            }
+            else {
+                statusCode = 400;
+                console.log(`Invalid argument`);
             }
 
             res.status(statusCode).end();
@@ -84,7 +103,7 @@ export default class Server {
                 statusCode = 500;
             }
             res.status(statusCode).end();
-        })
+        });
 
         this.io.on("connection", (socket: IOSocket) => {
             console.log(`socket ${socket.id} connected!`);

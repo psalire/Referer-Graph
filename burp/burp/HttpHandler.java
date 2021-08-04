@@ -63,6 +63,10 @@ public class HttpHandler {
             }
         });
     }
+    public void postIsSqliteOn(boolean isOn) {
+        String url = "http://"+this.serverAddress+":"+this.serverPort;
+        this.postJson("{}", URI.create(url+"/sqlite/"+(isOn?"ON":"OFF")));
+    }
 
     public void setRequestEndpoint(String address, String port) {
         this.serverAddress = address;
