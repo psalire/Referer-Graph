@@ -77,6 +77,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             return;
         }
         IResponseInfo responseInfo = this.burpHelpers.analyzeResponse(messageInfo.getResponse());
+        if (this.burpUi.getIsNo404TrafficForwaded() && responseInfo.getStatusCode()==404) {
+            return;
+        }
 
         String requestBody = this.writer.jsonToString(
             Json.createObjectBuilder().addAll(
