@@ -39,7 +39,7 @@ public class BurpConfigUI implements Runnable {
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
     private boolean isSaveTraffic = false;
-    private boolean isNo404TrafficForwarded = true;
+    private boolean isNo404TrafficForwarded = false;
 
     public BurpConfigUI(IBurpExtenderCallbacks callbacks, BurpExtender burpExtender, HttpHandler httpHandler, Writer writer) {
         this.callbacks = callbacks;
@@ -53,22 +53,42 @@ public class BurpConfigUI implements Runnable {
         this.uiGridConstraints.gridy = y;
         this.uiPanel.add(component, this.uiGridConstraints);
     }
-    private void indicateChangesMade() {
+    protected void indicateChangesMade() {
         this.uiApplyButton.setText("*Apply");
     }
-    private void clearChangesMade() {
+    protected void clearChangesMade() {
         this.uiApplyButton.setText("Apply");
+    }
+
+    // Helper classes, decorators
+    class NotifyOnKeypress extends KeyAdapter {
+        public void keyReleased(KeyEvent e) {
+            indicateChangesMade();
+        }
+    }
+    class LoggedActionListener extends ActionListenerDecorator {
+        public LoggedActionListener(ActionListener actionListener) {
+            super(actionListener);
+        }
+        @Override
+        public void decorator(ActionEvent arg) {
+            writer.printlnOut("actionEvent: "+arg.paramString());
+        }
+    }
+    class InidcateChangesActionListener extends ActionListenerDecorator {
+        public InidcateChangesActionListener(ActionListener actionListener) {
+            super(actionListener);
+        }
+        @Override
+        public void decorator(ActionEvent arg) {
+            indicateChangesMade();
+        }
     }
 
     @Override
     public void run() {
         GridBagLayout uiGridLayout = new GridBagLayout();
         uiPanel = new JPanel(uiGridLayout);
-        class NotifyOnKeypress extends KeyAdapter {
-            public void keyReleased(KeyEvent e) {
-                indicateChangesMade();
-            }
-        }
 
         // Address:Port fields
         JPanel uiAddressPortPanel = new JPanel(new FlowLayout());
@@ -93,17 +113,20 @@ public class BurpConfigUI implements Runnable {
         JFileChooser uiFileChooser = new JFileChooser();
         JFrame uiFrameFileChooser = new JFrame("SQLite File Chooser");
         uiFrameFileChooser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        uiFileChooserButton.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
-                    if (option == JFileChooser.APPROVE_OPTION) {
-                        sqliteFile = uiFileChooser.getSelectedFile();
-                        uiFileTextField.setText(getFilepath()+File.separator+getFilename());
+        uiFileChooserButton.addActionListener(
+            new LoggedActionListener(
+                new InidcateChangesActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent arg) {
+                            int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
+                            if (option == JFileChooser.APPROVE_OPTION) {
+                                sqliteFile = uiFileChooser.getSelectedFile();
+                                uiFileTextField.setText(getFilepath()+File.separator+getFilename());
+                            }
+                        }
                     }
-                    indicateChangesMade();
-                }
-            }, writer)
+                )
+            )
         );
         String defaultSqliteFilepath = uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite";
         uiFileTextField.setText(defaultSqliteFilepath);
@@ -124,49 +147,60 @@ public class BurpConfigUI implements Runnable {
         // Send traffic buttons
         JButton uiSendSqliteTrafficButton = new JButton("Send SQLite history");
         JButton uiSendBurpTrafficButton = new JButton("Send ALL Burp Proxy history");
-        uiSendSqliteTrafficButton.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    burpExtender.sendSqliteHistory();
+        uiSendSqliteTrafficButton.addActionListener(
+            new LoggedActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent arg) {
+                        burpExtender.sendSqliteHistory();
+                    }
                 }
-            }, writer)
+            )
         );
-        uiSendBurpTrafficButton.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    burpExtender.sendAllProxyHistory();
+        uiSendBurpTrafficButton.addActionListener(
+            new LoggedActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent arg) {
+                        burpExtender.sendAllProxyHistory();
+                    }
                 }
-            }, writer)
+            )
         );
 
         // Checkboxes
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
-        uiInScopeCheckbox.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    indicateChangesMade();
-                }
-            }, writer)
+        uiInScopeCheckbox.addActionListener(
+            new LoggedActionListener(
+                new InidcateChangesActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent arg) {}
+                    }
+                )
+            )
         );
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
-        uiSaveToSqliteCheckbox.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-                    boolean isCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
-                    uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
-                    uiFileTextField.setEnabled(isCheckboxEnabled);
-                    uiFileChooserButton.setEnabled(isCheckboxEnabled);
-                    indicateChangesMade();
-                }
-            }, writer)
+        uiSaveToSqliteCheckbox.addActionListener(
+            new LoggedActionListener(
+                new InidcateChangesActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent arg) {
+                            boolean isCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
+                            uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
+                            uiFileTextField.setEnabled(isCheckboxEnabled);
+                            uiFileChooserButton.setEnabled(isCheckboxEnabled);
+                        }
+                    }
+                )
+            )
         );
-        JCheckBox uiNoForward404 = new JCheckBox("Don't forward 404 traffic", this.isNo404TrafficForwarded);
-        uiNoForward404.addActionListener(new LoggedActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent arg) {
-
-                }
-            }, writer)
+        JCheckBox uiNoForward404Checkbox = new JCheckBox("Don't forward 404 traffic", this.isNo404TrafficForwarded);
+        uiNoForward404Checkbox.addActionListener(
+            new LoggedActionListener(
+                new InidcateChangesActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent arg) {}
+                    }
+                )
+            )
         );
         uiFileTextFieldLabel.setEnabled(this.isSaveTraffic);
         uiFileTextField.setEnabled(this.isSaveTraffic);
@@ -183,6 +217,7 @@ public class BurpConfigUI implements Runnable {
                 writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
                 writer.printlnOut("Filepath: "+getFullFilepath());
                 isLimitInScope = uiInScopeCheckbox.isSelected();
+                isNo404TrafficForwarded = uiNoForward404Checkbox.isSelected();
                 isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
                 httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
                 if (uiSaveToSqliteCheckbox.isSelected()) {
@@ -210,8 +245,8 @@ public class BurpConfigUI implements Runnable {
                     uiSendSqliteTrafficButton.setEnabled(uiSaveToSqliteCheckbox.isSelected() && isTrafficForwarded);
                     uiSendBurpTrafficButton.setEnabled(isTrafficForwarded);
                 }
-            }, writer)
-        );
+            }
+        ));
 
         JLabel uiDivider = new JLabel("------------------------------------------");
         uiDivider.setEnabled(false);
@@ -219,6 +254,7 @@ public class BurpConfigUI implements Runnable {
             uiOnOffButton,
             uiAddressPortPanel,
             uiInScopeCheckbox,
+            uiNoForward404Checkbox,
             uiSaveToSqliteCheckbox,
             uiFileChooserPanel,
             this.uiApplyButton,
@@ -261,6 +297,9 @@ public class BurpConfigUI implements Runnable {
     }
     public boolean getIsLimitInScope() {
         return this.isLimitInScope;
+    }
+    public boolean getIsNo404TrafficForwaded() {
+        return this.isNo404TrafficForwarded;
     }
     public boolean getIsSaveTraffic() {
         return this.isSaveTraffic;
