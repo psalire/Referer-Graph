@@ -39,6 +39,7 @@ public class BurpConfigUI implements Runnable {
     private boolean isTrafficForwarded = false;
     private boolean isLimitInScope = true;
     private boolean isSaveTraffic = false;
+    private boolean isNo404TrafficForwarded = true;
 
     public BurpConfigUI(IBurpExtenderCallbacks callbacks, BurpExtender burpExtender, HttpHandler httpHandler, Writer writer) {
         this.callbacks = callbacks;
@@ -92,17 +93,18 @@ public class BurpConfigUI implements Runnable {
         JFileChooser uiFileChooser = new JFileChooser();
         JFrame uiFrameFileChooser = new JFrame("SQLite File Chooser");
         uiFrameFileChooser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        uiFileChooserButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
-                if (option == JFileChooser.APPROVE_OPTION) {
-                    sqliteFile = uiFileChooser.getSelectedFile();
-                    uiFileTextField.setText(getFilepath()+File.separator+getFilename());
+        uiFileChooserButton.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    int option = uiFileChooser.showDialog(uiFrameFileChooser, "Select");
+                    if (option == JFileChooser.APPROVE_OPTION) {
+                        sqliteFile = uiFileChooser.getSelectedFile();
+                        uiFileTextField.setText(getFilepath()+File.separator+getFilename());
+                    }
+                    indicateChangesMade();
                 }
-                indicateChangesMade();
-            }
-        });
+            }, writer)
+        );
         String defaultSqliteFilepath = uiFileChooser.getCurrentDirectory().getAbsolutePath()+File.separator+"default.sqlite";
         uiFileTextField.setText(defaultSqliteFilepath);
         this.sqliteFile = new File(defaultSqliteFilepath);
@@ -122,43 +124,54 @@ public class BurpConfigUI implements Runnable {
         // Send traffic buttons
         JButton uiSendSqliteTrafficButton = new JButton("Send SQLite history");
         JButton uiSendBurpTrafficButton = new JButton("Send ALL Burp Proxy history");
-        uiSendSqliteTrafficButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                burpExtender.sendSqliteHistory();
-            }
-        });
-        uiSendBurpTrafficButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                burpExtender.sendAllProxyHistory();
-            }
-        });
+        uiSendSqliteTrafficButton.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    burpExtender.sendSqliteHistory();
+                }
+            }, writer)
+        );
+        uiSendBurpTrafficButton.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    burpExtender.sendAllProxyHistory();
+                }
+            }, writer)
+        );
 
         // Checkboxes
         JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarding to Burp scope", this.isLimitInScope);
-        uiInScopeCheckbox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                indicateChangesMade();
-            }
-        });
+        uiInScopeCheckbox.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    indicateChangesMade();
+                }
+            }, writer)
+        );
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
-        uiSaveToSqliteCheckbox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                boolean isCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
-                uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
-                uiFileTextField.setEnabled(isCheckboxEnabled);
-                uiFileChooserButton.setEnabled(isCheckboxEnabled);
-                indicateChangesMade();
-            }
-        });
-        boolean isSqliteCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
-        uiFileTextFieldLabel.setEnabled(isSqliteCheckboxEnabled);
-        uiFileTextField.setEnabled(isSqliteCheckboxEnabled);
-        uiFileChooserButton.setEnabled(isSqliteCheckboxEnabled);
-        uiSendSqliteTrafficButton.setEnabled(isSqliteCheckboxEnabled);
+        uiSaveToSqliteCheckbox.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    boolean isCheckboxEnabled = uiSaveToSqliteCheckbox.isSelected();
+                    uiFileTextFieldLabel.setEnabled(isCheckboxEnabled);
+                    uiFileTextField.setEnabled(isCheckboxEnabled);
+                    uiFileChooserButton.setEnabled(isCheckboxEnabled);
+                    indicateChangesMade();
+                }
+            }, writer)
+        );
+        JCheckBox uiNoForward404 = new JCheckBox("Don't forward 404 traffic", this.isNo404TrafficForwarded);
+        uiNoForward404.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+
+                }
+            }, writer)
+        );
+        uiFileTextFieldLabel.setEnabled(this.isSaveTraffic);
+        uiFileTextField.setEnabled(this.isSaveTraffic);
+        uiFileChooserButton.setEnabled(this.isSaveTraffic);
+        uiSendSqliteTrafficButton.setEnabled(this.isSaveTraffic);
 
         // Apply button
         this.uiApplyButton.addActionListener(new ActionListener() {
@@ -187,17 +200,18 @@ public class BurpConfigUI implements Runnable {
 
         // Traffic on/off toggle button
         JToggleButton uiOnOffButton = new JToggleButton();
-        uiOnOffButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                isTrafficForwarded = !isTrafficForwarded;
-                String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
-                uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
-                uiApplyButton.setEnabled(isTrafficForwarded);
-                uiSendSqliteTrafficButton.setEnabled(uiSaveToSqliteCheckbox.isSelected() && isTrafficForwarded);
-                uiSendBurpTrafficButton.setEnabled(isTrafficForwarded);
-            }
-        });
+        uiOnOffButton.addActionListener(new LoggedActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent arg) {
+                    isTrafficForwarded = !isTrafficForwarded;
+                    String forwardTrafficStatus = isTrafficForwarded ? "ON" : "OFF";
+                    uiOnOffButton.setText("Forward Traffic: "+forwardTrafficStatus);
+                    uiApplyButton.setEnabled(isTrafficForwarded);
+                    uiSendSqliteTrafficButton.setEnabled(uiSaveToSqliteCheckbox.isSelected() && isTrafficForwarded);
+                    uiSendBurpTrafficButton.setEnabled(isTrafficForwarded);
+                }
+            }, writer)
+        );
 
         JLabel uiDivider = new JLabel("------------------------------------------");
         uiDivider.setEnabled(false);
