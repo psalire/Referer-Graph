@@ -69,7 +69,7 @@ public class HttpHandler {
         this.serverPort = port;
         String url = "http://"+address+":"+port;
         this.requestEndpoint = URI.create(url+"/request");
-        this.updateFilepathEndpoint = URI.create(url+"/updateFilepath");
+        this.updateFilepathEndpoint = URI.create(url+"/filepath");
     }
     public String getServerAddress() {
         return this.serverAddress;

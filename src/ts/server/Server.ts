@@ -92,7 +92,7 @@ export default class Server {
             res.status(statusCode).end();
         });
 
-        this.app.post('/updateFilepath', (req, res) => {
+        this.app.post('/filepath', (req, res) => {
             console.log(req.body);
             var statusCode = 204;
             try {
