@@ -202,28 +202,32 @@ public class BurpConfigUI implements Runnable {
         uiSendSqliteTrafficButton.setEnabled(this.isSaveTraffic);
 
         // Apply button
-        this.uiApplyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg) {
-                clearChangesMade();
-                writer.printlnOut("actionEvent: "+arg.paramString());
-                writer.printlnOut("Address: "+uiAddressText.getText());
-                writer.printlnOut("Port: "+uiPortText.getText());
-                writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
-                writer.printlnOut("Filepath: "+getFullFilepath());
-                writer.printlnOut("Sqlite: "+uiSaveToSqliteCheckbox.isSelected());
-                isLimitInScope = uiInScopeCheckbox.isSelected();
-                isNo404TrafficForwarded = uiNoForward404Checkbox.isSelected();
-                isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
-                httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
+        this.uiApplyButton.addActionListener(
+            new LoggedActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent arg) {
+                        clearChangesMade();
+                        writer.printlnOut("actionEvent: "+arg.paramString());
+                        writer.printlnOut("Address: "+uiAddressText.getText());
+                        writer.printlnOut("Port: "+uiPortText.getText());
+                        writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
+                        writer.printlnOut("Filepath: "+getFullFilepath());
+                        writer.printlnOut("Sqlite: "+uiSaveToSqliteCheckbox.isSelected());
+                        isLimitInScope = uiInScopeCheckbox.isSelected();
+                        isNo404TrafficForwarded = uiNoForward404Checkbox.isSelected();
+                        isSaveTraffic = uiSaveToSqliteCheckbox.isSelected();
+                        httpHandler.setRequestEndpoint(uiAddressText.getText(), uiPortText.getText());
 
-                boolean isSqliteOn = uiSaveToSqliteCheckbox.isSelected();
-                uiSendSqliteTrafficButton.setEnabled(isSqliteOn);
-                burpExtender.updateSqliteOnOff(isSqliteOn);
-                if (isSqliteOn) {
-                    burpExtender.updateSqliteFilepath();
+                        boolean isSqliteOn = uiSaveToSqliteCheckbox.isSelected();
+                        uiSendSqliteTrafficButton.setEnabled(isSqliteOn);
+                        burpExtender.updateSqliteOnOff(isSqliteOn);
+                        if (isSqliteOn) {
+                            burpExtender.updateSqliteFilepath();
+                        }
+                    }
                 }
-            }
-        });
+            )
+        );
 
         // Traffic on/off toggle button
         JToggleButton uiOnOffButton = new JToggleButton();

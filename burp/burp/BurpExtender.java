@@ -108,8 +108,15 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
             while (rs.next()) {
                 String requestBody = this.writer.jsonToString(
                     Json.createObjectBuilder().addAll(
-                        JsonHelper.getRequestJson("GET", rs.getString("dstHost"), rs.getString("dstPath"), "https",
-                        rs.getString("dstQuery"), "https://"+rs.getString("srcHost")+rs.getString("srcPath"), this.writer)
+                        JsonHelper.getRequestJson(
+                            "GET",
+                            rs.getString("dstHost"),
+                            rs.getString("dstPath"),
+                            "https",
+                            rs.getString("dstQuery"),
+                            "https://"+rs.getString("srcHost")+rs.getString("srcPath"),
+                            this.writer
+                        )
                     ).addAll(
                         JsonHelper.getResponseJson(200, this.writer)
                     ).add(
