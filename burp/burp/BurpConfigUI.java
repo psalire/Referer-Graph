@@ -1,12 +1,9 @@
 package burp;
 
-import java.awt.Component;
-import java.awt.LayoutManager;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
@@ -18,10 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
-import javax.swing.JSeparator;
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 

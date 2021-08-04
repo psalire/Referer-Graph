@@ -1,11 +1,5 @@
 package burp;
 
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.net.URL;
-import java.net.MalformedURLException;
-
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,17 +9,12 @@ import java.sql.Statement;
 import java.awt.Component;
 import javax.swing.SwingUtilities;
 
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonStructure;
-import javax.json.JsonObject;
-import javax.json.JsonArray;
 import javax.json.Json;
 
 public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtensionStateListener {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers burpHelpers;
-    private Pattern reHeader = Pattern.compile("^(.+): (.+)$");
+    // private Pattern reHeader = Pattern.compile("^(.+): (.+)$");
     private Writer writer;
     private HttpHandler httpHandler;
     private BurpConfigUI burpUi;
