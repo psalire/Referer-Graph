@@ -32,6 +32,9 @@ tspan {
 #graph:hover {
     cursor: grab;
 }
+#graph:active {
+    cursor: grabbing;
+}
 
 .graph-controls-btn {
     @extend .mx-auto;
