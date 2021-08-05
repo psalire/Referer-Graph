@@ -29,7 +29,7 @@ export default class Server {
     private async insertURLToDB(requestData: express.Request<any,any,any,any>): Promise<any> {
         await this.db.addProtocol(requestData.protocol);
         await this.db.addHost(requestData.host, requestData.protocol);
-        await this.db.addPath(requestData.path, requestData.host);
+        await this.db.addPath(requestData.path, requestData.host, requestData.protocol);
         await this.db.addPathQuery(requestData.query, requestData.path);
     }
 
@@ -55,6 +55,8 @@ export default class Server {
                         await this.insertURLToDB(requestData.referer);
                         await this.db.addSrcDstMapping(
                             [requestData.referer.path, requestData.path],
+                            requestData.referer.protocol,
+                            requestData.protocol,
                             requestData.referer.host,
                             requestData.host
                         );

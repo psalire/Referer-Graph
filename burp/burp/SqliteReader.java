@@ -33,13 +33,16 @@ public class SqliteReader {
         Statement stmt = this.conn.createStatement();
         ResultSet rs = stmt.executeQuery(
             "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost,"
-            +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery FROM SrcDsts"
-            +" JOIN Paths AS s ON srcPathId=s.id"
-            +" JOIN Paths AS d ON dstPathid=d.id"
-            +" JOIN Hosts AS sh ON s.hostid=sh.id"
-            +" JOIN Hosts AS dh ON d.hostid=dh.id"
-            +" JOIN Queries as sq ON srcPathId=sq.PathId"
-            +" JOIN Queries as dq ON dstPathId=dq.PathId"
+            +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery,"
+            +" sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
+            +" LEFT JOIN Paths AS s ON srcPathId=s.id"
+            +" LEFT JOIN Paths AS d ON dstPathid=d.id"
+            +" LEFT JOIN Hosts AS sh ON s.HostId=sh.id"
+            +" LEFT JOIN Hosts AS dh ON d.HostId=dh.id"
+            +" LEFT JOIN Protocols AS sp ON sh.ProtocolId=sp.id"
+            +" LEFT JOIN Protocols AS dp ON dh.ProtocolId=dp.id"
+            +" LEFT JOIN Queries as sq ON srcPathId=sq.PathId"
+            +" LEFT JOIN Queries as dq ON dstPathId=dq.PathId"
         );
         return rs;
     }

@@ -115,9 +115,9 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                             "GET",
                             rs.getString("dstHost"),
                             rs.getString("dstPath"),
-                            "https",
+                            rs.getString("dstProtocol"),
                             rs.getString("dstQuery"),
-                            "https://"+rs.getString("srcHost")+rs.getString("srcPath"),
+                            rs.getString("srcProtocol")+"://"+rs.getString("srcHost")+rs.getString("srcPath"),
                             this.writer
                         )
                     ).addAll(

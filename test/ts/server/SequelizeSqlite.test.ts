@@ -6,7 +6,8 @@ import * as path from "path";
 import { ValidationError, SequelizeUniqueConstraintError } from 'sequelize';
 
 var db: SqliteDatabase|null = null;
-const dbsPath = './test/sqlite-dbs'
+const dbsPath = './test/sqlite-dbs';
+const PROTOCOL = 'https';
 
 function rmDefaultTestSqliteFile() {
     try {
@@ -45,7 +46,8 @@ test('Sync hosts table', async () => {
 
 test('Insert one into hosts table', async () => {
     const testVal = 'example.com'
-    await db.hosts.insert([testVal]);
+    await db.protocols.insert([PROTOCOL]);
+    await db.hosts.insert([testVal, PROTOCOL]);
     let models = await db.hosts.selectAll();
     expect(models.length).toBe(1);
     expect(models[0].host).toBe(testVal);
@@ -58,7 +60,7 @@ test('Insert bulk into hosts table', async () => {
         'example3.com'
     ]
     for (let testVal of testVals) {
-        await db.hosts.insert([testVal]);
+        await db.hosts.insert([testVal, PROTOCOL]);
     }
 
     let models = await db.hosts.selectAll();
@@ -77,7 +79,7 @@ test('Insert bulk into hosts table', async () => {
         'www.test4.com',
         'test.test5.com',
     ];
-    await db.hosts.bulkInsert(testVals2.map(val=>[val]));
+    await db.hosts.bulkInsert(testVals2.map(val=>[val]), PROTOCOL);
 
     models = await db.hosts.selectAll();
     expect(models.length).toBe(10);
@@ -88,26 +90,26 @@ test('Insert bulk into hosts table', async () => {
 });
 
 test('Insert duplicate hosts', async () => {
-    expect(await db.hosts.insert(['apple.com'])).not.toBeNull();
+    expect(await db.hosts.insert(['apple.com', PROTOCOL])).not.toBeNull();
     for (let i=0; i<5; i++) {
-        expect(await db.hosts.insert(['apple.com'])).toBeNull();
+        expect(await db.hosts.insert(['apple.com', PROTOCOL])).toBeNull();
     }
 });
 
 test('Insert into paths table', async () => {
-    await db.paths.insert(['/'], 'example.com');
+    await db.paths.insert(['/', 'example.com'], PROTOCOL);
     let models = await db.paths.selectAll();
     expect(models.length).toBe(1);
     expect(models[0].path).toBe('/');
 
     let vals = [
-        [['/index.html'], 'example.com'],
-        [['/word.exe'], 'example.com'],
-        [['/a/path/file'], 'test.test5.com'],
-        [['/home'], 'www.test3.com'],
+        [['/index.html', 'example.com']],
+        [['/word.exe', 'example.com']],
+        [['/a/path/file', 'test.test5.com']],
+        [['/home', 'www.test3.com']],
     ];
     for (let val of vals) {
-        await db.paths.insert(val[0], val[1]);
+        await db.paths.insert(val[0], PROTOCOL);
     }
     models = await db.paths.selectAll();
     expect(models.length).toBe(5);
@@ -117,7 +119,7 @@ test('Insert into paths table', async () => {
     });
     hosts = await Promise.all(hosts);
     let testPaths = (vals.map(val=>val[0][0])).concat("/");
-    let testHosts = vals.map(val=>val[1]);
+    let testHosts = vals.map(val=>val[0][1]);
     for (let path of paths) {
         expect(testPaths).toContain(path);
     }
@@ -127,13 +129,13 @@ test('Insert into paths table', async () => {
 });
 
 test('Insert bulk into paths table', async () => {
-    await db.hosts.insert(['yahoo.com']);
+    await db.hosts.insert(['yahoo.com', PROTOCOL]);
     let vals = [
         '/', '/page/1', '/page/2',
         '/page/3', '/page/4', '/page/5',
         '/page/6', '/page/7', '/page/8',
     ];
-    await db.paths.bulkInsert(vals.map(v=>[v]), 'yahoo.com');
+    await db.paths.bulkInsert(vals.map(v=>[v]), 'yahoo.com', PROTOCOL);
     let hostObj = await db.hosts.selectOne({
         host: 'yahoo.com'
     });
@@ -148,7 +150,7 @@ test('Insert bulk into paths table', async () => {
 
 test('Insert duplicate paths', async () => {
     for (let i=0; i<5; i++) {
-        expect(await db.paths.insert(['/index.html'], 'example.com')).toBeNull();
+        expect(await db.paths.insert(['/index.html', 'example.com'], PROTOCOL)).toBeNull();
     }
 });
 
@@ -163,7 +165,7 @@ test('Insert into srcDst table', async () => {
         [['/word.exe', '/index.html'], 'example.com', 'example.com']
     ]
     for (let val of vals) {
-        await db.srcDsts.insert(val[0], val[1]);
+        await db.srcDsts.insert(val[0], PROTOCOL, PROTOCOL, val[1]);
     }
     let models = await db.srcDsts.selectAll();
     expect(models.length).toBe(vals.length);
@@ -185,7 +187,7 @@ test('Insert cross host into srcDst table', async () => {
         [['/home', '/a/path/file'], 'www.test3.com', 'test.test5.com']
     ]
     for (let val of vals) {
-        await db.srcDsts.insert(val[0], val[1], val[2]);
+        await db.srcDsts.insert(val[0], PROTOCOL, PROTOCOL, val[1], val[2]);
     }
     // let models = await db.srcDsts.selectAll(undefined, [['updatedAt', 'ASC']]);
     // expect(models.length).toBe(6);
@@ -207,41 +209,41 @@ test('Insert bulk into srcDst table', async () => {
         ['/qrst', '/uvwx'],
         ['/yz', '/abcd'],
     ];
-    expect(await db.paths.bulkInsert(vals.flat().map(v=>[v]), 'yahoo.com')).toBeNull();
+    expect(await db.paths.bulkInsert(vals.flat().map(v=>[v]), 'yahoo.com', PROTOCOL)).toBeNull();
     for (let val of vals.flat()) {
-        await db.paths.insert([val], 'yahoo.com');
+        await db.paths.insert([val, 'yahoo.com'], PROTOCOL);
     }
-    await db.srcDsts.bulkInsert(vals, 'yahoo.com');
+    await db.srcDsts.bulkInsert(vals, PROTOCOL, PROTOCOL, 'yahoo.com');
 });
 
 test('Insert duplicate into srcDst table', async () => {
     for (let i=0; i<5; i++) {
-        expect(await db.srcDsts.insert(['/abcd', '/efgh'], 'yahoo.com')).toBeNull();
+        expect(await db.srcDsts.insert(['/abcd', '/efgh'], PROTOCOL, PROTOCOL, 'yahoo.com')).toBeNull();
     }
 });
 
 test('Insert non-existing paths & hosts into srcDst table', async () => {
-    await db.srcDsts.insert(['/non', '/exist'], 'nonexist.com');
-    await db.srcDsts.insert(['/nonx', '/existx'], 'yahoo.com');
-    await db.srcDsts.insert(['/non', '/exist'], 'yahoo.com');
+    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist'], PROTOCOL, PROTOCOL, 'nonexist.com')}).rejects.toThrow();
+    expect(async ()=>{await db.srcDsts.insert(['/nonx', '/existx'], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
+    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist'], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
 
-    let hostObj = await db.hosts.selectOne({
-        host: 'nonexist.com'
-    });
-    let srcPathObj = await db.paths.selectOne({
-        path: '/non',
-        HostId: hostObj.id
-    });
-    let dstPathObj = await db.paths.selectOne({
-        path: '/exist',
-        HostId: hostObj.id
-    });
-    let srcModels = await db.srcDsts.selectAll({
-        srcPathId: srcPathObj.id
-    });
-    let dstModels = await db.srcDsts.selectAll({
-        dstPathId: dstPathObj.id
-    });
-    expect(srcModels.length).toBe(1);
-    expect(dstModels.length).toBe(1);
+    // let hostObj = await db.hosts.selectOne({
+    //     host: 'nonexist.com'
+    // });
+    // let srcPathObj = await db.paths.selectOne({
+    //     path: '/non',
+    //     HostId: hostObj.id
+    // });
+    // let dstPathObj = await db.paths.selectOne({
+    //     path: '/exist',
+    //     HostId: hostObj.id
+    // });
+    // let srcModels = await db.srcDsts.selectAll({
+    //     srcPathId: srcPathObj.id
+    // });
+    // let dstModels = await db.srcDsts.selectAll({
+    //     dstPathId: dstPathObj.id
+    // });
+    // expect(srcModels.length).toBe(1);
+    // expect(dstModels.length).toBe(1);
 })

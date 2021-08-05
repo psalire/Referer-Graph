@@ -21,8 +21,6 @@ export default class SqliteDatabase {
     }
 
     public setDB(dbPath: string, dbName: string) {
-        console.log(dbPath);
-        console.log(dbName);
         var resolvedPath = path.resolve(path.join(dbPath, dbName));
         if (resolvedPath==this.filepath) {
             console.log(`[SqliteDatabase] ${resolvedPath} is already active`);
@@ -176,9 +174,9 @@ export default class SqliteDatabase {
 
         this.protocols = new ProtocolsTable(protocolsModel);
         this.hosts = new HostsTable(hostsModel, protocolsModel);
-        this.paths = new PathsTable(pathsModel, hostsModel);
+        this.paths = new PathsTable(pathsModel, hostsModel, protocolsModel);
         this.queries = new QueriesTable(queriesModel, pathsModel);
-        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel);
+        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel, protocolsModel);
 
         this.sync();
     }

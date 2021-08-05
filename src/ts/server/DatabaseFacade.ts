@@ -22,11 +22,11 @@ export default class DatabaseFacade {
         return this.sqliteDb.hosts.bulkInsert(hosts.map(val=>[val]), protocol);
     }
 
-    public addPath(path: string, host: string): Promise<any> {
-        return this.sqliteDb.paths.insert([path, host]);
+    public addPath(path: string, host: string, protocol: string): Promise<any> {
+        return this.sqliteDb.paths.insert([path, host], protocol);
     }
-    public addPaths(paths: string[], host: string): Promise<any> {
-        return this.sqliteDb.paths.bulkInsert(paths.map(val=>[val]), host);
+    public addPaths(paths: string[], host: string, protocol: string): Promise<any> {
+        return this.sqliteDb.paths.bulkInsert(paths.map(val=>[val]), host, protocol);
     }
 
     public addPathQuery(query: string, path: string): Promise<any> {
@@ -37,14 +37,16 @@ export default class DatabaseFacade {
     }
 
     public addSrcDstMapping(
-        srcDst: string[], srcHost: string, dstHost?: string
+        srcDst: string[], srcProtocol: string, dstProtocol: string,
+        srcHost: string, dstHost?: string
     ): Promise<any> {
-        return this.sqliteDb.srcDsts.insert(srcDst, srcHost, dstHost);
+        return this.sqliteDb.srcDsts.insert(srcDst, srcProtocol, dstProtocol, srcHost, dstHost);
     }
     public addSrcDstMappings(
-        srcDsts: string[][], srcHost: string, dstHost?: string
+        srcDsts: string[][], srcProtocol: string, dstProtocol: string,
+        srcHost: string, dstHost?: string
     ): Promise<any> {
-        return this.sqliteDb.srcDsts.bulkInsert(srcDsts, srcHost, dstHost);
+        return this.sqliteDb.srcDsts.bulkInsert(srcDsts, srcProtocol, dstProtocol, srcHost, dstHost);
     }
 
     public updateDBPath(dbPath: string, dbName: string) {
