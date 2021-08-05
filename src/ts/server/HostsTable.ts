@@ -33,7 +33,7 @@ export default class HostsTable extends aSqliteTable {
             host: vals[0],
             ProtocolId: protocolObj.id
         }).catch((e) => {
-            if (!this.isUniqueViolationError(e, undefined, 1)) {
+            if (!this.isUniqueViolationError(e)) {
                 throw e;
             }
             return null;
