@@ -26,6 +26,13 @@ export default class Server {
         });
     }
 
+    private async insertURLToDB(requestData: express.Request<any,any,any,any>): Promise<any> {
+        await this.db.addProtocol(requestData.protocol);
+        await this.db.addHost(requestData.host);
+        await this.db.addPath(requestData.path, requestData.host);
+        await this.db.addPathQuery(requestData.query, requestData.path);
+    }
+
     public start(): void {
         this.app.all('*', (req, _, next) => {
             console.log(`[${req.ip}]: ${req.method} ${req.originalUrl}`);
@@ -43,14 +50,9 @@ export default class Server {
             var responseData = req.body.responseData;
             if (this.isSaveToSqliteOn==true) {
                 try {
-                    await this.db.addProtocol(requestData.protocol);
-                    await this.db.addHost(requestData.host);
-                    await this.db.addPath(requestData.path, requestData.host);
-                    await this.db.addPathQuery(requestData.query, requestData.path);
+                    await this.insertURLToDB(requestData);
                     if (requestData.referer) {
-                        await this.db.addProtocol(requestData.referer.protocol);
-                        await this.db.addPath(requestData.referer.path, requestData.referer.host);
-                        await this.db.addPathQuery(requestData.referer.query, requestData.referer.path);
+                        await this.insertURLToDB(requestData.referer);
                         await this.db.addSrcDstMapping(
                             [requestData.referer.path, requestData.path],
                             requestData.referer.host,
