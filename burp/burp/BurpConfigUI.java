@@ -180,16 +180,7 @@ public class BurpConfigUI implements Runnable {
         );
 
         // Checkboxes
-        JCheckBox uiInScopeCheckbox = new JCheckBox("Limit forwarded traffic to Burp scope", this.isLimitInScope);
-        uiInScopeCheckbox.addActionListener(
-            new LoggedActionListener(
-                new InidcateChangesActionListener(
-                    new ActionListener() {
-                        public void actionPerformed(ActionEvent arg) {}
-                    }
-                )
-            )
-        );
+        JCheckBox uiInScopeCheckbox = this.createCheckBox("Limit forwarded traffic to Burp scope", this.isLimitInScope);
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
         uiSaveToSqliteCheckbox.addActionListener(
             new LoggedActionListener(
