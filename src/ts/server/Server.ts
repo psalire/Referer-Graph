@@ -53,8 +53,13 @@ export default class Server {
                     await this.insertURLToDB(requestData);
                     if (requestData.referer) {
                         await this.insertURLToDB(requestData.referer);
+                        await this.db.addMethod(requestData.method);
                         await this.db.addSrcDstMapping(
-                            [requestData.referer.path, requestData.path],
+                            [
+                                requestData.referer.path,
+                                requestData.path,
+                                requestData.method
+                            ],
                             requestData.referer.protocol,
                             requestData.protocol,
                             requestData.referer.host,

@@ -32,11 +32,12 @@ public class SqliteReader {
         }
         Statement stmt = this.conn.createStatement();
         ResultSet rs = stmt.executeQuery(
-            "SELECT s.path AS srcPath, d.path AS dstPath, sh.host AS srcHost,"
+            "SELECT s.path AS srcPath, d.path AS dstPath, m.method AS method, sh.host AS srcHost,"
             +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery,"
             +" sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
             +" LEFT JOIN Paths AS s ON srcPathId=s.id"
             +" LEFT JOIN Paths AS d ON dstPathid=d.id"
+            +" LEFT JOIN Methods AS m ON methodId=m.id"
             +" LEFT JOIN Hosts AS sh ON s.HostId=sh.id"
             +" LEFT JOIN Hosts AS dh ON d.HostId=dh.id"
             +" LEFT JOIN Protocols AS sp ON sh.ProtocolId=sp.id"

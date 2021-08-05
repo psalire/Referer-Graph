@@ -12,7 +12,7 @@ export default class DatabaseFacade {
         return this.sqliteDb.protocols.insert([protocol]);
     }
     public addProtocols(protocols: string[]): Promise<any> {
-        return this.sqliteDb.hosts.bulkInsert(protocols.map(val=>[val]));
+        return this.sqliteDb.protocols.bulkInsert(protocols.map(val=>[val]));
     }
 
     public addHost(host: string, protocol: string): Promise<any> {
@@ -34,6 +34,13 @@ export default class DatabaseFacade {
     }
     public addPathQueries(queries: string[], path: string): Promise<any> {
         return this.sqliteDb.queries.bulkInsert(queries.map(val=>[val]), path);
+    }
+
+    public addMethod(method: string): Promise<any> {
+        return this.sqliteDb.methods.insert([method]);
+    }
+    public addMethods(methods: string[]): Promise<any> {
+        return this.sqliteDb.methods.bulkInsert(methods.map(val=>[val]));
     }
 
     public addSrcDstMapping(

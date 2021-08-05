@@ -5,6 +5,7 @@ import ProtocolsTable from './ProtocolsTable';
 import HostsTable from './HostsTable';
 import PathsTable from './PathsTable';
 import QueriesTable from './QueriesTable';
+import MethodsTable from './MethodsTable';
 import SrcDstTable from './SrcDstTable';
 
 export default class SqliteDatabase {
@@ -14,6 +15,7 @@ export default class SqliteDatabase {
     public hosts: HostsTable;
     public paths: PathsTable;
     public queries: QueriesTable;
+    public methods: MethodsTable;
     public srcDsts: SrcDstTable;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
@@ -118,6 +120,20 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
+        var methodsModel = this.sequelize.define(
+            'Method',
+            {
+                method: {
+                    type: DataTypes.TEXT,
+                    allowNull: false,
+                    unique: true
+                }
+            },
+            {
+                timestamps: false,
+                createdAt: false
+            }
+        );
         var srcDstModel = this.sequelize.define(
             'SrcDst',
             {
@@ -136,6 +152,15 @@ export default class SqliteDatabase {
                     unique: 'srcDstComposite',
                     references: {
                         model: pathsModel,
+                        key: 'id'
+                    }
+                },
+                methodId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'srcDstComposite',
+                    references: {
+                        model: methodsModel,
                         key: 'id'
                     }
                 }
@@ -176,7 +201,8 @@ export default class SqliteDatabase {
         this.hosts = new HostsTable(hostsModel, protocolsModel);
         this.paths = new PathsTable(pathsModel, hostsModel, protocolsModel);
         this.queries = new QueriesTable(queriesModel, pathsModel);
-        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel, protocolsModel);
+        this.methods = new MethodsTable(methodsModel);
+        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel, protocolsModel, methodsModel);
 
         this.sync();
     }

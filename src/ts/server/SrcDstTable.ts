@@ -7,15 +7,18 @@ export default class SrcDstTable extends aSqliteTable {
     private pathsModel: ModelCtor<Model>;
     private hostsModel: ModelCtor<Model>;
     private protocolsModel: ModelCtor<Model>;
+    private methodsModel: ModelCtor<Model>;
 
     constructor(
         model: ModelCtor<Model>, pathsModel: ModelCtor<Model>,
-        hostsModel: ModelCtor<Model>, protocolsModel: ModelCtor<Model>
+        hostsModel: ModelCtor<Model>, protocolsModel: ModelCtor<Model>,
+        methodsModel: ModelCtor<Model>
     ) {
-        super(model, ['srcPathId','dstPathId']);
+        super(model, ['srcPathId','dstPathId','methodId']);
         this.pathsModel = pathsModel;
         this.hostsModel = hostsModel;
         this.protocolsModel = protocolsModel;
+        this.methodsModel = methodsModel;
     }
     private async getProtocolObj(protocol?: string): Promise<Model> {
         if (protocol === undefined) {
@@ -68,6 +71,20 @@ export default class SrcDstTable extends aSqliteTable {
         }
         return pathObj;
     }
+    private async getMethodObj(method?: string): Promise<Model> {
+        if (method === undefined) {
+            throw new SqliteDatabaseError('missing method argument');
+        }
+        var methodObj = await this.methodsModel.findOne({
+            where: {
+                method: method
+            }
+        });
+        if (methodObj == null) {
+            throw new SqliteDatabaseError(`cannot find method "${method}"`);
+        }
+        return methodObj;
+    }
 
     public async insert(
         vals: string[], srcProtocol?: string, dstProtocol?: string,
@@ -81,9 +98,11 @@ export default class SrcDstTable extends aSqliteTable {
         this.validateValuesLength(vals);
         var srcHostObj = await this.getPathObj(vals[0], srcHost, srcProtocol);
         var dstHostObj = await this.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost, dstProtocol);
+        var methodObj = await this.getMethodObj(vals[2]);
         return this.model.create({
             srcPathId: srcHostObj.id,
-            dstPathId: dstHostObj.id
+            dstPathId: dstHostObj.id,
+            methodId: methodObj.id
         }).catch((e) => {
             if (!this.isUniqueViolationError(e)) {
                 throw e;
