@@ -25,10 +25,10 @@ export default class QueriesTable extends aSqliteTable {
         }
         return pathObj;
     }
-    public async insert(vals: string[], path?: string): Promise<any> {
+    public async insert(vals: string[]): Promise<any> {
         this.validateValuesLength(vals);
 
-        var pathObj = await this.getPathObj(path);
+        var pathObj = await this.getPathObj(vals[1]);
         return this.model.create({
             query: vals[0],
             PathId: pathObj.id

@@ -28,7 +28,7 @@ export default class Server {
 
     private async insertURLToDB(requestData: express.Request<any,any,any,any>): Promise<any> {
         await this.db.addProtocol(requestData.protocol);
-        await this.db.addHost(requestData.host);
+        await this.db.addHost(requestData.host, requestData.protocol);
         await this.db.addPath(requestData.path, requestData.host);
         await this.db.addPathQuery(requestData.query, requestData.path);
     }

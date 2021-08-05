@@ -57,7 +57,16 @@ export default class SqliteDatabase {
                 host: {
                     type: DataTypes.TEXT,
                     allowNull: false,
-                    unique: true
+                    unique: 'hostsComposite'
+                },
+                ProtocolId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'hostsComposite',
+                    references: {
+                        model: protocolsModel,
+                        key: 'id'
+                    }
                 }
             },
             {
@@ -166,7 +175,7 @@ export default class SqliteDatabase {
         });
 
         this.protocols = new ProtocolsTable(protocolsModel);
-        this.hosts = new HostsTable(hostsModel);
+        this.hosts = new HostsTable(hostsModel, protocolsModel);
         this.paths = new PathsTable(pathsModel, hostsModel);
         this.queries = new QueriesTable(queriesModel, pathsModel);
         this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel);

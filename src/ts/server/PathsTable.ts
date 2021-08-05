@@ -25,10 +25,10 @@ export default class PathsTable extends aSqliteTable {
         }
         return hostObj;
     }
-    public async insert(vals: string[], host?: string): Promise<any> {
+    public async insert(vals: string[]): Promise<any> {
         this.validateValuesLength(vals);
 
-        var hostObj = await this.getHostObj(host);
+        var hostObj = await this.getHostObj(vals[1]);
         return this.model.create({
             path: vals[0],
             HostId: hostObj.id

@@ -34,7 +34,7 @@ export default abstract class aSqliteTable implements iDatabaseTable {
     }
     protected validateValuesLength(vals: string[]): void {
         if (vals.length != this.columns.length) {
-            new SqliteDatabaseError(
+            throw new SqliteDatabaseError(
                 `Expected length ${this.columns.length}. Got ${vals.length}`
             );
         }

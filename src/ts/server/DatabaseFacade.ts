@@ -15,22 +15,22 @@ export default class DatabaseFacade {
         return this.sqliteDb.hosts.bulkInsert(protocols.map(val=>[val]));
     }
 
-    public addHost(host: string): Promise<any> {
-        return this.sqliteDb.hosts.insert([host]);
+    public addHost(host: string, protocol: string): Promise<any> {
+        return this.sqliteDb.hosts.insert([host, protocol]);
     }
-    public addHosts(hosts: string[]): Promise<any> {
-        return this.sqliteDb.hosts.bulkInsert(hosts.map(val=>[val]));
+    public addHosts(hosts: string[], protocol: string): Promise<any> {
+        return this.sqliteDb.hosts.bulkInsert(hosts.map(val=>[val]), protocol);
     }
 
     public addPath(path: string, host: string): Promise<any> {
-        return this.sqliteDb.paths.insert([path], host);
+        return this.sqliteDb.paths.insert([path, host]);
     }
     public addPaths(paths: string[], host: string): Promise<any> {
         return this.sqliteDb.paths.bulkInsert(paths.map(val=>[val]), host);
     }
 
     public addPathQuery(query: string, path: string): Promise<any> {
-        return this.sqliteDb.queries.insert([query], path);
+        return this.sqliteDb.queries.insert([query, path]);
     }
     public addPathQueries(queries: string[], path: string): Promise<any> {
         return this.sqliteDb.queries.bulkInsert(queries.map(val=>[val]), path);
