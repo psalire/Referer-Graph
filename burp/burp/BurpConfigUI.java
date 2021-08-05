@@ -279,6 +279,7 @@ public class BurpConfigUI implements Runnable {
         callbacks.addSuiteTab(burpExtender);
 
         uiOnOffButton.doClick(); // Turn on forwarding
+        uiApplyButton.doClick(); // Send initial settings
     }
     public JPanel getUiPanel() {
         return this.uiPanel;
