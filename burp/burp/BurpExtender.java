@@ -54,8 +54,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     */
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        if (messageIsRequest || !this.burpUi.getIsTrafficForwarded()) {
-            return; // Only record requests with responses & if forwarding is on
+        if (messageIsRequest || !this.burpUi.getIsTrafficForwarded() // Only record requests w/ responses
+            || (toolFlag==IBurpExtenderCallbacks.TOOL_SCANNER && this.burpUi.getIsNoScannerTrafficForwarded())
+            || (toolFlag==IBurpExtenderCallbacks.TOOL_REPEATER && this.burpUi.getIsNoRepeaterTrafficForwarded())
+            ) {
+            return;
         }
 
         IRequestInfo requestInfo = this.burpHelpers.analyzeRequest(messageInfo);
