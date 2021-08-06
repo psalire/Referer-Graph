@@ -5,7 +5,6 @@ import Data from './Data';
 import iGraph from './iGraph';
 import LiveUpdateButton from './LiveUpdateButton';
 import URLFilterForm from './URLFilterForm';
-import ToggleElement from './StyledButton';
 
 export default class GraphBridge {
     public data: Data = new Data();
@@ -16,7 +15,6 @@ export default class GraphBridge {
     private activeGraph?: iGraph;
     private isLiveUpdateBtn: LiveUpdateButton;
     private urlFilterForm: URLFilterForm;
-    private hostsFilterSuccessElem: ToggleElement;
 
     constructor(initialGraph='dagre') {
         this.isLiveUpdateBtn = new LiveUpdateButton();
