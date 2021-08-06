@@ -4,9 +4,8 @@ import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
 import LiveUpdateButton from './LiveUpdateButton';
-import StyledButton from './StyledButton';
+import URLFilterForm from './URLFilterForm';
 import ToggleElement from './StyledButton';
-import { createButton } from './createButton';
 
 export default class GraphBridge {
     public data: Data = new Data();
@@ -16,6 +15,7 @@ export default class GraphBridge {
     ]);
     private activeGraph?: iGraph;
     private isLiveUpdateBtn: LiveUpdateButton;
+    private urlFilterForm: URLFilterForm;
     private hostsFilterSuccessElem: ToggleElement;
 
     constructor(initialGraph='dagre') {
@@ -30,21 +30,13 @@ export default class GraphBridge {
             this.setActiveGraph(graphSelect.value);
         });
 
-        var hostsFilterBtn = document.getElementById('filter-input-btn');
-        var hostsFilterText = document.getElementById('filter-input-text');
-        var hostsFilterDelimeter = document.getElementById('filter-input-delimeter');
-        hostsFilterText.value = 'ico,jpg,png,gif,css';
-        hostsFilterDelimeter.value = ',';
-        hostsFilterBtn.addEventListener('click', () => {
-            this.applyURLFilter(hostsFilterText.value, hostsFilterDelimeter.value, true);
+        this.urlFilterForm = new URLFilterForm();
+        this.urlFilterForm.getApplyButton().addEventListener('click', ()=>{
+            this.applyURLFilter(this.urlFilterForm.getFilterText(), this.urlFilterForm.getFilterDelimeter(), true);
             this.activeGraph.refreshGraph();
         });
 
-        this.hostsFilterSuccessElem = new ToggleElement(document.getElementById('filter-input-success'));
-        this.hostsFilterSuccessElem.addToggleValue('visible', 'visible', 'invisible')
-                                   .addToggleValue('color', 'text-success', 'text-danger');
-
-        this.applyURLFilter(hostsFilterText.value, hostsFilterDelimeter.value);
+        this.applyURLFilter(this.urlFilterForm.getFilterText(), this.urlFilterForm.getFilterDelimeter());
     }
 
     public setActiveGraph(type: string): void {
@@ -77,38 +69,10 @@ export default class GraphBridge {
             console.log('Saving filter: ');
             console.log(filterArr);
             this.data.setFilters(filterArr);
-            notify && this.displayFilterSuccessMessage();
+            notify && this.urlFilterForm.displayFilterSuccessMessage();
         }
         catch(e) {
-            notify && this.displayFilterErrorMessage();
+            notify && this.urlFilterForm.displayFilterErrorMessage();
         }
-    }
-    private displayFilterSuccessMessage(): void {
-        if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
-            return;
-        }
-        this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
-                                   .toggleStyle('visible');
-        setTimeout(() => {
-            if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
-                this.hostsFilterSuccessElem.toggleStyle('visible');
-            }
-        }, 3000);
-    }
-    private displayFilterErrorMessage(): void {
-        if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
-            return;
-        }
-        this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
-                                   .toggleStyle('visible')
-                                   .toggleStyle('color');
-        this.hostsFilterSuccessElem.getElem().textContent = 'Error';
-        setTimeout(() => {
-            if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
-                this.hostsFilterSuccessElem.toggleStyle('visible')
-                                           .toggleStyle('color');
-                this.hostsFilterSuccessElem.getElem().textContent = 'Success';
-            }
-        }, 3000);
     }
 }
