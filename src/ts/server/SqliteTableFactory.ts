@@ -90,7 +90,6 @@ export default class SqliteTableFactory implements iSQLTableFactory {
         return methodObj;
     }
 
-
     public createHostsTable(): iDatabaseTable {
         const parent = this;
         return new class extends aSqliteTable {

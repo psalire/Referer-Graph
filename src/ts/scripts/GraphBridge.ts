@@ -20,19 +20,18 @@ export default class GraphBridge {
 
     constructor(initialGraph='dagre') {
         this.isLiveUpdateOn = true;
-        this.isLiveUpdateBtn = new StyledButton(this.getIsLiveButtonText(), 'btn-success', true);
+        this.isLiveUpdateBtn = new StyledButton(this.createIsLiveButtonText(), 'btn-success', true);
         this.isLiveUpdateBtn.addToggleValue('color', 'btn-success', 'btn-secondary');
         this.isLiveUpdateBtn.getButton().onclick = ()=>{
             this.isLiveUpdateOn = !this.isLiveUpdateOn;
             this.isLiveUpdateBtn.toggleStyle('color');
-            this.isLiveUpdateBtn.setText(this.getIsLiveButtonText(), true);
+            this.isLiveUpdateBtn.setText(this.createIsLiveButtonText(), true);
             this.isLiveUpdateOn && this.activeGraph.refreshGraph();
         };
 
         this.setActiveGraph(initialGraph);
         var graphSelect = document.getElementById('graph-layout-select');
-
-        graphSelect.addEventListener('change', () => {
+        graphSelect && graphSelect.addEventListener('change', () => {
             this.setActiveGraph(graphSelect.value);
         });
 
@@ -42,7 +41,7 @@ export default class GraphBridge {
         hostsFilterText.value = 'ico,jpg,png,gif,css';
         hostsFilterDelimeter.value = ',';
         hostsFilterBtn.addEventListener('click', () => {
-            this.applyFilter(hostsFilterText.value, hostsFilterDelimeter.value, true);
+            this.applyURLFilter(hostsFilterText.value, hostsFilterDelimeter.value, true);
             this.activeGraph.refreshGraph();
         });
 
@@ -50,7 +49,7 @@ export default class GraphBridge {
         this.hostsFilterSuccessElem.addToggleValue('visible', 'visible', 'invisible')
                                    .addToggleValue('color', 'text-success', 'text-danger');
 
-        this.applyFilter(hostsFilterText.value, hostsFilterDelimeter.value);
+        this.applyURLFilter(hostsFilterText.value, hostsFilterDelimeter.value);
     }
 
     public setActiveGraph(type: string): void {
@@ -77,10 +76,10 @@ export default class GraphBridge {
     public getIsLiveUpdateOn(): boolean {
         return this.isLiveUpdateOn;
     }
-    private getIsLiveButtonText(): string {
-        return `Live Update: <span class="fw-bold">${this.isLiveUpdateOn?'ON':'OFF'}</span>`;
+    private createIsLiveButtonText(): string {
+        return `Live Update: <span class="fw-bold">${this.getIsLiveUpdateOn()?'ON':'OFF'}</span>`;
     }
-    private applyFilter(filter: string, delimeter: string, notify?: boolean): void {
+    private applyURLFilter(filter: string, delimeter: string, notify?: boolean): void {
         try {
             var filterArr = filter.split(delimeter).filter(v=>v.length>0);
             console.log('Saving filter: ');
@@ -93,21 +92,31 @@ export default class GraphBridge {
         }
     }
     private displayFilterSuccessMessage(): void {
+        if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
+            return;
+        }
         this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
                                    .toggleStyle('visible');
         setTimeout(() => {
-            this.hostsFilterSuccessElem.toggleStyle('visible');
+            if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
+                this.hostsFilterSuccessElem.toggleStyle('visible');
+            }
         }, 3000);
     }
     private displayFilterErrorMessage(): void {
+        if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
+            return;
+        }
         this.hostsFilterSuccessElem.setElem(document.getElementById('filter-input-success'))
                                    .toggleStyle('visible')
                                    .toggleStyle('color');
         this.hostsFilterSuccessElem.getElem().textContent = 'Error';
         setTimeout(() => {
-            this.hostsFilterSuccessElem.toggleStyle('visible')
-                                       .toggleStyle('color');
-            this.hostsFilterSuccessElem.getElem().textContent = 'Success';
+            if (this.hostsFilterSuccessElem.getElem().classList.contains('visible')) {
+                this.hostsFilterSuccessElem.toggleStyle('visible')
+                                           .toggleStyle('color');
+                this.hostsFilterSuccessElem.getElem().textContent = 'Success';
+            }
         }, 3000);
     }
 }
