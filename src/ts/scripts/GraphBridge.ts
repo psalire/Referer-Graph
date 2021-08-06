@@ -3,6 +3,7 @@ import D3Graph from './D3Graph';
 import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
+import LiveUpdateButton from './LiveUpdateButton';
 import StyledButton from './StyledButton';
 import ToggleElement from './StyledButton';
 import { createButton } from './createButton';
@@ -14,20 +15,14 @@ export default class GraphBridge {
         ['d3-force', new D3Graph(this.data)],
     ]);
     private activeGraph?: iGraph;
-    private isLiveUpdateOn: boolean;
-    private isLiveUpdateBtn: StyledButton;
+    private isLiveUpdateBtn: LiveUpdateButton;
     private hostsFilterSuccessElem: ToggleElement;
 
     constructor(initialGraph='dagre') {
-        this.isLiveUpdateOn = true;
-        this.isLiveUpdateBtn = new StyledButton(this.createIsLiveButtonText(), 'btn-success', true);
-        this.isLiveUpdateBtn.addToggleValue('color', 'btn-success', 'btn-secondary');
-        this.isLiveUpdateBtn.getButton().onclick = ()=>{
-            this.isLiveUpdateOn = !this.isLiveUpdateOn;
-            this.isLiveUpdateBtn.toggleStyle('color');
-            this.isLiveUpdateBtn.setText(this.createIsLiveButtonText(), true);
-            this.isLiveUpdateOn && this.activeGraph.refreshGraph();
-        };
+        this.isLiveUpdateBtn = new LiveUpdateButton();
+        this.isLiveUpdateBtn.getButton().addEventListener('click', ()=>{
+            this.isLiveUpdateBtn.getIsLiveUpdateOn() && this.activeGraph.refreshGraph();
+        });
 
         this.setActiveGraph(initialGraph);
         var graphSelect = document.getElementById('graph-layout-select');
@@ -74,10 +69,7 @@ export default class GraphBridge {
         return this.activeGraph;
     }
     public getIsLiveUpdateOn(): boolean {
-        return this.isLiveUpdateOn;
-    }
-    private createIsLiveButtonText(): string {
-        return `Live Update: <span class="fw-bold">${this.getIsLiveUpdateOn()?'ON':'OFF'}</span>`;
+        return this.isLiveUpdateBtn.getIsLiveUpdateOn();
     }
     private applyURLFilter(filter: string, delimeter: string, notify?: boolean): void {
         try {
