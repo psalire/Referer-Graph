@@ -1,5 +1,5 @@
 
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes, Model, ModelCtor } from 'sequelize';
 import * as path from 'path';
 import ProtocolsTable from './ProtocolsTable';
 import HostsTable from './HostsTable';
@@ -7,16 +7,24 @@ import PathsTable from './PathsTable';
 import QueriesTable from './QueriesTable';
 import MethodsTable from './MethodsTable';
 import SrcDstTable from './SrcDstTable';
+import iDatabaseTable from './iDatabaseTable';
+import SqliteTableFactory from './SqliteTableFactory';
 
 export default class SqliteDatabase {
     private sequelize: Sequelize;
     private filepath: string;
-    public protocols: ProtocolsTable;
-    public hosts: HostsTable;
-    public paths: PathsTable;
-    public queries: QueriesTable;
-    public methods: MethodsTable;
-    public srcDsts: SrcDstTable;
+    public protocols: iDatabaseTable;
+    public hosts: iDatabaseTable;
+    public paths: iDatabaseTable;
+    public queries: iDatabaseTable;
+    public methods: iDatabaseTable;
+    public srcDsts: iDatabaseTable;
+    public protocolsModel: ModelCtor<Model>;
+    public hostsModel: ModelCtor<Model>;
+    public pathsModel: ModelCtor<Model>;
+    public queriesModel: ModelCtor<Model>;
+    public methodsModel: ModelCtor<Model>;
+    public srcDstModel: ModelCtor<Model>;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
         this.setDB(dbPath, dbName);
@@ -37,7 +45,7 @@ export default class SqliteDatabase {
             logging: false
         });
 
-        var protocolsModel = this.sequelize.define(
+        this.protocolsModel = this.sequelize.define(
             'Protocol',
             {
                 protocol: {
@@ -51,7 +59,7 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
-        var hostsModel = this.sequelize.define(
+        this.hostsModel = this.sequelize.define(
             'Host',
             {
                 host: {
@@ -64,7 +72,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'hostsComposite',
                     references: {
-                        model: protocolsModel,
+                        model: this.protocolsModel,
                         key: 'id'
                     }
                 }
@@ -74,7 +82,7 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
-        var pathsModel = this.sequelize.define(
+        this.pathsModel = this.sequelize.define(
             'Path',
             {
                 path: {
@@ -87,7 +95,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'pathsComposite',
                     references: {
-                        model: hostsModel,
+                        model: this.hostsModel,
                         key: 'id'
                     }
                 }
@@ -97,7 +105,7 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
-        var queriesModel = this.sequelize.define(
+        this.queriesModel = this.sequelize.define(
             'Query',
             {
                 query: {
@@ -110,7 +118,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'queryComposite',
                     references: {
-                        model: pathsModel,
+                        model: this.pathsModel,
                         key: 'id'
                     }
                 }
@@ -120,7 +128,7 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
-        var methodsModel = this.sequelize.define(
+        this.methodsModel = this.sequelize.define(
             'Method',
             {
                 method: {
@@ -134,7 +142,7 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
-        var srcDstModel = this.sequelize.define(
+        this.srcDstModel = this.sequelize.define(
             'SrcDst',
             {
                 srcPathId: {
@@ -142,7 +150,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'srcDstComposite',
                     references: {
-                        model: pathsModel,
+                        model: this.pathsModel,
                         key: 'id'
                     }
                 },
@@ -151,7 +159,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'srcDstComposite',
                     references: {
-                        model: pathsModel,
+                        model: this.pathsModel,
                         key: 'id'
                     }
                 },
@@ -160,7 +168,7 @@ export default class SqliteDatabase {
                     allowNull: false,
                     unique: 'srcDstComposite',
                     references: {
-                        model: methodsModel,
+                        model: this.methodsModel,
                         key: 'id'
                     }
                 }
@@ -171,38 +179,39 @@ export default class SqliteDatabase {
             }
         );
 
-        hostsModel.hasMany(pathsModel, {
+        this.hostsModel.hasMany(this.pathsModel, {
             foreignKey: {
                 allowNull: false
             }
         });
-        pathsModel.belongsTo(hostsModel);
-        pathsModel.hasMany(srcDstModel, {
+        this.pathsModel.belongsTo(this.hostsModel);
+        this.pathsModel.hasMany(this.srcDstModel, {
             as: 'src',
             foreignKey: {
                 name: 'srcPathId',
                 allowNull: false
             }
         });
-        pathsModel.hasMany(srcDstModel, {
+        this.pathsModel.hasMany(this.srcDstModel, {
             as: 'dst',
             foreignKey: {
                 name: 'dstPathId',
                 allowNull: false
             }
         });
-        pathsModel.hasMany(queriesModel, {
+        this.pathsModel.hasMany(this.queriesModel, {
             foreignKey: {
                 allowNull: false
             }
         });
 
-        this.protocols = new ProtocolsTable(protocolsModel);
-        this.hosts = new HostsTable(hostsModel, protocolsModel);
-        this.paths = new PathsTable(pathsModel, hostsModel, protocolsModel);
-        this.queries = new QueriesTable(queriesModel, pathsModel);
-        this.methods = new MethodsTable(methodsModel);
-        this.srcDsts = new SrcDstTable(srcDstModel, pathsModel, hostsModel, protocolsModel, methodsModel);
+        var tableFactory = new SqliteTableFactory(this);
+        this.protocols = tableFactory.createProtocolsTable();
+        this.hosts = tableFactory.createHostsTable();
+        this.paths = tableFactory.createPathsTable();
+        this.queries = tableFactory.createQueriesTable();
+        this.methods = tableFactory.createMethodsTable();
+        this.srcDsts = tableFactory.createSrcDstsTable();
 
         this.sync();
     }

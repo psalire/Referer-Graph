@@ -8,6 +8,7 @@ import { ValidationError, SequelizeUniqueConstraintError } from 'sequelize';
 var db: SqliteDatabase|null = null;
 const dbsPath = './test/sqlite-dbs';
 const PROTOCOL = 'https';
+const METHOD = 'GET';
 
 function rmDefaultTestSqliteFile() {
     try {
@@ -159,10 +160,11 @@ test('Insert path with non-existing host', async () => {
 });
 
 test('Insert into srcDst table', async () => {
+    await db.methods.insert([METHOD]);
     let vals = [
-        [['/', '/index.html'], 'example.com'],
-        [['/index.html', '/word.exe'], 'example.com'],
-        [['/word.exe', '/index.html'], 'example.com', 'example.com']
+        [['/', '/index.html', METHOD], 'example.com'],
+        [['/index.html', '/word.exe', METHOD], 'example.com'],
+        [['/word.exe', '/index.html', METHOD], 'example.com', 'example.com']
     ]
     for (let val of vals) {
         await db.srcDsts.insert(val[0], PROTOCOL, PROTOCOL, val[1]);
@@ -182,9 +184,9 @@ test('Insert into srcDst table', async () => {
 
 test('Insert cross host into srcDst table', async () => {
     let vals = [
-        [['/index.html', '/home'], 'example.com', 'www.test3.com'],
-        [['/word.exe', '/home'], 'example.com', 'www.test3.com'],
-        [['/home', '/a/path/file'], 'www.test3.com', 'test.test5.com']
+        [['/index.html', '/home', METHOD], 'example.com', 'www.test3.com'],
+        [['/word.exe', '/home', METHOD], 'example.com', 'www.test3.com'],
+        [['/home', '/a/path/file', METHOD], 'www.test3.com', 'test.test5.com']
     ]
     for (let val of vals) {
         await db.srcDsts.insert(val[0], PROTOCOL, PROTOCOL, val[1], val[2]);
@@ -213,19 +215,19 @@ test('Insert bulk into srcDst table', async () => {
     for (let val of vals.flat()) {
         await db.paths.insert([val, 'yahoo.com'], PROTOCOL);
     }
-    await db.srcDsts.bulkInsert(vals, PROTOCOL, PROTOCOL, 'yahoo.com');
+    await db.srcDsts.bulkInsert(vals.map(v=>[...v, METHOD]), PROTOCOL, PROTOCOL, 'yahoo.com');
 });
 
 test('Insert duplicate into srcDst table', async () => {
     for (let i=0; i<5; i++) {
-        expect(await db.srcDsts.insert(['/abcd', '/efgh'], PROTOCOL, PROTOCOL, 'yahoo.com')).toBeNull();
+        expect(await db.srcDsts.insert(['/abcd', '/efgh', METHOD], PROTOCOL, PROTOCOL, 'yahoo.com')).toBeNull();
     }
 });
 
 test('Insert non-existing paths & hosts into srcDst table', async () => {
-    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist'], PROTOCOL, PROTOCOL, 'nonexist.com')}).rejects.toThrow();
-    expect(async ()=>{await db.srcDsts.insert(['/nonx', '/existx'], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
-    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist'], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
+    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist', METHOD], PROTOCOL, PROTOCOL, 'nonexist.com')}).rejects.toThrow();
+    expect(async ()=>{await db.srcDsts.insert(['/nonx', '/existx', METHOD], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
+    expect(async ()=>{await db.srcDsts.insert(['/non', '/exist', METHOD], PROTOCOL, PROTOCOL, 'yahoo.com')}).rejects.toThrow();
 
     // let hostObj = await db.hosts.selectOne({
     //     host: 'nonexist.com'

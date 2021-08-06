@@ -29,11 +29,11 @@ export default class DatabaseFacade {
         return this.sqliteDb.paths.bulkInsert(paths.map(val=>[val]), host, protocol);
     }
 
-    public addPathQuery(query: string, path: string): Promise<any> {
-        return this.sqliteDb.queries.insert([query, path]);
+    public addPathQuery(query: string, path: string, host: string, protocol: string): Promise<any> {
+        return this.sqliteDb.queries.insert([query, path], protocol, host);
     }
-    public addPathQueries(queries: string[], path: string): Promise<any> {
-        return this.sqliteDb.queries.bulkInsert(queries.map(val=>[val]), path);
+    public addPathQueries(queries: string[], path: string, host: string, protocol: string): Promise<any> {
+        return this.sqliteDb.queries.bulkInsert(queries.map(val=>[val]), path, protocol, host);
     }
 
     public addMethod(method: string): Promise<any> {

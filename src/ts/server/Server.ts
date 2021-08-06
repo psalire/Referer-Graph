@@ -30,7 +30,7 @@ export default class Server {
         await this.db.addProtocol(requestData.protocol);
         await this.db.addHost(requestData.host, requestData.protocol);
         await this.db.addPath(requestData.path, requestData.host, requestData.protocol);
-        await this.db.addPathQuery(requestData.query, requestData.path);
+        await this.db.addPathQuery(requestData.query, requestData.path, requestData.host, requestData.protocol);
     }
 
     public start(): void {

@@ -1,4 +1,5 @@
 
+import 'source-map-support/register';
 import Server from "./Server";
 import { ArgumentParser } from "argparse";
 
