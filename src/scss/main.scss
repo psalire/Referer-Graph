@@ -88,8 +88,14 @@ svg {
 }
 
 // Bottom window
-#bottom-window svg:hover {
-    cursor: pointer;
+#bottom-window {
+    height: 500px;
+    svg:hover {
+        cursor: pointer;
+    }
+    #bottom-window-text {
+        overflow-y: scroll;
+    }
 }
 
 .clickable:hover {
