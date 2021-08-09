@@ -11,7 +11,7 @@ export default class URLFilterForm {
         this.hostsFilterBtn = document.getElementById('filter-input-btn');
         this.hostsFilterText = document.getElementById('filter-input-text');
         this.hostsFilterDelimeter = document.getElementById('filter-input-delimeter');
-        this.hostsFilterText.value = 'ico,jpg,png,gif,css';
+        this.hostsFilterText.value = '.ico,.jpg,.png,.gif,.css';
         this.hostsFilterDelimeter.value = ',';
 
         this.hostsFilterSuccessElem = new ToggleElement(document.getElementById('filter-input-success'));
