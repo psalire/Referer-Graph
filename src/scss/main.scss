@@ -86,3 +86,12 @@ svg {
     @extend .text-center;
     font-size: 0.95em;
 }
+
+// Bottom window
+#bottom-window svg:hover {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}

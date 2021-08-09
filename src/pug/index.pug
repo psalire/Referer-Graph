@@ -19,6 +19,9 @@ mixin gear-svg
 mixin list-svg
     svg.bi.bi-list(xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewbox='0 0 16 16')
         path(fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z')
+mixin ex-svg
+    svg.bi.bi-x(xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewbox='0 0 16 16')
+        path(d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z')
 
 block scripts
     script(src="/static/js/graph.js")
@@ -43,7 +46,7 @@ block main
     section.d-flex.w-100.h-100.border-top
         aside#sidebar.border-end
             div.settings-header-label.border-bottom.mb-2
-                span#sidebar-toggle.float-start.px-1.border-bottom.border-end
+                button#sidebar-toggle.float-start.py-0.px-1.border-start-0.border-top-0.border-bottom.border-end.bg-light
                     +list-svg
                 span.control-text Controls
             div#buttons.d-flex.flex-column.h-100.px-2.show-buttons
@@ -51,5 +54,8 @@ block main
             figure.flex-grow-1.d-flex.flex-column.h-100
                 div.flex-grow-1
                     div#graph-container
-            div#bottom-window.border-top
-                | hello world
+            div#bottom-window.border-top.d-none
+                button#ex-button.float-end.bg-white.border-0
+                    +ex-svg
+                div.text-center.border-bottom Headers
+                div#bottom-window-text

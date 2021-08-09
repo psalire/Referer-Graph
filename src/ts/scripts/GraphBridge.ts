@@ -4,6 +4,7 @@ import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
 import LiveUpdateButton from './LiveUpdateButton';
+import BottomWindow from './BottomWindow';
 import URLFilterForm from './URLFilterForm';
 
 export default class GraphBridge {
@@ -17,6 +18,8 @@ export default class GraphBridge {
     private urlFilterForm: URLFilterForm;
 
     constructor(initialGraph='dagre') {
+        var bottomWindow = new BottomWindow('bottom-window');
+
         this.isLiveUpdateBtn = new LiveUpdateButton();
         this.isLiveUpdateBtn.getButton().addEventListener('click', ()=>{
             this.isLiveUpdateBtn.getIsLiveUpdateOn() && this.activeGraph.refreshGraph();

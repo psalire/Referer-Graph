@@ -99,9 +99,16 @@ export default class DagreGraph implements iGraph {
         this.svgInner.selectAll(".node")
             .attr("title", (v) => {
                 let dataNode = this.data.getNode(this.dataMap.get(btoa(v)));
-                return `Status Code: ${dataNode.statusCode}`;
+                let getOnClickEvent = (action)=>{
+                    return `window.dispatchEvent(new CustomEvent('bottomWindow',{detail:{id:'${btoa(v)}',action:'${action}'}}))`
+                };
+                return `Status Code: ${dataNode.statusCode}`
+                       +`<div class="clickable link-info" onclick="${getOnClickEvent('info')}">More info...</div>`
+                       +`<div class="clickable link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</div>`
             })
-            .attr("data-bs-toggle", (v) => "tooltip")
+            .attr("data-bs-toggle", "tooltip")
+            .attr("data-bs-html", "true")
+            .attr("data-bs-placement", "right")
             .attr("id", (v) => btoa(v))
             .each((v) => {
                 if (this.tooltipSet.has(btoa(v))) return;
@@ -111,7 +118,8 @@ export default class DagreGraph implements iGraph {
                     container: '#graph-container',
                     placement: 'right',
                     trigger: 'click',
-                    html: true
+                    html: true,
+                    sanitize: false,
                 }));
                 console.log(this.tooltips.length)
                 console.log(this.tooltips)
