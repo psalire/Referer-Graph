@@ -35,17 +35,13 @@ svg {
     height: 1em;
 }
 
+
+// Show grab cursor on graph svg
 #graph:hover {
     cursor: grab;
 }
 #graph:active {
     cursor: grabbing;
-}
-
-.graph-controls-btn {
-    @extend .mx-auto;
-    @extend .p-1;
-    width: 150px !important;
 }
 
 #settings-btn {
@@ -56,11 +52,8 @@ svg {
         @extend .px-1;
     }
 }
-.settings-header-label {
-    @extend .text-center;
-    font-size: 0.95em;
-}
 
+// Filter form
 #filter-input {
     textarea {
         height: 10px;
@@ -73,12 +66,23 @@ svg {
     width: 50px;
 }
 
-.hide-buttons button {
-    @extend .d-none;
-}
 
+// Sidebar styles
 #sidebar-toggle {
     svg:hover {
         cursor: pointer;
     }
+}
+.hide-buttons button {
+    @extend .d-none;
+}
+.graph-controls-btn {
+    @extend .mx-auto;
+    @extend .p-1;
+    width: 150px !important;
+}
+
+.settings-header-label {
+    @extend .text-center;
+    font-size: 0.95em;
 }
