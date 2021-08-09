@@ -28,6 +28,12 @@
 tspan {
     @extend .user-select-none;
 }
+svg {
+    display: inline-block;
+    vertical-align: -.125em;
+    width: 1em;
+    height: 1em;
+}
 
 #graph:hover {
     cursor: grab;
@@ -44,12 +50,6 @@ tspan {
 
 #settings-btn {
     font-size: 0.95em !important;
-    svg {
-        display: inline-block;
-        vertical-align: -.125em;
-        width: 1em;
-        height: 1em;
-    }
 }
 #settings-inner {
     > div {
@@ -73,29 +73,12 @@ tspan {
     width: 50px;
 }
 
-// https://spin.atomicobject.com/2019/11/21/creating-a-resizable-html-element/
-
-#sidebar {
-    @extend .px-2;
-    @extend .py-1;
-    --resizeable-width: 200px;
-    width: var(--resizeable-width);
-    min-width: var(--min-width);
+.hide-buttons button {
+    @extend .d-none;
 }
 
-#handle {
-    float: right;
-    width: 1px;
-    z-index: 1;
-}
-
-#handle::after {
-    content: "";
-    width: 9px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: transparent;
-    cursor: ew-resize;
-    z-index: 2;
+#sidebar-toggle {
+    svg:hover {
+        cursor: pointer;
+    }
 }

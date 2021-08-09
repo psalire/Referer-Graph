@@ -5,7 +5,7 @@ const scriptsPath = './src/ts/scripts/';
 module.exports = {
     mode: 'development',
     entry: {
-        'resizable-sidebar': path.resolve(scriptsPath, 'resizable-sidebar.ts'),
+        'sidebar': path.resolve(scriptsPath, 'sidebar.ts'),
         'settings': path.resolve(scriptsPath, 'settings.ts'),
         'graph': path.resolve(scriptsPath, 'graph.ts'),
         'bootstrap-collapse': './node_modules/bootstrap/js/dist/collapse.js'
