@@ -89,6 +89,20 @@ export default class SqliteTableFactory implements iSQLTableFactory {
         }
         return methodObj;
     }
+    private async getHeadersObj(headers?: string): Promise<Model> {
+        if (headers === undefined) {
+            throw new SqliteDatabaseError('missing headers argument');
+        }
+        var headersObj = await this.db.headersModel.findOne({
+            where: {
+                headers: headers
+            }
+        });
+        if (headersObj == null) {
+            throw new SqliteDatabaseError(`cannot find header "${headers}"`);
+        }
+        return headersObj;
+    }
 
     public createHostsTable(): iDatabaseTable {
         const parent = this;
@@ -249,11 +263,36 @@ export default class SqliteTableFactory implements iSQLTableFactory {
             }
         }();
     }
+    public createHeadersTable(): iDatabaseTable {
+        const parent = this;
+        return new class extends aSqliteTable {
+            constructor() {
+                super(parent.db.headersModel, ['headers']);
+            }
+
+            public async insert(vals: string[]): Promise<any> {
+                this.validateValuesLength(vals);
+                return this.model.create({
+                    headers: vals[0],
+                }).catch((e) => {
+                    if (!this.isUniqueViolationError(e, undefined, 1)) {
+                        throw e;
+                    }
+                    return null;
+                });
+            }
+            public bulkInsert(vals: string[][]): Promise<any> {
+                return this.model.bulkCreate(vals.flat().map((val) => {
+                    return {headers: val};
+                }));
+            }
+        }();
+    }
     public createSrcDstsTable(): iDatabaseTable {
         const parent = this;
         return new class extends aSqliteTable {
             constructor() {
-                super(parent.db.srcDstModel, ['srcPathId','dstPathId','methodId']);
+                super(parent.db.srcDstModel, ['srcPathId','dstPathId','methodId','requestHeadersId','responseHeadersId']);
             }
 
             public async insert(
@@ -269,10 +308,14 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                 var srcHostObj = await parent.getPathObj(vals[0], srcHost, srcProtocol, true);
                 var dstHostObj = await parent.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost, dstProtocol, true);
                 var methodObj = await parent.getMethodObj(vals[2]);
+                var srcHeadersObj = await parent.getHeadersObj(vals[3]);
+                var dstHeadersObj = await parent.getHeadersObj(vals[4]);
                 return this.model.create({
                     srcPathId: srcHostObj.id,
                     dstPathId: dstHostObj.id,
-                    methodId: methodObj.id
+                    methodId: methodObj.id,
+                    requestHeadersId: srcHeadersObj.id,
+                    responseHeadersId: dstHeadersObj.id
                 }).catch((e) => {
                     if (!this.isUniqueViolationError(e)) {
                         throw e;
@@ -296,10 +339,12 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                         var srcHostObj = await parent.getPathObj(val[0], srcHost, srcProtocol, true);
                         var dstHostObj = await parent.getPathObj(val[1], dstHostStr, dstProtocol, true);
                         var methodObj = await parent.getMethodObj(val[2]);
+                        var headersObj = await parent.getHeadersObj(vals[3]);
                         return {
                             srcPathId: srcHostObj.id,
                             dstPathId: dstHostObj.id,
-                            methodId: methodObj.id
+                            methodId: methodObj.id,
+                            headersId: headersObj.id,
                         };
                     })
                 ));

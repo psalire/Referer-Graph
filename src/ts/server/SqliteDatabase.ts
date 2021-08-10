@@ -18,12 +18,14 @@ export default class SqliteDatabase {
     public paths: iDatabaseTable;
     public queries: iDatabaseTable;
     public methods: iDatabaseTable;
+    public headers: iDatabaseTable;
     public srcDsts: iDatabaseTable;
     public protocolsModel: ModelCtor<Model>;
     public hostsModel: ModelCtor<Model>;
     public pathsModel: ModelCtor<Model>;
     public queriesModel: ModelCtor<Model>;
     public methodsModel: ModelCtor<Model>;
+    public headersModel: ModelCtor<Model>;
     public srcDstModel: ModelCtor<Model>;
 
     public constructor(dbPath='./sqlite-dbs', dbName='default.sqlite') {
@@ -142,6 +144,20 @@ export default class SqliteDatabase {
                 createdAt: false
             }
         );
+        this.headersModel = this.sequelize.define(
+            'Header',
+            {
+                headers: {
+                    type: DataTypes.TEXT,
+                    allowNull: false,
+                    unique: true
+                }
+            },
+            {
+                timestamps: false,
+                createdAt: false
+            }
+        )
         this.srcDstModel = this.sequelize.define(
             'SrcDst',
             {
@@ -169,6 +185,24 @@ export default class SqliteDatabase {
                     unique: 'srcDstComposite',
                     references: {
                         model: this.methodsModel,
+                        key: 'id'
+                    }
+                },
+                requestHeadersId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'srcDstComposite',
+                    references: {
+                        model: this.headersModel,
+                        key: 'id'
+                    }
+                },
+                responseHeadersId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'srcDstComposite',
+                    references: {
+                        model: this.headersModel,
                         key: 'id'
                     }
                 }
@@ -211,6 +245,7 @@ export default class SqliteDatabase {
         this.paths = tableFactory.createPathsTable();
         this.queries = tableFactory.createQueriesTable();
         this.methods = tableFactory.createMethodsTable();
+        this.headers = tableFactory.createHeadersTable();
         this.srcDsts = tableFactory.createSrcDstsTable();
 
         this.sync();

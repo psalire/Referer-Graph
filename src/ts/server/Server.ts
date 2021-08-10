@@ -26,8 +26,14 @@ export default class Server {
         });
     }
 
-    private async insertURLToDB(requestData: express.Request<any,any,any,any>): Promise<any> {
+    private async insertURLToDB(requestData: {[key: string]: any}, headers?: string): Promise<any> {
         await this.db.addProtocol(requestData.protocol);
+        if (headers !== undefined) {
+            await this.db.addHeader(headers);
+        }
+        else {
+            requestData.headers && await this.db.addHeader(requestData.headers);
+        }
         await this.db.addHost(requestData.host, requestData.protocol);
         await this.db.addPath(requestData.path, requestData.host, requestData.protocol);
         await this.db.addPathQuery(requestData.query, requestData.path, requestData.host, requestData.protocol);
@@ -52,13 +58,15 @@ export default class Server {
                 try {
                     await this.insertURLToDB(requestData);
                     if (requestData.referer) {
-                        await this.insertURLToDB(requestData.referer);
+                        await this.insertURLToDB(requestData.referer, responseData.headers);
                         await this.db.addMethod(requestData.method);
                         await this.db.addSrcDstMapping(
                             [
                                 requestData.referer.path,
                                 requestData.path,
-                                requestData.method
+                                requestData.method,
+                                requestData.headers,
+                                responseData.headers
                             ],
                             requestData.referer.protocol,
                             requestData.protocol,

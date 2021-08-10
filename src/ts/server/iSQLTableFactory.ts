@@ -7,5 +7,6 @@ export default interface iSQLTableFactory {
     createProtocolsTable(): iDatabaseTable;
     createQueriesTable(): iDatabaseTable;
     createMethodsTable(): iDatabaseTable;
+    createHeadersTable(): iDatabaseTable;
     createSrcDstsTable(): iDatabaseTable;
 }

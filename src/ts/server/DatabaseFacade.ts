@@ -43,6 +43,13 @@ export default class DatabaseFacade {
         return this.sqliteDb.methods.bulkInsert(methods.map(val=>[val]));
     }
 
+    public addHeader(headers: string): Promise<any> {
+        return this.sqliteDb.headers.insert([headers]);
+    }
+    public addHeaders(headers: string[]): Promise<any> {
+        return this.sqliteDb.headers.bulkInsert(headers.map(val=>[val]));
+    }
+
     public addSrcDstMapping(
         srcDst: string[], srcProtocol: string, dstProtocol: string,
         srcHost: string, dstHost?: string
