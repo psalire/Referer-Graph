@@ -101,9 +101,8 @@ public class JsonHelper {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         jsonObjectBuilder.add(
             "method", requestInfo.getMethod()
-        // );
         ).add(
-            "headers", Json.createArrayBuilder(headers)
+            "headers", String.join("\r\n", headers)
         );
         addURLInformationToJson(jsonObjectBuilder, requestURL);
         addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
@@ -154,7 +153,7 @@ public class JsonHelper {
             Json.createObjectBuilder().add(
                 "statusCode", responseInfo.getStatusCode()
             ).add(
-                "headers", Json.createArrayBuilder(responseInfo.getHeaders())
+                "headers", String.join("\r\n", responseInfo.getHeaders())
             )
         );
     }
