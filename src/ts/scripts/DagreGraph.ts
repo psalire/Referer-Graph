@@ -169,10 +169,10 @@ export default class DagreGraph implements iGraph {
         orientationSelect.id = 'orientation-select';
         orientationSelect.classList.add('form-select');
         orientationSelect.classList.add('p-1');
-        for (let val of ['LR','TB','RL','BT']) {
+        for (let val of [['LR','Left to Right'],['TB','Top to Bottom'],['RL','Right to Left'],['BT','Bottom to Top']]) {
             var option = document.createElement('OPTION');
-            option.value = val;
-            option.text = val;
+            option.value = val[0];
+            option.text = val[1];
             orientationSelect.appendChild(option);
         }
         orientationSelect.addEventListener('change', (e)=> {
