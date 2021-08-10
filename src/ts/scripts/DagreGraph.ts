@@ -42,7 +42,7 @@ export default class DagreGraph implements iGraph {
             directed: true,
             compound: true
         }).setGraph({
-            rankdir: orientation,
+            rankdir: orientation && ['LR','RL','TB','BT'].includes(orientation) ? orientation : 'LR',
             nodesep: '20',
             ranksep: '20'
         });
@@ -147,9 +147,10 @@ export default class DagreGraph implements iGraph {
         }
         return this;
     }
-    public refreshGraph(orientation='LR'): DagreGraph {
+    public refreshGraph(): DagreGraph {
+        var orientationElem = document.getElementById('orientation-select');
         return this.deleteGraph()
-                   .createGraph(orientation)
+                   .createGraph(orientationElem && orientationElem.value)
                    .updateGraph();
     }
     public getControlComponents(): HTMLElement[] {
@@ -165,6 +166,7 @@ export default class DagreGraph implements iGraph {
         }
 
         var orientationSelect = document.createElement('SELECT');
+        orientationSelect.id = 'orientation-select';
         orientationSelect.classList.add('form-select');
         orientationSelect.classList.add('p-1');
         for (let val of ['LR','TB','RL','BT']) {
