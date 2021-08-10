@@ -1,5 +1,5 @@
 
-import { Model, ModelCtor, ValidationError, UniqueConstraintError, OrderItem } from 'sequelize';
+import { Model } from 'sequelize';
 import iDatabaseTable from './iDatabaseTable';
 import iSQLTableFactory from './iSQLTableFactory';
 import SqliteDatabase from './SqliteDatabase';
@@ -186,7 +186,7 @@ export default class SqliteTableFactory implements iSQLTableFactory {
     }
     public createQueriesTable(): iDatabaseTable {
         const parent = this;
-        return new class QueriesTable extends aSqliteTable {
+        return new class extends aSqliteTable {
             constructor() {
                 super(parent.db.queriesModel, ['protocol', 'PathId']);
             }
