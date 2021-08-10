@@ -31,7 +31,7 @@ public class BurpConfigUI implements Runnable {
     private String serverPort = "8000";
     private File sqliteFile;
     private boolean isTrafficForwarded = false;
-    private boolean isLimitInScope = true;
+    private boolean isLimitInScope = false;
     private boolean isSaveTraffic = false;
     private boolean isNo404TrafficForwarded = false;
     private boolean isNoRepeaterTrafficForwarded = false;
