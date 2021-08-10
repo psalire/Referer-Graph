@@ -26,7 +26,7 @@ export default class DagreGraph implements iGraph {
         this.render = new dagreD3.render();
     }
 
-    public createGraph(): DagreGraph {
+    public createGraph(orientation='LR'): DagreGraph {
         console.log('dagre.createGraph()...')
         this.svg = d3.select('#graph-container').append('svg').attr('id','graph');
         this.svgInner = this.svg.append('g');
@@ -42,7 +42,7 @@ export default class DagreGraph implements iGraph {
             directed: true,
             compound: true
         }).setGraph({
-            rankdir: 'LR',
+            rankdir: orientation,
             nodesep: '20',
             ranksep: '20'
         });
@@ -96,6 +96,7 @@ export default class DagreGraph implements iGraph {
         // Run the renderer. This is what draws the final graph.
         this.render(this.svgInner, this.dagreGraph);
 
+        // Add bootstrap tooltip
         this.svgInner.selectAll(".node")
             .attr("title", (v) => {
                 let dataNode = this.data.getNode(this.dataMap.get(btoa(v)));
@@ -146,22 +147,39 @@ export default class DagreGraph implements iGraph {
         }
         return this;
     }
-    public refreshGraph(): DagreGraph {
+    public refreshGraph(orientation='LR'): DagreGraph {
         return this.deleteGraph()
-                   .createGraph()
+                   .createGraph(orientation)
                    .updateGraph();
     }
-    public getButtons(): HTMLButtonElement[] {
+    public getControlComponents(): HTMLElement[] {
         var deleteBtn = StyledButton.createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
             this.refreshGraph();
         };
+
         var refreshBtn = StyledButton.createButton('Refresh Graph');
         refreshBtn.onclick = ()=>{
             this.refreshGraph();
         }
-        return [deleteBtn, refreshBtn];
+
+        var orientationSelect = document.createElement('SELECT');
+        orientationSelect.classList.add('form-select');
+        orientationSelect.classList.add('p-1');
+        for (let val of ['LR','TB','RL','BT']) {
+            var option = document.createElement('OPTION');
+            option.value = val;
+            option.text = val;
+            orientationSelect.appendChild(option);
+        }
+        orientationSelect.addEventListener('change', (e)=> {
+            this.refreshGraph(e.target.value);
+        });
+        var selectLabel = document.createElement('SPAN');
+        selectLabel.textContent = 'Orientation';
+
+        return [deleteBtn, refreshBtn, selectLabel, orientationSelect];
     }
     private getSvgDimensions(): {[key: string]:number} {
         let dims = document.getElementById(this.svgId).getBoundingClientRect();

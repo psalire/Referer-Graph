@@ -27,8 +27,8 @@ export default class GraphBridge {
 
         this.setActiveGraph(initialGraph);
         var graphSelect = document.getElementById('graph-layout-select');
-        graphSelect && graphSelect.addEventListener('change', () => {
-            this.setActiveGraph(graphSelect.value);
+        graphSelect && graphSelect.addEventListener('change', (e) => {
+            this.setActiveGraph(e.target.value);
         });
 
         this.urlFilterForm = new URLFilterForm();
@@ -53,7 +53,7 @@ export default class GraphBridge {
         if (btnContainer) {
             btnContainer.innerHTML = '';
             btnContainer.appendChild(this.isLiveUpdateBtn.getButton());
-            for (let btn of this.activeGraph.getButtons()) {
+            for (let btn of this.activeGraph.getControlComponents()) {
                 btnContainer.appendChild(btn);
             }
         }

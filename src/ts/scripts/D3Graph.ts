@@ -196,7 +196,7 @@ export default class D3Graph implements iGraph {
         return this;
     }
 
-    public getButtons(): HTMLElement[] {
+    public getControlComponents(): HTMLElement[] {
         var deleteBtn = StyledButton.createButton('Clear Graph');
         deleteBtn.onclick = ()=>{
             this.data.clear();
