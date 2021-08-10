@@ -73,7 +73,7 @@ svg {
         cursor: pointer;
     }
 }
-.hide-buttons button {
+.hide-components * {
     @extend .d-none;
 }
 .graph-controls-btn {
