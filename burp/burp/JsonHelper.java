@@ -121,7 +121,7 @@ public class JsonHelper {
     */
     public static JsonObjectBuilder getRequestJson(
         String method, String host, String path, String protocol,
-        String query, String referer, Writer writer
+        String query, String reqHeaders, String referer, Writer writer
     ) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         jsonObjectBuilder.add(
@@ -130,6 +130,8 @@ public class JsonHelper {
             "host", host
         ).add(
             "path", path
+        ).add(
+            "headers", reqHeaders
         ).add(
             "protocol", protocol
         );
@@ -160,10 +162,14 @@ public class JsonHelper {
     /**
     * Json helper. Build JSON with relevant request data
     */
-    public static JsonObjectBuilder getResponseJson(int statusCode, Writer writer) {
+    public static JsonObjectBuilder getResponseJson(int statusCode, String resHeaders, Writer writer) {
         return Json.createObjectBuilder().add(
             "responseData",
-            Json.createObjectBuilder().add("statusCode", statusCode)
+            Json.createObjectBuilder().add(
+                "statusCode", statusCode
+            ).add(
+                "headers", resHeaders
+            )
         );
     }
     /**

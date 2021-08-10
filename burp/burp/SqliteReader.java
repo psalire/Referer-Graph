@@ -33,8 +33,8 @@ public class SqliteReader {
         Statement stmt = this.conn.createStatement();
         ResultSet rs = stmt.executeQuery(
             "SELECT s.path AS srcPath, d.path AS dstPath, m.method AS method, sh.host AS srcHost,"
-            +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery,"
-            +" sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
+            +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery, shd.headers AS reqHeaders,"
+            +" dhd.headers AS resHeaders, sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
             +" LEFT JOIN Paths AS s ON srcPathId=s.id"
             +" LEFT JOIN Paths AS d ON dstPathid=d.id"
             +" LEFT JOIN Methods AS m ON methodId=m.id"
@@ -42,6 +42,8 @@ public class SqliteReader {
             +" LEFT JOIN Hosts AS dh ON d.HostId=dh.id"
             +" LEFT JOIN Protocols AS sp ON sh.ProtocolId=sp.id"
             +" LEFT JOIN Protocols AS dp ON dh.ProtocolId=dp.id"
+            +" LEFT JOIN Headers AS shd ON requestHeadersId=shd.id"
+            +" LEFT JOIN Headers AS dhd ON responseHeadersId=dhd.id"
             +" LEFT JOIN Queries as sq ON srcPathId=sq.PathId"
             +" LEFT JOIN Queries as dq ON dstPathId=dq.PathId"
         );

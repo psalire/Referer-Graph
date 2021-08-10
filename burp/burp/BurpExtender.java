@@ -117,11 +117,12 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
                             rs.getString("dstPath"),
                             rs.getString("dstProtocol"),
                             rs.getString("dstQuery"),
+                            rs.getString("reqHeaders"),
                             rs.getString("srcProtocol")+"://"+rs.getString("srcHost")+rs.getString("srcPath"),
                             this.writer
                         )
                     ).addAll(
-                        JsonHelper.getResponseJson(200, this.writer)
+                        JsonHelper.getResponseJson(200, rs.getString("resHeaders"), this.writer)
                     ).add(
                         "save", this.burpUi.getIsSaveTraffic()
                     ).build()
