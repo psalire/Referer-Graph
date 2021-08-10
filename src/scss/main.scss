@@ -101,3 +101,14 @@ svg {
 .clickable:hover {
     cursor: pointer;
 }
+
+.tooltip-buttons {
+    button {
+        font-size: 1em !important;
+        @extend .d-block;
+        @extend .bg-transparent;
+        @extend .p-0;
+        @extend .mx-auto;
+        @extend .clickable;
+    }
+}

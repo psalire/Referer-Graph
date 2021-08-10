@@ -11,8 +11,17 @@ export default class BottomWindow {
             this.hide();
         });
         window.addEventListener('bottomWindow', (e)=>{
+            if (!e || !e.detail) return;
+            switch(e.detail.action) {
+                case 'close':
+                    document.getElementById(e.detail.id).dispatchEvent(new MouseEvent('click'));
+                    break;
+                case 'delete':
+                case 'info':
+                    this.show(e.detail.id);
+                    break;
+            }
             console.log(e.detail);
-            this.show(e.detail.id);
         });
     }
 

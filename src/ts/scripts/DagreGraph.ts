@@ -104,8 +104,11 @@ export default class DagreGraph implements iGraph {
                     return `window.dispatchEvent(new CustomEvent('bottomWindow',{detail:{id:'${btoa(v)}',action:'${action}'}}))`
                 };
                 return (dataNode.statusCode ? `Status Code: ${dataNode.statusCode}` : '')
-                       +`<div class="clickable link-info" onclick="${getOnClickEvent('info')}">More info...</div>`
-                       +`<div class="clickable link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</div>`
+                       +`<div class="tooltip-buttons">`
+                       +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">More info...</button>`
+                       +`<button class="btn link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</button>`
+                       +`<button class="btn link-secondary" onclick="${getOnClickEvent('close')}">Close</button>`
+                       +`</div>`
             })
             .attr("data-bs-toggle", "tooltip")
             .attr("data-bs-html", "true")
