@@ -96,13 +96,19 @@ public class JsonHelper {
         Writer writer
     ) {
         URL requestURL = requestInfo.getUrl();
+        List<String> headers = requestInfo.getHeaders();
 
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add("method", requestInfo.getMethod());
+        jsonObjectBuilder.add(
+            "method", requestInfo.getMethod()
+        // );
+        ).add(
+            "headers", Json.createArrayBuilder(headers)
+        );
         addURLInformationToJson(jsonObjectBuilder, requestURL);
         addPotentialNullToJson(jsonObjectBuilder, "query", requestURL.getQuery());
         addPotentialNullToJson(jsonObjectBuilder, "referer", getRefererJson(
-            getRefererString(requestInfo.getHeaders(), writer),
+            getRefererString(headers, writer),
             writer
         ));
 
@@ -145,7 +151,11 @@ public class JsonHelper {
     ) {
         return Json.createObjectBuilder().add(
             "responseData",
-            Json.createObjectBuilder().add("statusCode", responseInfo.getStatusCode())
+            Json.createObjectBuilder().add(
+                "statusCode", responseInfo.getStatusCode()
+            ).add(
+                "headers", Json.createArrayBuilder(responseInfo.getHeaders())
+            )
         );
     }
     /**
