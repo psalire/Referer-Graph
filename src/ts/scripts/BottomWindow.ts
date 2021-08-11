@@ -24,11 +24,11 @@ export default class BottomWindow {
                     console.log(reqHeaders)
                     console.log('res:');
                     console.log(resHeaders)
-                    this.containerElem.querySelector('#requests .header-container').textContent =
+                    this.containerElem.querySelector('#requests').textContent =
                         reqHeaders.length ? reqHeaders[0] : '';
-                    this.containerElem.querySelector('#responses .header-container').textContent =
+                    this.containerElem.querySelector('#responses').textContent =
                         resHeaders.length ? resHeaders[0] : '';
-                    this.show();
+                    this.show(e.detail.id);
                     break;
             }
             document.getElementById(e.detail.id).dispatchEvent(new MouseEvent('click'));
@@ -39,8 +39,9 @@ export default class BottomWindow {
     private hide(): void {
         this.elem && this.elem.classList.add('d-none');
     }
-    private show(): void {
+    private show(id: string): void {
         if (!this.elem) return;
+        document.getElementById('details-header').textContent = `Details: ${atob(id)}`;
         this.elem.classList.remove('d-none');
     }
 }

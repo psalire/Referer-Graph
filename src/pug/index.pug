@@ -57,14 +57,16 @@ block main
             div#bottom-window.border-top.d-none
                 button#ex-button.float-end.bg-white.border-0.border-bottom.py-0
                     +ex-svg
-                div.text-center.border-bottom.fw-bold Details
+                div#details-header.text-center.border-bottom.fw-bold Details
                 div#bottom-window-container.h-100
                     div.text-center.bg-light
-                        span#headers-container-label.link-primary.clickable Associated Headers
-                    div#headers-container.d-flex.h-100
-                        div#requests.w-100
-                            div.border-bottom.text-center.bg-light Request Headers
-                            div.header-container.border-end.p-2.h-100
-                        div#responses.w-100
-                            div.border-bottom.text-center.bg-light Response Headers
-                            div.header-container.p-2.h-100
+                    table#headers-container.h-100.w-100
+                        tr
+                            th(colspan="2").bg-light.text-center
+                                span#headers-container-label.link-primary.clickable Associated Headers
+                        tr
+                            td.border-bottom.text-center.bg-light Request Headers
+                            td.border-bottom.text-center.bg-light Response Headers
+                        tr
+                            td#requests.header-container.border-end.px-2.h-100.w-100
+                            td#responses.header-container.px-2.h-100.w-100

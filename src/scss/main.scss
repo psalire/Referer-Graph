@@ -113,7 +113,12 @@ svg {
     }
 }
 
+#headers-container {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
 .header-container {
     font-family: 'Courier New', monospace;
-    white-space: pre;
+    white-space: pre-wrap;
+    line-height: 1 !important;
 }
