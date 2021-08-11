@@ -103,8 +103,7 @@ export default class DagreGraph implements iGraph {
                 let getOnClickEvent = (action)=>{
                     return `window.dispatchEvent(new CustomEvent('bottomWindow',{detail:{id:'${btoa(v)}',action:'${action}'}}))`
                 };
-                return (dataNode.statusCode ? `Status Code: ${dataNode.statusCode}` : '')
-                       +`<div class="tooltip-buttons">`
+                return `<div class="tooltip-buttons">`
                        +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">More info...</button>`
                        +`<button class="btn link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</button>`
                        +`<button class="btn link-secondary" onclick="${getOnClickEvent('close')}">Close</button>`
