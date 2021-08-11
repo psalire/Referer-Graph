@@ -43,10 +43,6 @@ public class JsonHelper {
             "path", url.getPath()
         ).add(
             "protocol", url.getProtocol()
-        // ).add(
-            // "headers", requestHeaders
-        // ).add(
-        //     "raw", rawRequest
         );
     }
     public static JsonObject getRefererJson(String referer, Writer writer) {

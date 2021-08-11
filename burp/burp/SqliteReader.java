@@ -55,8 +55,10 @@ public class SqliteReader {
     public ResultSet selectHeaderData(String path, String host) throws SQLException {
         return this.executeSelectStatement(
             String.format(
-                "SELECT h.headers FROM (SELECT Paths.id FROM Paths JOIN Hosts ON Paths.HostId=Hosts.id WHERE path='%s') AS p"
+                "SELECT h.reqHeaders, h.resHeaders FROM"
+                +" (SELECT Paths.id FROM Paths JOIN Hosts ON Paths.HostId=(SELECT id FROM Hosts WHERE Host='%s') WHERE path='%s') AS p"
                 +" LEFT JOIN Headers AS h ON h.PathId=p.id",
+                host,
                 path
             )
         );
