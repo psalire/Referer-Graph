@@ -28,15 +28,12 @@ export default class Server {
 
     private async insertURLToDB(requestData: {[key: string]: any}, headers?: string): Promise<any> {
         await this.db.addProtocol(requestData.protocol);
-        if (headers !== undefined) {
-            await this.db.addHeader(headers);
-        }
-        else {
-            requestData.headers && await this.db.addHeader(requestData.headers);
-        }
         await this.db.addHost(requestData.host, requestData.protocol);
         await this.db.addPath(requestData.path, requestData.host, requestData.protocol);
         await this.db.addPathQuery(requestData.query, requestData.path, requestData.host, requestData.protocol);
+        await this.db.addHeader(
+            headers!==undefined ? headers : requestData.headers, requestData.path, requestData.host, requestData.protocol
+        );
     }
 
     public start(): void {
@@ -64,9 +61,7 @@ export default class Server {
                             [
                                 requestData.referer.path,
                                 requestData.path,
-                                requestData.method,
-                                requestData.headers,
-                                responseData.headers
+                                requestData.method
                             ],
                             requestData.referer.protocol,
                             requestData.protocol,

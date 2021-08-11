@@ -250,7 +250,7 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                 return this.model.create({
                     method: vals[0]
                 }).catch((e) => {
-                    if (!this.isUniqueViolationError(e, undefined, 1)) {
+                    if (!this.isUniqueViolationError(e)) {
                         throw e;
                     }
                     return null;
@@ -267,23 +267,32 @@ export default class SqliteTableFactory implements iSQLTableFactory {
         const parent = this;
         return new class extends aSqliteTable {
             constructor() {
-                super(parent.db.headersModel, ['headers']);
+                super(parent.db.headersModel, ['headers', 'PathId']);
             }
 
-            public async insert(vals: string[]): Promise<any> {
+            public async insert(vals: string[], protocol?: string, host?: string): Promise<any> {
                 this.validateValuesLength(vals);
+                var pathObj = await parent.getPathObj(vals[1], host, protocol, false);
                 return this.model.create({
                     headers: vals[0],
+                    PathId: pathObj.id
                 }).catch((e) => {
-                    if (!this.isUniqueViolationError(e, undefined, 1)) {
+                    if (!this.isUniqueViolationError(e)) {
                         throw e;
                     }
                     return null;
                 });
             }
-            public bulkInsert(vals: string[][]): Promise<any> {
+            public async bulkInsert(vals: string[][], path?: string, protocol?: string, host?: string): Promise<any> {
+                if (path===undefined) {
+                    throw new SqliteDatabaseError('missing path argument');
+                }
+                var pathObj = await parent.getPathObj(path, host, protocol, false);
                 return this.model.bulkCreate(vals.flat().map((val) => {
-                    return {headers: val};
+                    return {
+                        headers: val,
+                        PathId: pathObj.id
+                    };
                 }));
             }
         }();
@@ -292,7 +301,7 @@ export default class SqliteTableFactory implements iSQLTableFactory {
         const parent = this;
         return new class extends aSqliteTable {
             constructor() {
-                super(parent.db.srcDstModel, ['srcPathId','dstPathId','methodId','requestHeadersId','responseHeadersId']);
+                super(parent.db.srcDstModel, ['srcPathId','dstPathId','methodId']);
             }
 
             public async insert(
@@ -308,14 +317,10 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                 var srcHostObj = await parent.getPathObj(vals[0], srcHost, srcProtocol, true);
                 var dstHostObj = await parent.getPathObj(vals[1], dstHost===undefined ? srcHost : dstHost, dstProtocol, true);
                 var methodObj = await parent.getMethodObj(vals[2]);
-                var srcHeadersObj = await parent.getHeadersObj(vals[3]);
-                var dstHeadersObj = await parent.getHeadersObj(vals[4]);
                 return this.model.create({
                     srcPathId: srcHostObj.id,
                     dstPathId: dstHostObj.id,
-                    methodId: methodObj.id,
-                    requestHeadersId: srcHeadersObj.id,
-                    responseHeadersId: dstHeadersObj.id
+                    methodId: methodObj.id
                 }).catch((e) => {
                     if (!this.isUniqueViolationError(e)) {
                         throw e;
@@ -339,12 +344,10 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                         var srcHostObj = await parent.getPathObj(val[0], srcHost, srcProtocol, true);
                         var dstHostObj = await parent.getPathObj(val[1], dstHostStr, dstProtocol, true);
                         var methodObj = await parent.getMethodObj(val[2]);
-                        var headersObj = await parent.getHeadersObj(vals[3]);
                         return {
                             srcPathId: srcHostObj.id,
                             dstPathId: dstHostObj.id,
-                            methodId: methodObj.id,
-                            headersId: headersObj.id,
+                            methodId: methodObj.id
                         };
                     })
                 ));

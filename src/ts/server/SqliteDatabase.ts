@@ -150,7 +150,16 @@ export default class SqliteDatabase {
                 headers: {
                     type: DataTypes.TEXT,
                     allowNull: false,
-                    unique: true
+                    unique: 'headerComposite'
+                },
+                PathId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    unique: 'headerComposite',
+                    references: {
+                        model: this.pathsModel,
+                        key: 'id'
+                    }
                 }
             },
             {
@@ -187,24 +196,6 @@ export default class SqliteDatabase {
                         model: this.methodsModel,
                         key: 'id'
                     }
-                },
-                requestHeadersId: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                    unique: 'srcDstComposite',
-                    references: {
-                        model: this.headersModel,
-                        key: 'id'
-                    }
-                },
-                responseHeadersId: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                    unique: 'srcDstComposite',
-                    references: {
-                        model: this.headersModel,
-                        key: 'id'
-                    }
                 }
             },
             {
@@ -234,6 +225,11 @@ export default class SqliteDatabase {
             }
         });
         this.pathsModel.hasMany(this.queriesModel, {
+            foreignKey: {
+                allowNull: false
+            }
+        });
+        this.pathsModel.hasMany(this.headersModel, {
             foreignKey: {
                 allowNull: false
             }
