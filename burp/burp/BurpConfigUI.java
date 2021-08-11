@@ -180,7 +180,6 @@ public class BurpConfigUI implements Runnable {
         );
 
         // Checkboxes
-        JCheckBox uiInScopeCheckbox = this.createCheckBox("Limit forwarded traffic to Burp scope", this.isLimitInScope);
         JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
         uiSaveToSqliteCheckbox.addActionListener(
             new LoggedActionListener(
@@ -196,6 +195,7 @@ public class BurpConfigUI implements Runnable {
                 )
             )
         );
+        JCheckBox uiNoNotInScopeCheckbox = this.createCheckBox("Not in Burp Scope traffic", this.isLimitInScope);
         JCheckBox uiNoForward404Checkbox = this.createCheckBox("404 traffic", this.isNo404TrafficForwarded);
         JCheckBox uiNoForwardRepeaterCheckbox = this.createCheckBox("Repeater traffic", this.isNoRepeaterTrafficForwarded);
         JCheckBox uiNoForwardScannerCheckbox = this.createCheckBox("Scanner traffic", this.isNoScannerTrafficForwarded);
@@ -213,12 +213,12 @@ public class BurpConfigUI implements Runnable {
                         writer.printlnOut("actionEvent: "+arg.paramString());
                         writer.printlnOut("Address: "+uiAddressText.getText());
                         writer.printlnOut("Port: "+uiPortText.getText());
-                        writer.printlnOut("Limit Scope: "+uiInScopeCheckbox.isSelected());
+                        writer.printlnOut("Limit Scope: "+uiNoNotInScopeCheckbox.isSelected());
                         writer.printlnOut("Filepath: "+getFullFilepath());
                         writer.printlnOut("Repeater: "+uiNoForwardRepeaterCheckbox.isSelected());
                         writer.printlnOut("Scanner: "+uiNoForwardScannerCheckbox.isSelected());
                         writer.printlnOut("Sqlite: "+uiSaveToSqliteCheckbox.isSelected());
-                        isLimitInScope = uiInScopeCheckbox.isSelected();
+                        isLimitInScope = uiNoNotInScopeCheckbox.isSelected();
                         isNo404TrafficForwarded = uiNoForward404Checkbox.isSelected();
                         isNoRepeaterTrafficForwarded = uiNoForwardRepeaterCheckbox.isSelected();
                         isNoScannerTrafficForwarded = uiNoForwardScannerCheckbox.isSelected();
@@ -256,10 +256,10 @@ public class BurpConfigUI implements Runnable {
         JComponent[] componentsOrdered = {
             uiOnOffButton,
             uiAddressPortPanel,
-            uiInScopeCheckbox,
             uiSaveToSqliteCheckbox,
             uiFileChooserPanel,
             new JLabel("Don't forward:"),
+            uiNoNotInScopeCheckbox,
             uiNoForwardRepeaterCheckbox,
             uiNoForwardScannerCheckbox,
             uiNoForward404Checkbox,
