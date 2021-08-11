@@ -2,10 +2,14 @@
 export default class BottomWindow {
     private elem: HTMLElement|null;
     private containerElem: HTMLElement|null;
+    private reqHeaderContainerElem: HTMLElement|null;
+    private resHeaderContainerElem: HTMLElement|null;
 
     constructor(id='bottom-window', containerId='bottom-window-container') {
         this.elem = document.getElementById(id);
         this.containerElem = document.getElementById(containerId);
+        this.reqHeaderContainerElem = document.getElementById('requests');
+        this.resHeaderContainerElem = document.getElementById('responses');
         if (!this.elem) return;
         this.elem.querySelector('#ex-button').addEventListener('click', ()=>{
             this.hide();
@@ -24,10 +28,10 @@ export default class BottomWindow {
                     console.log(reqHeaders)
                     console.log('res:');
                     console.log(resHeaders)
-                    this.containerElem.querySelector('#requests').textContent =
-                        reqHeaders.length ? reqHeaders[0] : '';
-                    this.containerElem.querySelector('#responses').textContent =
-                        resHeaders.length ? resHeaders[0] : '';
+                    this.reqHeaderContainerElem &&
+                        (this.reqHeaderContainerElem.textContent = reqHeaders.length ? reqHeaders[0] : '');
+                    this.resHeaderContainerElem &&
+                        (this.resHeaderContainerElem.textContent = resHeaders.length ? resHeaders[0] : '');
                     this.show(e.detail.id);
                     break;
             }

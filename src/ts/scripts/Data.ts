@@ -12,7 +12,7 @@ export default class Data {
         this.links = [];
     }
 
-    public addDstNode(reqData: {[key: string]: any}): Data {
+    public addDstNode(reqData: {[key: string]: any}, resHeaders: string): Data {
         let dst = reqData.protocol+'://'+reqData.host+reqData.path;
         if (!this.knownPathsSet.has(dst)) {
             this.knownPathsSet.add(dst);
@@ -21,25 +21,26 @@ export default class Data {
                 reqData.referer ? reqData.method : null,
                 reqData.statusCode,
                 reqData.headers,
-                null,
+                resHeaders,
                 1
             );
         }
         else {
             this.updateNodeMethod(dst, reqData.method);
-            this.updateNodeReqHeaders(dst, reqData.headers);
+            this.updateNodeReqHeaders(dst, resHeaders);
+            // this.updateNodeResHeaders(dst, reqData.headers);
         }
         return this;
     }
-    public addSrcNode(refData: {[key: string]: any}, resHeaders: string): Data {
+    public addSrcNode(refData: {[key: string]: any}): Data {
         let src = refData.protocol+'://'+refData.host+refData.path;
         if (!this.knownPathsSet.has(src)) {
             this.knownPathsSet.add(src);
-            this.addNode(src, null, null, null, resHeaders, 1);
+            this.addNode(src, null, null, null, null, 1);
         }
-        else {
-            this.updateNodeResHeaders(src, resHeaders);
-        }
+        // else {
+        //     this.updateNodeResHeaders(src, resHeaders);
+        // }
         return this;
     }
     public addLink(reqData: {[key: string]: any}): Data {
