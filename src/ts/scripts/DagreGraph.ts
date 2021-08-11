@@ -88,10 +88,17 @@ export default class DagreGraph implements iGraph {
                 this.svgInner.select('g').attr("transform", d3.event.transform);
             });
         this.svg.call(zoom);
+        // console.log('------------NODES--------------')
         // this.dagreGraph.nodes().forEach((v) => {
         //     console.log(v);
         //     console.log(this.dagreGraph.node(v))
         // })
+        // console.log('------------EDGES--------------')
+        // this.dagreGraph.edges().forEach((e) => {
+        //     console.log(e);
+        //     console.log(this.dagreGraph.edge(e));
+        // })
+        // console.log('------------END-EDGES--------------')
 
         // Run the renderer. This is what draws the final graph.
         this.render(this.svgInner, this.dagreGraph);
