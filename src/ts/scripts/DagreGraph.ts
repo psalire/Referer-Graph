@@ -116,7 +116,7 @@ export default class DagreGraph implements iGraph {
                 };
                 return `<div class="tooltip-buttons">`
                        +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">More info...</button>`
-                       +`<button class="btn link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</button>`
+                       // +`<button class="btn link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</button>`
                        +`<button class="btn link-secondary" onclick="${getOnClickEvent('close')}">Close</button>`
                        +`</div>`
             })

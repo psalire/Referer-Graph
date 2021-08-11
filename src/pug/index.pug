@@ -65,8 +65,13 @@ block main
                             th(colspan="2").bg-light.text-center
                                 span#headers-container-label.link-primary.clickable Associated Headers
                         tr
+                            td(colspan="2").bg-light
+                                div.d-flex.justify-content-center
+                                    div.mx-2 #
+                                    select#headers-select.form-select.py-0
+                        tr
                             td.border-bottom.text-center.bg-light Request Headers
                             td.border-bottom.text-center.bg-light Response Headers
                         tr
                             td#requests.header-container.border-end.p-2.h-100.w-100
-                            td#responses.header-container.px-2.h-100.w-100
+                            td#responses.header-container.p-2.h-100.w-100

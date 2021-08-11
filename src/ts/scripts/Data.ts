@@ -27,8 +27,8 @@ export default class Data {
         }
         else {
             this.updateNodeMethod(dst, reqData.method);
-            this.updateNodeReqHeaders(dst, resHeaders);
-            // this.updateNodeResHeaders(dst, reqData.headers);
+            this.updateNodeReqHeaders(dst, reqData.headers);
+            this.updateNodeResHeaders(dst, resHeaders);
         }
         return this;
     }

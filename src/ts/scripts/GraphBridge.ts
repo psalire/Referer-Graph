@@ -16,9 +16,11 @@ export default class GraphBridge {
     private activeGraph?: iGraph;
     private isLiveUpdateBtn: LiveUpdateButton;
     private urlFilterForm: URLFilterForm;
+    private bottomWindow: BottomWindow;
 
     constructor(initialGraph='dagre') {
-        var bottomWindow = new BottomWindow('bottom-window');
+        this.bottomWindow = new BottomWindow('bottom-window');
+        this.bottomWindow.initListeners();
 
         this.isLiveUpdateBtn = new LiveUpdateButton();
         this.isLiveUpdateBtn.getButton().addEventListener('click', ()=>{
