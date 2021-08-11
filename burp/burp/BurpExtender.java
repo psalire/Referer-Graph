@@ -107,24 +107,39 @@ public class BurpExtender implements IBurpExtender, IHttpListener, ITab, IExtens
     public void sendSqliteHistory() {
         try {
             this.sqliteReader.openConnection(this.burpUi.getFullFilepath());
-            ResultSet rs = this.sqliteReader.selectAllData();
+            ResultSet rs = this.sqliteReader.selectSrcDstData();
             while (rs.next()) {
+                writer.printlnOut("next");
+                String dstHost = rs.getString("dstHost");
+                String dstPath = rs.getString("dstPath");
+                String srcHost = rs.getString("srcHost");
+                String srcPath = rs.getString("srcPath");
+                String method = rs.getString("method");
+                String srcProtocol = rs.getString("srcProtocol");
+                String dstProtocol = rs.getString("dstProtocol");
+                String srcQuery = this.sqliteReader.selectQueryData(srcPath, srcHost).getString("query");
+                String srcHeaders = this.sqliteReader.selectHeaderData(srcPath, srcHost).getString("headers");
+                String dstHeaders = this.sqliteReader.selectHeaderData(dstPath, dstHost).getString("headers");
                 String requestBody = this.writer.jsonToString(
                     Json.createObjectBuilder().addAll(
                         JsonHelper.getRequestJson(
-                            rs.getString("method"),
-                            rs.getString("dstHost"),
-                            rs.getString("dstPath"),
-                            rs.getString("dstProtocol"),
-                            rs.getString("dstQuery"),
-                            rs.getString("reqHeaders"),
-                            rs.getString("srcProtocol")+"://"+rs.getString("srcHost")+rs.getString("srcPath"),
+                            method,
+                            dstHost,
+                            dstPath,
+                            dstProtocol,
+                            srcQuery,
+                            srcHeaders,
+                            srcProtocol+"://"+srcHost+srcPath,
                             this.writer
                         )
                     ).addAll(
-                        JsonHelper.getResponseJson(200, rs.getString("resHeaders"), this.writer)
+                        JsonHelper.getResponseJson(
+                            200,
+                            dstHeaders,
+                            this.writer
+                        )
                     ).add(
-                        "save", this.burpUi.getIsSaveTraffic()
+                        "save", false
                     ).build()
                 );
                 this.writer.printlnOut(requestBody);

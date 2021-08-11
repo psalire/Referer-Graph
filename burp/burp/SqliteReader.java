@@ -26,15 +26,18 @@ public class SqliteReader {
         this.conn = DriverManager.getConnection(url);
     }
 
-    public ResultSet selectAllData() throws SQLException {
+    private ResultSet executeSelectStatement(String statement) throws SQLException {
         if (this.conn == null) {
             throw new SQLException("conn==null");
         }
         Statement stmt = this.conn.createStatement();
-        ResultSet rs = stmt.executeQuery(
+        return stmt.executeQuery(statement);
+    }
+
+    public ResultSet selectSrcDstData() throws SQLException {
+        return this.executeSelectStatement(
             "SELECT s.path AS srcPath, d.path AS dstPath, m.method AS method, sh.host AS srcHost,"
-            +" dh.host AS dstHost, sq.query AS srcQuery, dq.query AS dstQuery, shd.headers AS reqHeaders,"
-            +" dhd.headers AS resHeaders, sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
+            +" dh.host AS dstHost, sp.protocol AS srcProtocol, dp.protocol AS dstProtocol FROM SrcDsts"
             +" LEFT JOIN Paths AS s ON srcPathId=s.id"
             +" LEFT JOIN Paths AS d ON dstPathid=d.id"
             +" LEFT JOIN Methods AS m ON methodId=m.id"
@@ -42,12 +45,31 @@ public class SqliteReader {
             +" LEFT JOIN Hosts AS dh ON d.HostId=dh.id"
             +" LEFT JOIN Protocols AS sp ON sh.ProtocolId=sp.id"
             +" LEFT JOIN Protocols AS dp ON dh.ProtocolId=dp.id"
-            +" LEFT JOIN Headers AS shd ON requestHeadersId=shd.id"
-            +" LEFT JOIN Headers AS dhd ON responseHeadersId=dhd.id"
-            +" LEFT JOIN Queries as sq ON srcPathId=sq.PathId"
-            +" LEFT JOIN Queries as dq ON dstPathId=dq.PathId"
+            // +" LEFT JOIN Headers AS shd ON requestHeadersId=shd.id"
+            // +" LEFT JOIN Headers AS dhd ON responseHeadersId=dhd.id"
+            // +" LEFT JOIN Queries as sq ON srcPathId=sq.PathId"
+            // +" LEFT JOIN Queries as dq ON dstPathId=dq.PathId"
         );
-        return rs;
+    }
+
+    public ResultSet selectHeaderData(String path, String host) throws SQLException {
+        return this.executeSelectStatement(
+            String.format(
+                "SELECT h.headers FROM (SELECT Paths.id FROM Paths JOIN Hosts ON Paths.HostId=Hosts.id WHERE path='%s') AS p"
+                +" LEFT JOIN Headers AS h ON h.PathId=p.id",
+                path
+            )
+        );
+    }
+
+    public ResultSet selectQueryData(String path, String host) throws SQLException {
+        return this.executeSelectStatement(
+            String.format(
+                "SELECT q.query FROM (SELECT Paths.id FROM Paths JOIN Hosts ON Paths.HostId=Hosts.id WHERE path='%s') AS p"
+                +" LEFT JOIN Queries AS q ON q.PathId=p.id",
+                path
+            )
+        );
     }
 
     public Connection getConnection() {

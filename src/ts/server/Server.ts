@@ -51,7 +51,7 @@ export default class Server {
             var statusCode = 204;
             var requestData = req.body.requestData;
             var responseData = req.body.responseData;
-            if (this.isSaveToSqliteOn==true) {
+            if (this.isSaveToSqliteOn==true && req.body.save==true) {
                 try {
                     await this.insertURLToDB(requestData);
                     if (requestData.referer) {
