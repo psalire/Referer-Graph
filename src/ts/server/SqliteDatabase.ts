@@ -147,7 +147,12 @@ export default class SqliteDatabase {
         this.headersModel = this.sequelize.define(
             'Header',
             {
-                headers: {
+                reqHeaders: {
+                    type: DataTypes.TEXT,
+                    allowNull: false,
+                    unique: 'headerComposite'
+                },
+                resHeaders: {
                     type: DataTypes.TEXT,
                     allowNull: false,
                     unique: 'headerComposite'

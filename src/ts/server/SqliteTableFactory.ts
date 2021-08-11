@@ -267,14 +267,15 @@ export default class SqliteTableFactory implements iSQLTableFactory {
         const parent = this;
         return new class extends aSqliteTable {
             constructor() {
-                super(parent.db.headersModel, ['headers', 'PathId']);
+                super(parent.db.headersModel, ['reqHeaders','resHeaders','PathId']);
             }
 
             public async insert(vals: string[], protocol?: string, host?: string): Promise<any> {
                 this.validateValuesLength(vals);
-                var pathObj = await parent.getPathObj(vals[1], host, protocol, false);
+                var pathObj = await parent.getPathObj(vals[2], host, protocol, false);
                 return this.model.create({
-                    headers: vals[0],
+                    reqHeaders: vals[0],
+                    resHeaders: vals[1],
                     PathId: pathObj.id
                 }).catch((e) => {
                     if (!this.isUniqueViolationError(e)) {
@@ -288,9 +289,10 @@ export default class SqliteTableFactory implements iSQLTableFactory {
                     throw new SqliteDatabaseError('missing path argument');
                 }
                 var pathObj = await parent.getPathObj(path, host, protocol, false);
-                return this.model.bulkCreate(vals.flat().map((val) => {
+                return this.model.bulkCreate(vals.map((val) => {
                     return {
-                        headers: val,
+                        reqHeaders: val[0],
+                        resHeaders: val[1],
                         PathId: pathObj.id
                     };
                 }));

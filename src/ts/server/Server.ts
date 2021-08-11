@@ -31,9 +31,6 @@ export default class Server {
         await this.db.addHost(requestData.host, requestData.protocol);
         await this.db.addPath(requestData.path, requestData.host, requestData.protocol);
         await this.db.addPathQuery(requestData.query, requestData.path, requestData.host, requestData.protocol);
-        await this.db.addHeader(
-            headers!==undefined ? headers : requestData.headers, requestData.path, requestData.host, requestData.protocol
-        );
     }
 
     public start(): void {
@@ -54,6 +51,9 @@ export default class Server {
             if (this.isSaveToSqliteOn==true && req.body.save==true) {
                 try {
                     await this.insertURLToDB(requestData);
+                    await this.db.addHeader(
+                        requestData.headers, responseData.headers, requestData.path, requestData.host, requestData.protocol
+                    );
                     if (requestData.referer) {
                         await this.insertURLToDB(requestData.referer, responseData.headers);
                         await this.db.addMethod(requestData.method);
