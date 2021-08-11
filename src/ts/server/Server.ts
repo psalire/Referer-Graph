@@ -75,7 +75,7 @@ export default class Server {
                     statusCode = 500;
                 }
             }
-            this.io.emit('data', {...requestData, ...responseData});
+            this.io.emit('data', req.body);
 
             res.status(statusCode).end();
         });

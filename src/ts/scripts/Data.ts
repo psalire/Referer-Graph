@@ -12,43 +12,43 @@ export default class Data {
         this.links = [];
     }
 
-    public addDstNode(msg: {[key: string]: any}): Data {
-        let dst = msg.protocol+'://'+msg.host+msg.path;
+    public addDstNode(reqData: {[key: string]: any}): Data {
+        let dst = reqData.protocol+'://'+reqData.host+reqData.path;
         if (!this.knownPathsSet.has(dst)) {
             this.knownPathsSet.add(dst);
             this.addNode(
                 dst,
-                msg.referer ? msg.method : null,
-                msg.statusCode,
-                msg.headers,
+                reqData.referer ? reqData.method : null,
+                reqData.statusCode,
+                reqData.headers,
                 1
             );
         }
         else {
-            this.updateNodeMethod(dst, msg.method);
-            this.addHeadersToNode(dst, msg.headers);
+            this.updateNodeMethod(dst, reqData.method);
+            this.updateNodeHeaders(dst, reqData.headers);
         }
         return this;
     }
-    public addSrcNode(msg: {[key: string]: any}): Data {
-        let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
+    public addSrcNode(refData: {[key: string]: any}, headers: string): Data {
+        let src = refData.protocol+'://'+refData.host+refData.path;
         if (!this.knownPathsSet.has(src)) {
             this.knownPathsSet.add(src);
-            this.addNode(src, null, null, msg.headers, 1);
+            this.addNode(src, null, null, headers, 1);
         }
         else {
-            this.addHeadersToNode(src, msg.headers);
+            this.updateNodeHeaders(src, headers);
         }
         return this;
     }
-    public addLink(msg: {[key: string]: any}): Data {
-        let dst = msg.protocol+'://'+msg.host+msg.path;
-        let src = msg.referer.protocol+'://'+msg.referer.host+msg.referer.path;
+    public addLink(reqData: {[key: string]: any}): Data {
+        let dst = reqData.protocol+'://'+reqData.host+reqData.path;
+        let src = reqData.referer.protocol+'://'+reqData.referer.host+reqData.referer.path;
         if (src==dst) return this;
         let srcDstStr = src+dst;
         if (!this.knownLinksSet.has(srcDstStr)) {
             this.knownLinksSet.add(srcDstStr);
-            let srcDstHosts = msg.referer.host+','+msg.host;
+            let srcDstHosts = reqData.referer.host+','+reqData.host;
             if (!this.knownPathsIndex.has(srcDstHosts)) {
                 this.knownPathsIndex.set(srcDstHosts, Math.random());
             }
@@ -56,12 +56,12 @@ export default class Data {
             this.links.push({
                 'source': src,
                 'target': dst,
-                'method': msg.method,
+                'method': reqData.method,
                 'type': type
             });
         }
         else {
-            this.updateLinkMethod(src, dst, msg.method);
+            this.updateLinkMethod(src, dst, reqData.method);
         }
         return this;
     }
@@ -93,14 +93,11 @@ export default class Data {
         });
         i!=-1 && (this.links[i].method += '|'+method);
     }
-    private addHeadersToNode(id: string, header: string) {
-        console.log('ADDING HEADERS!!!!');
+    private updateNodeHeaders(id: string, header: string) {
         var i = this.nodes.findIndex(v => {
             return v.id==id&&v.headers&&!v.headers.includes(header)
         });
         i!=-1 && (this.nodes[i].headers = this.nodes[i].headers.concat(header));
-        console.log(i+'AFTER!!!!!!!!!!!!!!');
-        i!=-1 && console.log(this.nodes[i]);
     }
     public getNodes(): object[] {
         console.log('getNodes(): '+JSON.stringify(this.nodes))

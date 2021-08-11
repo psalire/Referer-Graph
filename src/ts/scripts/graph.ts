@@ -8,10 +8,9 @@ window.onload = () => {
 
     const socket = io();
     socket.on('data', (msg) => {
-        graph.data.addDstNode(msg);
-        if (msg.referer) {
-            graph.data.addSrcNode(msg);
-            graph.data.addLink(msg);
+        graph.data.addDstNode(msg.requestData);
+        if (msg.requestData.referer) {
+            graph.data.addSrcNode(msg.requestData.referer, msg.responseData.headers).addLink(msg.requestData);
             graph.getIsLiveUpdateOn() && graph.getActiveGraph().updateGraph();
         }
     });
