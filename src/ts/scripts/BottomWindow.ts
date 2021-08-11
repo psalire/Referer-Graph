@@ -1,11 +1,11 @@
 
 export default class BottomWindow {
     private elem: HTMLElement|null;
-    private textElem: HTMLElement|null;
+    private containerElem: HTMLElement|null;
 
-    constructor(id='bottom-window', textId='bottom-window-text') {
+    constructor(id='bottom-window', containerId='bottom-window-container') {
         this.elem = document.getElementById(id);
-        this.textElem = document.getElementById(textId);
+        this.containerElem = document.getElementById(containerId);
         if (!this.elem) return;
         this.elem.querySelector('#ex-button').addEventListener('click', ()=>{
             this.hide();
@@ -14,13 +14,24 @@ export default class BottomWindow {
             if (!e || !e.detail) return;
             switch(e.detail.action) {
                 case 'close':
-                    document.getElementById(e.detail.id).dispatchEvent(new MouseEvent('click'));
                     break;
                 case 'delete':
+                    break;
                 case 'info':
-                    this.show(e.detail.id);
+                    var reqHeaders = JSON.parse(atob(e.detail.reqHeaders));
+                    var resHeaders = JSON.parse(atob(e.detail.resHeaders));
+                    console.log('req:');
+                    console.log(reqHeaders)
+                    console.log('res:');
+                    console.log(resHeaders)
+                    this.containerElem.querySelector('#requests .header-container').textContent =
+                        reqHeaders.length ? reqHeaders[0] : '';
+                    this.containerElem.querySelector('#responses .header-container').textContent =
+                        resHeaders.length ? resHeaders[0] : '';
+                    this.show();
                     break;
             }
+            document.getElementById(e.detail.id).dispatchEvent(new MouseEvent('click'));
             console.log(e.detail);
         });
     }
@@ -28,9 +39,8 @@ export default class BottomWindow {
     private hide(): void {
         this.elem && this.elem.classList.add('d-none');
     }
-    private show(id: string): void {
-        if (!this.elem || !this.textElem) return;
+    private show(): void {
+        if (!this.elem) return;
         this.elem.classList.remove('d-none');
-        this.textElem.textContent = id;
     }
 }

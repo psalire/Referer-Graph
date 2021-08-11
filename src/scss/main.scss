@@ -93,7 +93,7 @@ svg {
     svg:hover {
         cursor: pointer;
     }
-    #bottom-window-text {
+    #bottom-window-container {
         overflow-y: scroll;
     }
 }
@@ -111,4 +111,9 @@ svg {
         @extend .mx-auto;
         @extend .clickable;
     }
+}
+
+.header-container {
+    font-family: 'Courier New', monospace;
+    white-space: pre;
 }

@@ -108,7 +108,11 @@ export default class DagreGraph implements iGraph {
             .attr("title", (v) => {
                 let dataNode = this.data.getNode(this.dataMap.get(btoa(v)));
                 let getOnClickEvent = (action)=>{
-                    return `window.dispatchEvent(new CustomEvent('bottomWindow',{detail:{id:'${btoa(v)}',action:'${action}'}}))`
+                    return "window.dispatchEvent(new CustomEvent('bottomWindow',{detail:{"
+                           +`id:'${btoa(v)}',`
+                           +`reqHeaders:'${btoa(JSON.stringify(dataNode.reqHeaders))}',`
+                           +`resHeaders:'${btoa(JSON.stringify(dataNode.resHeaders))}',`
+                           +`action:'${action}'}}))`
                 };
                 return `<div class="tooltip-buttons">`
                        +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">More info...</button>`

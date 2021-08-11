@@ -21,23 +21,24 @@ export default class Data {
                 reqData.referer ? reqData.method : null,
                 reqData.statusCode,
                 reqData.headers,
+                null,
                 1
             );
         }
         else {
             this.updateNodeMethod(dst, reqData.method);
-            this.updateNodeHeaders(dst, reqData.headers);
+            this.updateNodeReqHeaders(dst, reqData.headers);
         }
         return this;
     }
-    public addSrcNode(refData: {[key: string]: any}, headers: string): Data {
+    public addSrcNode(refData: {[key: string]: any}, resHeaders: string): Data {
         let src = refData.protocol+'://'+refData.host+refData.path;
         if (!this.knownPathsSet.has(src)) {
             this.knownPathsSet.add(src);
-            this.addNode(src, null, null, headers, 1);
+            this.addNode(src, null, null, null, resHeaders, 1);
         }
         else {
-            this.updateNodeHeaders(src, headers);
+            this.updateNodeResHeaders(src, resHeaders);
         }
         return this;
     }
@@ -72,12 +73,13 @@ export default class Data {
         this.filters = undefined;
     }
 
-    private addNode(id: string, method: string|null, statusCode: number|null, headers: string, type: number): void {
+    private addNode(id: string, method: string|null, statusCode: number|null, reqHeaders: string|null, resHeaders: string|null, type: number): void {
         this.nodes.push({
             'id': id,
             'method': method,
             'statusCode': statusCode,
-            'headers': [headers],
+            'reqHeaders': reqHeaders!=null ? [reqHeaders] : [],
+            'resHeaders': resHeaders!=null ? [resHeaders] : [],
             'type': type
         });
     }
@@ -93,11 +95,17 @@ export default class Data {
         });
         i!=-1 && (this.links[i].method += '|'+method);
     }
-    private updateNodeHeaders(id: string, header: string) {
+    private updateNodeReqHeaders(id: string, header: string) {
         var i = this.nodes.findIndex(v => {
-            return v.id==id&&v.headers&&!v.headers.includes(header)
+            return v.id==id&&v.reqHeaders&&!v.reqHeaders.includes(header)
         });
-        i!=-1 && (this.nodes[i].headers = this.nodes[i].headers.concat(header));
+        i!=-1 && (this.nodes[i].reqHeaders = this.nodes[i].reqHeaders.concat(header));
+    }
+    private updateNodeResHeaders(id: string, header: string) {
+        var i = this.nodes.findIndex(v => {
+            return v.id==id&&v.resHeaders&&!v.resHeaders.includes(header)
+        });
+        i!=-1 && (this.nodes[i].resHeaders = this.nodes[i].resHeaders.concat(header));
     }
     public getNodes(): object[] {
         console.log('getNodes(): '+JSON.stringify(this.nodes))
