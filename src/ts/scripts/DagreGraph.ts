@@ -111,11 +111,13 @@ export default class DagreGraph implements iGraph {
         this.svgInner.selectAll(".node")
             .selectAll("rect")
             .classed("highlight", (v)=>{
-                return this.data.getNode(this.dataMap.get(btoa(v))).highlight;
+                return this.data.getIsHighlightNewPaths() &&
+                        this.data.getNode(this.dataMap.get(btoa(v))).highlight;
             })
         this.svgInner.selectAll(".path")
             .classed("highlight", (v)=>{
-                return this.data.getLink(this.linkMap.get(btoa(v.v+v.w))).highlight;
+                return this.data.getIsHighlightNewPaths() &&
+                        this.data.getLink(this.linkMap.get(btoa(v.v+v.w))).highlight;
             })
 
         // Add bootstrap tooltip

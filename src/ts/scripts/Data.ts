@@ -110,6 +110,12 @@ export default class Data {
         });
         i!=-1 && (this.nodes[i].resHeaders = this.nodes[i].resHeaders.concat(header));
     }
+    public getAllNodes(): object[] {
+        return this.nodes;
+    }
+    public getAllLinks(): object[] {
+        return this.links;
+    }
     public getNodes(): object[] {
         // console.log('getNodes(): '+JSON.stringify(this.nodes));
         if (this.filters !== undefined) {
@@ -170,7 +176,10 @@ export default class Data {
         this.knownPathsIndex.clear();
         return this;
     }
-    public setIsHighlightNewPaths(val: boolean) {
+    public setIsHighlightNewPaths(val: boolean): void {
         this.isHighlightNewPathsOn = val;
+    }
+    public getIsHighlightNewPaths(): boolean {
+        return this.isHighlightNewPathsOn;
     }
 }
