@@ -228,10 +228,27 @@ export default class DagreGraph implements iGraph {
             } while ((elems = document.getElementsByClassName('highlight')).length);
         };
 
+        var searchLabel = document.createElement('SPAN');
+        searchLabel.textContent = 'Search Headers';
+        var searchContainer = document.createElement('DIV');
+        searchContainer.setAttribute('class', 'input-group');
+        var searchInput = document.createElement('INPUT');
+        searchInput.setAttribute('class', 'form-control p-1');
+        searchInput.setAttribute('type', 'text')
+        var searchButton = document.createElement('BUTTON');
+        searchButton.setAttribute('class', 'btn btn-outline-secondary p-1');
+        searchButton.textContent = 'Go';
+        searchButton.onclick = ()=>{
+            this.highlightHeaders(searchInput.value);
+        }
+        searchContainer.appendChild(searchInput);
+        searchContainer.appendChild(searchButton);
+
+        var selectLabel = document.createElement('SPAN');
+        selectLabel.textContent = 'Orientation';
         var orientationSelect = document.createElement('SELECT');
         orientationSelect.id = 'orientation-select';
-        orientationSelect.classList.add('form-select');
-        orientationSelect.classList.add('p-1');
+        orientationSelect.setAttribute('class', 'form-select p-1');
         for (let val of [['LR','Left to Right'],['TB','Top to Bottom'],['RL','Right to Left'],['BT','Bottom to Top']]) {
             var option = document.createElement('OPTION');
             option.value = val[0];
@@ -241,19 +258,30 @@ export default class DagreGraph implements iGraph {
         orientationSelect.addEventListener('change', (e)=> {
             this.refreshGraph(e.target.value);
         });
-        var selectLabel = document.createElement('SPAN');
-        selectLabel.textContent = 'Orientation';
 
         return [
             refreshBtn,
             deleteBtn,
             clearHighlightsButton,
             selectLabel,
-            orientationSelect
+            orientationSelect,
+            searchLabel,
+            searchContainer
         ];
     }
-    private getSvgDimensions(): {[key: string]:number} {
-        let dims = document.getElementById(this.svgId).getBoundingClientRect();
-        return {'x':dims.width, 'y':dims.height,'xoff':dims.x,'yoff':dims.y};
+    public highlightHeaders(searchStr: string): void {
+        for (let val of this.dataMap) {
+            let dataNode = this.data.getNode(val[1]);
+            for (let header of dataNode.reqHeaders.concat(dataNode.resHeaders)) {
+                if (header.includes(searchStr)) {
+                    document.getElementById(val[0]).querySelector('rect').classList.add('highlight');
+                    break;
+                }
+            }
+        }
     }
+    // private getSvgDimensions(): {[key: string]:number} {
+    //     let dims = document.getElementById(this.svgId).getBoundingClientRect();
+    //     return {'x':dims.width, 'y':dims.height,'xoff':dims.x,'yoff':dims.y};
+    // }
 }
