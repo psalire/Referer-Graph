@@ -10,6 +10,11 @@
             stroke: $dark;
             fill: $light;
         }
+        .highlight {
+            stroke: $red !important;
+            fill: $red-200 !important;
+            stroke-width: 2px;
+        }
         rect:hover {
             cursor: pointer;
         }

@@ -46,7 +46,7 @@ export default class DagreGraph implements iGraph {
             nodesep: '20',
             ranksep: '20'
         });
-        console.log(JSON.stringify(this.dagreGraph));
+        // console.log(JSON.stringify(this.dagreGraph));
 
         // this.svg.call(zoom.transform, d3.zoomIdentity.translate(
         //     this.getSvgDimensions().x / 2, 20)
@@ -64,13 +64,13 @@ export default class DagreGraph implements iGraph {
         // Add states to the graph, set labels, and style
         for (let i=0; i<dataNodes.length; i++) {
             let node = dataNodes[i];
-            console.log(JSON.stringify(node));
+            // console.log(JSON.stringify(node));
             this.dagreGraph.setNode(node.id, {label: node.id});
             this.dataMap.set(btoa(node.id), i);
         }
         for (let link of this.data.getLinks()) {
-            console.log('link')
-            console.log(JSON.stringify(link));
+            // console.log('link')
+            // console.log(JSON.stringify(link));
             var method = link.target.method || link.method || '';
             var sourceId = link.source.id||link.source;
             var targetId = link.target.id||link.target;
@@ -115,7 +115,8 @@ export default class DagreGraph implements iGraph {
                            +`action:'${action}'}}))`
                 };
                 return `<div class="tooltip-buttons">`
-                       +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">More info...</button>`
+                       +`<button class="btn link-info" onclick="${getOnClickEvent('info')}">View Headers</button>`
+                       +`<button class="btn link-warning" onclick="${getOnClickEvent('highlight')}">Highlight Node</button>`
                        // +`<button class="btn link-danger" onclick="${getOnClickEvent('delete')}">Delete Node</button>`
                        +`<button class="btn link-secondary" onclick="${getOnClickEvent('close')}">Close</button>`
                        +`</div>`
@@ -127,7 +128,7 @@ export default class DagreGraph implements iGraph {
             .each((v) => {
                 if (this.tooltipSet.has(btoa(v))) return;
                 this.tooltipSet.add(btoa(v));
-                console.log(btoa(v));
+                // console.log(btoa(v));
                 this.tooltips.push(new Tooltip(document.getElementById(btoa(v)), {
                     container: '#graph-container',
                     placement: 'right',
@@ -135,8 +136,6 @@ export default class DagreGraph implements iGraph {
                     html: true,
                     sanitize: false,
                 }));
-                console.log(this.tooltips.length)
-                console.log(this.tooltips)
             });
 
         return this;

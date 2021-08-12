@@ -22,6 +22,15 @@ export default class BottomWindow {
             switch(e.detail.action) {
                 case 'close':
                     break;
+                case 'highlight':
+                    var nodeElem = document.getElementById(e.detail.id).querySelector('rect');
+                    if (!nodeElem) return;
+                    if (nodeElem.classList.contains('highlight')) {
+                        nodeElem.classList.remove('highlight');
+                    }
+                    else {
+                        nodeElem.classList.add('highlight');
+                    }
                 case 'delete':
                     break;
                 case 'info':

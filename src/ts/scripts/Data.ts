@@ -109,7 +109,7 @@ export default class Data {
         i!=-1 && (this.nodes[i].resHeaders = this.nodes[i].resHeaders.concat(header));
     }
     public getNodes(): object[] {
-        console.log('getNodes(): '+JSON.stringify(this.nodes))
+        // console.log('getNodes(): '+JSON.stringify(this.nodes));
         if (this.filters !== undefined) {
             return this.nodes.filter(
                 val => this.filters.every(
@@ -120,7 +120,7 @@ export default class Data {
         return this.nodes;
     }
     public getLinks(): object[] {
-        console.log('getLinks(): '+JSON.stringify(this.links));
+        // console.log('getLinks(): '+JSON.stringify(this.links));
         if (this.filters !== undefined) {
             return this.links.filter(
                 val => this.filters.every(

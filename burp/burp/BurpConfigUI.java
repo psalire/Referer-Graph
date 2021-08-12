@@ -195,7 +195,7 @@ public class BurpConfigUI implements Runnable {
                 )
             )
         );
-        JCheckBox uiNoNotInScopeCheckbox = this.createCheckBox("Not in Burp Scope traffic", this.isLimitInScope);
+        JCheckBox uiNoNotInScopeCheckbox = this.createCheckBox("Non Burp Scope traffic", this.isLimitInScope);
         JCheckBox uiNoForward404Checkbox = this.createCheckBox("404 traffic", this.isNo404TrafficForwarded);
         JCheckBox uiNoForwardRepeaterCheckbox = this.createCheckBox("Repeater traffic", this.isNoRepeaterTrafficForwarded);
         JCheckBox uiNoForwardScannerCheckbox = this.createCheckBox("Scanner traffic", this.isNoScannerTrafficForwarded);
