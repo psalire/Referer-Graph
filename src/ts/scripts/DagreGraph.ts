@@ -263,10 +263,10 @@ export default class DagreGraph implements iGraph {
             refreshBtn,
             deleteBtn,
             clearHighlightsButton,
-            selectLabel,
-            orientationSelect,
             searchLabel,
-            searchContainer
+            searchContainer,
+            selectLabel,
+            orientationSelect
         ];
     }
     public highlightHeaders(searchStr: string): void {
