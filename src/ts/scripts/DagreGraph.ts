@@ -140,10 +140,10 @@ export default class DagreGraph implements iGraph {
         this.svgInner.selectAll(".path")
             .attr("title", (v)=>{
                 return `<div class="tooltip-buttons">`
-                       +`<button class="btn link-warning" onclick=`
-                       +`"e=document.getElementById('${btoa(v.v+v.w)}');if(e.classList.contains('highlight')){e.classList.remove('highlight')}else{e.classList.add('highlight')}e.dispatchEvent(new MouseEvent('click'))"`
-                       +`>Highlight Path</button>`
-                       +`</div>`
+                       +`<button class="btn link-warning" onclick="e=document.getElementById('${btoa(v.v+v.w)}');`
+                       +`if(e.classList.contains('highlight')){e.classList.remove('highlight')}else{e.classList.add('highlight')}`
+                       +`e.dispatchEvent(new MouseEvent('click'))"`
+                       +`>Highlight Path</button></div>`
             })
             .attr("data-bs-toggle", "tooltip")
             .attr("data-bs-html", "true")
@@ -201,6 +201,16 @@ export default class DagreGraph implements iGraph {
             this.refreshGraph();
         }
 
+        var clearHighlightsButton = StyledButton.createButton('Clear Highlights');
+        clearHighlightsButton.onclick = ()=>{
+            var elems = document.getElementsByClassName('highlight');
+            do {
+                for (let elem of elems) {
+                    elem.classList.remove('highlight');
+                }
+            } while ((elems = document.getElementsByClassName('highlight')).length);
+        };
+
         var orientationSelect = document.createElement('SELECT');
         orientationSelect.id = 'orientation-select';
         orientationSelect.classList.add('form-select');
@@ -217,7 +227,7 @@ export default class DagreGraph implements iGraph {
         var selectLabel = document.createElement('SPAN');
         selectLabel.textContent = 'Orientation';
 
-        return [deleteBtn, refreshBtn, selectLabel, orientationSelect];
+        return [deleteBtn, refreshBtn, clearHighlightsButton, selectLabel, orientationSelect];
     }
     private getSvgDimensions(): {[key: string]:number} {
         let dims = document.getElementById(this.svgId).getBoundingClientRect();
