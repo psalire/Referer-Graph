@@ -4,11 +4,13 @@ import DagreGraph from './DagreGraph';
 import Data from './Data';
 import iGraph from './iGraph';
 import LiveUpdateButton from './LiveUpdateButton';
+import HighlightNewPathsButton from './HighlightNewPathsButton';
 import BottomWindow from './BottomWindow';
 import URLFilterForm from './URLFilterForm';
 
 export default class GraphBridge {
-    public data: Data = new Data();
+    private highlightNewPathsButton: HighlightNewPathsButton = new HighlightNewPathsButton();
+    public data: Data = new Data(this.highlightNewPathsButton.getIsHighlightNewPathsOn());
     private graphs: Map<string,iGraph> = new Map([
         ['dagre', new DagreGraph(this.data)],
         ['d3-force', new D3Graph(this.data)],
@@ -19,6 +21,9 @@ export default class GraphBridge {
     private bottomWindow: BottomWindow;
 
     constructor(initialGraph='dagre') {
+        this.highlightNewPathsButton.getButton().addEventListener('click', ()=>{
+            this.data.setIsHighlightNewPaths(this.highlightNewPathsButton.getIsHighlightNewPathsOn());
+        });
         this.bottomWindow = new BottomWindow('bottom-window');
         this.bottomWindow.initListeners();
 
@@ -55,6 +60,7 @@ export default class GraphBridge {
         if (btnContainer) {
             btnContainer.innerHTML = '';
             btnContainer.appendChild(this.isLiveUpdateBtn.getButton());
+            btnContainer.appendChild(this.highlightNewPathsButton.getButton());
             for (let btn of this.activeGraph.getControlComponents()) {
                 btnContainer.appendChild(btn);
             }

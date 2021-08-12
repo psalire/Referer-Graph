@@ -15,6 +15,7 @@ export default class DagreGraph implements iGraph {
     private render: object;
     private tooltips: object[];
     private dataMap: Map<string,number>;
+    private linkMap: Map<string,number>;
     private tooltipSet: Set<string>;
 
     constructor(data: Data, svgId='graph') {
@@ -22,6 +23,7 @@ export default class DagreGraph implements iGraph {
         this.svgId = svgId;
         this.tooltips = [];
         this.dataMap = new Map();
+        this.linkMap = new Map();
         this.tooltipSet = new Set();
         this.render = new dagreD3.render();
     }
@@ -68,18 +70,20 @@ export default class DagreGraph implements iGraph {
             this.dagreGraph.setNode(node.id, {label: node.id});
             this.dataMap.set(btoa(node.id), i);
         }
-        for (let link of this.data.getLinks()) {
+        var dataLinks = this.data.getLinks();
+        for (let i=0; i<dataLinks.length; i++) {
             // console.log('link')
             // console.log(JSON.stringify(link));
-            var method = link.target.method || link.method || '';
-            var sourceId = link.source.id||link.source;
-            var targetId = link.target.id||link.target;
+            var method = dataLinks[i].target.method || dataLinks[i].method || '';
+            var sourceId = dataLinks[i].source.id||dataLinks[i].source;
+            var targetId = dataLinks[i].target.id||dataLinks[i].target;
 
             this.dagreGraph.setEdge(
                 sourceId,
                 targetId,
                 {label: method}
             );
+            this.linkMap.set(btoa(sourceId+targetId), i);
         }
 
         // Create the renderer
@@ -102,6 +106,17 @@ export default class DagreGraph implements iGraph {
 
         // Run the renderer. This is what draws the final graph.
         this.render(this.svgInner, this.dagreGraph);
+
+        // Highlight new nodes & paths
+        this.svgInner.selectAll(".node")
+            .selectAll("rect")
+            .classed("highlight", (v)=>{
+                return this.data.getNode(this.dataMap.get(btoa(v))).highlight;
+            })
+        this.svgInner.selectAll(".path")
+            .classed("highlight", (v)=>{
+                return this.data.getLink(this.linkMap.get(btoa(v.v+v.w))).highlight;
+            })
 
         // Add bootstrap tooltip
         this.svgInner.selectAll(".node")
@@ -227,7 +242,13 @@ export default class DagreGraph implements iGraph {
         var selectLabel = document.createElement('SPAN');
         selectLabel.textContent = 'Orientation';
 
-        return [deleteBtn, refreshBtn, clearHighlightsButton, selectLabel, orientationSelect];
+        return [
+            refreshBtn,
+            deleteBtn,
+            clearHighlightsButton,
+            selectLabel,
+            orientationSelect
+        ];
     }
     private getSvgDimensions(): {[key: string]:number} {
         let dims = document.getElementById(this.svgId).getBoundingClientRect();

@@ -180,7 +180,7 @@ public class BurpConfigUI implements Runnable {
         );
 
         // Checkboxes
-        JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to Sqlite file", this.isSaveTraffic);
+        JCheckBox uiSaveToSqliteCheckbox = new JCheckBox("Save traffic to SQLite file", this.isSaveTraffic);
         uiSaveToSqliteCheckbox.addActionListener(
             new LoggedActionListener(
                 new InidcateChangesActionListener(

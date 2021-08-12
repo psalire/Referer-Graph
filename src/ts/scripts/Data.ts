@@ -5,11 +5,13 @@ export default class Data {
     private knownPathsSet: Set<string> = new Set();
     private knownLinksSet: Set<string> = new Set();
     private knownPathsIndex: Map<string,number> = new Map();
+    private isHighlightNewPathsOn: boolean;
     private filters?: string[];
 
-    constructor() {
+    constructor(isHighlightNewPathsOn=false) {
         this.nodes = [];
         this.links = [];
+        this.isHighlightNewPathsOn = isHighlightNewPathsOn;
     }
 
     public addDstNode(reqData: {[key: string]: any}, resHeaders: string): Data {
@@ -21,8 +23,7 @@ export default class Data {
                 reqData.referer ? reqData.method : null,
                 reqData.statusCode,
                 reqData.headers,
-                resHeaders,
-                1
+                resHeaders
             );
         }
         else {
@@ -36,7 +37,7 @@ export default class Data {
         let src = refData.protocol+'://'+refData.host+refData.path;
         if (!this.knownPathsSet.has(src)) {
             this.knownPathsSet.add(src);
-            this.addNode(src, null, null, null, null, 1);
+            this.addNode(src, null, null, null, null);
         }
         // else {
         //     this.updateNodeResHeaders(src, resHeaders);
@@ -59,7 +60,8 @@ export default class Data {
                 'source': src,
                 'target': dst,
                 'method': reqData.method,
-                'type': type
+                'type': type,
+                'highlight': this.isHighlightNewPathsOn
             });
         }
         else {
@@ -74,14 +76,14 @@ export default class Data {
         this.filters = undefined;
     }
 
-    private addNode(id: string, method: string|null, statusCode: number|null, reqHeaders: string|null, resHeaders: string|null, type: number): void {
+    private addNode(id: string, method: string|null, statusCode: number|null, reqHeaders: string|null, resHeaders: string|null): void {
         this.nodes.push({
             'id': id,
             'method': method,
             'statusCode': statusCode,
             'reqHeaders': reqHeaders!=null ? [reqHeaders] : [],
             'resHeaders': resHeaders!=null ? [resHeaders] : [],
-            'type': type
+            'highlight': this.isHighlightNewPathsOn
         });
     }
     private updateNodeMethod(id: string, method: string) {
@@ -145,6 +147,21 @@ export default class Data {
         }
         return this.nodes[index];
     }
+    public getLink(index: number): object {
+        if (this.filters !== undefined) {
+            return this.links.filter(
+                val => this.filters.every(
+                    f => {
+                        // d3.js changes the object, so have to check val.{source,target}.id
+                        var sourceVal = val.source.id || val.source;
+                        var targetVal = val.target.id || val.target;
+                        return !sourceVal.includes(f) && !targetVal.includes(f)
+                    }
+                )
+            )[index];
+        }
+        return this.links[index];
+    }
     public clear(): Data {
         this.nodes.splice(0,this.nodes.length);
         this.links.splice(0,this.links.length);
@@ -152,5 +169,8 @@ export default class Data {
         this.knownPathsSet.clear();
         this.knownPathsIndex.clear();
         return this;
+    }
+    public setIsHighlightNewPaths(val: boolean) {
+        this.isHighlightNewPathsOn = val;
     }
 }
