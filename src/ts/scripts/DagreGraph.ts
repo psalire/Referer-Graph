@@ -137,6 +137,30 @@ export default class DagreGraph implements iGraph {
                     sanitize: false,
                 }));
             });
+        this.svgInner.selectAll(".path")
+            .attr("title", (v)=>{
+                return `<div class="tooltip-buttons">`
+                       +`<button class="btn link-warning" onclick=`
+                       +`"e=document.getElementById('${btoa(v.v+v.w)}');if(e.classList.contains('highlight')){e.classList.remove('highlight')}else{e.classList.add('highlight')}e.dispatchEvent(new MouseEvent('click'))"`
+                       +`>Highlight Path</button>`
+                       +`</div>`
+            })
+            .attr("data-bs-toggle", "tooltip")
+            .attr("data-bs-html", "true")
+            .attr("data-bs-placement", "right")
+            .attr("id", (v) => btoa(v.v+v.w))
+            .each((v) => {
+                if (this.tooltipSet.has(btoa(v.v+v.w))) return;
+                this.tooltipSet.add(btoa(v.v+v.w));
+                // console.log(btoa(v));
+                this.tooltips.push(new Tooltip(document.getElementById(btoa(v.v+v.w)), {
+                    container: '#graph-container',
+                    placement: 'top',
+                    trigger: 'click',
+                    html: true,
+                    sanitize: false,
+                }));
+            });
 
         return this;
     }

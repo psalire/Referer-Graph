@@ -24,10 +24,19 @@
     }
 }
 .edgePaths {
-    .edgePath path {
-        stroke: $dark;
-        fill: $dark;
-        stroke-width: 1.5px;
+    .edgePath {
+        path {
+            stroke: $dark;
+            fill: $dark;
+            stroke-width: 1.5px;
+        }
+        .highlight {
+            stroke: $red !important;
+            stroke-width: 2px;
+        }
+    }
+    .edgePath path:hover {
+        cursor: pointer;
     }
 }
 tspan {

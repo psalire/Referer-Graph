@@ -36,10 +36,6 @@ export default class BottomWindow {
                 case 'info':
                     this.reqHeaders = JSON.parse(atob(e.detail.reqHeaders));
                     this.resHeaders = JSON.parse(atob(e.detail.resHeaders));
-                    console.log('req:');
-                    console.log(this.reqHeaders)
-                    console.log('res:');
-                    console.log(this.resHeaders)
 
                     if (this.headerSelectElem == null) break;
                     this.headerSelectElem.innerHTML = '';
