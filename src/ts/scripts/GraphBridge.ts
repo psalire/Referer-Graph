@@ -23,14 +23,6 @@ export default class GraphBridge {
     constructor(initialGraph='dagre') {
         this.highlightNewPathsButton.getButton().addEventListener('click', ()=>{
             this.data.setIsHighlightNewPaths(this.highlightNewPathsButton.getIsHighlightNewPathsOn());
-            var nodes = this.data.getAllNodes();
-            var links = this.data.getAllLinks();
-            for (let i=0; i<nodes.length; i++) {
-                nodes[i].highlight = false;
-            }
-            for (let i=0; i<links.length; i++) {
-                links[i].highlight = false;
-            }
         });
         this.bottomWindow = new BottomWindow('bottom-window');
         this.bottomWindow.initListeners();

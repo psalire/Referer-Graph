@@ -226,6 +226,15 @@ export default class DagreGraph implements iGraph {
                     elem.classList.remove('highlight');
                 }
             } while ((elems = document.getElementsByClassName('highlight')).length);
+
+            var nodes = this.data.getAllNodes();
+            var links = this.data.getAllLinks();
+            for (let i=0; i<nodes.length; i++) {
+                nodes[i].highlight = false;
+            }
+            for (let i=0; i<links.length; i++) {
+                links[i].highlight = false;
+            }
         };
 
         var searchLabel = document.createElement('SPAN');
