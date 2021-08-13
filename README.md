@@ -1,7 +1,7 @@
 
 # Referer Graph
 
-Visualize the directed graph of HTTP "Referer" headers.
+Visualize the directed graph of HTTP "Referer" headers. See [demo video](demo.mp4)
 
 ## How to Install
 
@@ -18,7 +18,7 @@ Node14, Java11, Gradle6.9
 
 Gradle version 6.9 is specifically needed; the gradle build file won't work with version 7 and some earlier versions.
 
-"sdkman" is a convenient way to install specific Java and Gradle versions. On Windows, you can use WSL to use sdkman.
+"sdkman" is a convenient way to install and switch between specific Java and Gradle versions. On Windows, you can use WSL to use sdkman.
 
 ### Node.js server
 ```
@@ -33,7 +33,7 @@ Navigate to the `burp/` directory and run:
 gradle shadowJar
 ```
 
-`burp/libs/burp-extension-web-app-flow-visualizer-all.jar` is created if successful.
+`burp-extension-web-app-flow-visualizer-all.jar` is created in directory `burp/libs/` if successful.
 
 ## How to Use
 
