@@ -1,7 +1,7 @@
 
 # Referer Graph
 
-Visualize the directed graph of HTTP "Referer" headers. See [demo video](demo.mp4)
+Visualize the directed graph of HTTP "Referer" headers. See [demo video](https://raw.githubusercontent.com/psalire/Referer-Graph/main/demo.mp4)
 
 ## How to Install
 
