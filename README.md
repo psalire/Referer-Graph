@@ -24,7 +24,7 @@ npm run build-all # Build the web app
 
 ### Building the Burp extension .jar
 
-Download the jar from releases. Alternatively, build the jar locally.
+Download the jar from [releases](https://github.com/psalire/Referer-Graph/releases/tag/jar). Alternatively, build the jar locally.
 
 #### Building the jar locally
 
@@ -41,7 +41,7 @@ Note: Gradle version 6.9 is recommended; the gradle build file may not work with
 
 Use the following steps to get everything up and running:
 
-1. In the base directory, run `npm start` to start the Node.js server
+1. Run `npm start` in the base directory to start the web-app server
 2. Import the `burp-extension-web-app-flow-visualizer-all.jar` to Burp Extender
 3. In the "Referer Graph" tab in Burp Suite, setup the configuration to your use case
 4. Navigate to `http://localhost:8000` to access the visualization web-app
