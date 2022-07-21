@@ -52,7 +52,8 @@ Use the following steps to get everything up and running:
 ## TODO
 
 - Parse URL query strings
-  - Query parameters shouldn't be treated as part of the unique URL 
+  - ~~Query parameters shouldn't be treated as part of the unique URL~~
+  - Some sites use non-standard query strings like Google
 
 ## Troubleshooting
 
