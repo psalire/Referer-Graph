@@ -49,6 +49,11 @@ Use the following steps to get everything up and running:
 3. In the "Referer Graph" tab in Burp Suite, setup the configuration to your use case
 4. Navigate to `http://localhost:8000` to access the visualization web-app
 
+## TODO
+
+- Parse URL query strings
+  - Query parameters shouldn't be treated as part of the unique URL 
+
 ## Troubleshooting
 
 ### Extension fails to connect to web-app
