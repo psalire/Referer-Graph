@@ -11,18 +11,19 @@ Referer Graph is comprised of 3 parts that work together sequentially:
 2. Node.js server
 3. Web application
 
-### Prerequisites:
+Required:
 ```
-Node14, Java11
+Node.js (version 14 recommended)
+Java    (version 11 recommended)
 ```
 
-### Building the Web App
+### 1. Building the Web App
 ```
 npm install       # Install dependencies
 npm run build-all # Build the web app
 ```
 
-### Building the Burp extension .jar
+### 2. Building the Burp extension .jar
 
 Download the jar from [releases](https://github.com/psalire/Referer-Graph/releases/tag/jar). Alternatively, build the jar locally.
 
