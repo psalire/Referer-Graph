@@ -16,13 +16,13 @@ Referer Graph is comprised of 3 parts that work together sequentially:
 Node14, Java11
 ```
 
-### Node.js server
+### Building the Web App
 ```
-npm install && \
-npm run build-all
+npm install       # Install dependencies
+npm run build-all # Build the web app
 ```
 
-### Burp extension .jar
+### Building the Burp extension .jar
 
 Download the jar from releases. Alternatively, build the jar locally.
 
