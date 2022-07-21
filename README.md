@@ -3,6 +3,8 @@
 
 Visualize the directed graph of HTTP "Referer" headers. See [demo video](https://raw.githubusercontent.com/psalire/Referer-Graph/main/demo.mp4)
 
+![Screenshot](screenshot.jpg)
+
 ## How to Install
 
 Referer Graph is comprised of 3 parts that work together sequentially:
